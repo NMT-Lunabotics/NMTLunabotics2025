@@ -10,8 +10,10 @@ Ensure you have an SSH key set up with Github
 <https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account>  
 
 Clone this repository with SSH and cd into it  
-`git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git  
-cd NMTLunabotics2025`  
+```
+git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git
+cd NMTLunabotics2025
+```
 
 Build the docker image  
 `docker build -t ros .`  
