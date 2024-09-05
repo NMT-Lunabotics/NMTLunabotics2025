@@ -28,5 +28,8 @@ See [realsense-ros2-docker](https://github.com/2b-t/realsense-ros2-docker/tree/b
 # USAGE
 
 Run the docker image  
-`docker run -it ros `
+`$ docker compose -f docker-compose-gui.yml up`
+
+If gui is not needed
+`$ docker compose -f docker-compose.yml up`
 
