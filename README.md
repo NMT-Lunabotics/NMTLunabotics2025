@@ -22,7 +22,8 @@ git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git
 cd NMTLunabotics2025
 ```
 
-See [realsense-ros2-docker](realsense-ros2-docker) for more information
+See [realsense-ros2-docker](https://github.com/2b-t/realsense-ros2-docker/tree/b8ceee5b17634996cca1bd7c50b12fc588c581c8?tab=readme-ov-file#2-launching) to setup docker environment  
+
 
 # USAGE
 
