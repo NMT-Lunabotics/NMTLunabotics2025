@@ -22,8 +22,7 @@ git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git
 cd NMTLunabotics2025
 ```
 
-Build the docker image  
-`docker build -t ros .`  
+See [realsense-ros2-docker](realsense-ros2-docker) for more information
 
 # USAGE
 

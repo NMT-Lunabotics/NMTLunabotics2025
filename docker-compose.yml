@@ -24,4 +24,8 @@ services:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'c 81:* rmw'
+      - 'c 189:* rmw'
  
