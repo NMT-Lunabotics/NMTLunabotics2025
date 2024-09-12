@@ -33,3 +33,6 @@ Run the docker image
 If gui is not needed
 `$ docker compose -f docker-compose.yml up`
 
+# Helpful Docs
+<https://github.com/ros2/teleop_twist_joy/tree/humble/>
+<https://github.com/ros-drivers/joystick_drivers/blob/ros2/joy/README.md>
