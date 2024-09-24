@@ -40,6 +40,7 @@ sudo apt install python3-colcon-common-extensions
 
 Build packages  
 ```
+source /opt/ros/humble/setup.bash
 cd <path_to_repo>/ros2_ws
 colcon build --symlink-install
 ```
