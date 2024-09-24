@@ -1,38 +1,28 @@
 # NMTLunabotics2025
 The main repository for the New Mexico Tech Lunabotics 2025 competition Team
 
-# INSTALLATION
+# Installation
 
-Install docker  
-<https://docs.docker.com/engine/install/ubuntu/>  
-
-To use docker without sudo, run the following commands  
+Robot dependencies
+TODO: Make sure this list is complete
 ```
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-Ensure you have an SSH key set up with Github  
-<https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account>  
-
-Clone this repository with SSH and cd into it  
-```
-git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git
-cd NMTLunabotics2025
+sudo apt install -y ros-humble-joy
+sudo apt install -y ros-humble-teleop-twist-joy
+sudo apt install -y ros-humble-slam-toolbox
+sudo apt install -y ros-humble-realsense2-camera
+sudo apt install -y ros-humble-librealsense2
+ros-humble-rmw-cyclonedds-cpp
+ros2-humble-usb-cam
+ros-humble-image-transport-plugins
 ```
 
-See [realsense-ros2-docker](https://github.com/2b-t/realsense-ros2-docker/tree/b8ceee5b17634996cca1bd7c50b12fc588c581c8?tab=readme-ov-file#2-launching) to setup docker environment  
-https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md
+Remote dependencies
+```
+sudo apt install -y ros-humble-joy
+sudo apt install -y ros-humble-teleop-twist-joy
+```
 
-# USAGE
+# Usage
 
-Run the docker image  
-`$ docker compose -f docker-compose-gui.yml up`
-
-If gui is not needed
-`$ docker compose -f docker-compose.yml up`
-
-# Helpful Docs
-<https://github.com/ros2/teleop_twist_joy/tree/humble/>
-<https://github.com/ros-drivers/joystick_drivers/blob/ros2/joy/README.md>
+Run slam toolbox with rplidar
+`ros2 launch slam_config slam_launch.py`
