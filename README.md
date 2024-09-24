@@ -24,5 +24,12 @@ sudo apt install -y ros-humble-teleop-twist-joy
 
 # Usage
 
+## Robot
+
 Run slam toolbox with rplidar
 `ros2 launch slam_config slam_launch.py`
+
+## Remote
+
+Run teleop node
+`ros2 launch teleop teleop_launch.py`
