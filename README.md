@@ -22,7 +22,7 @@ Remote dependencies
 ```
 sudo apt install -y ros-humble-joy
 sudo apt install -y ros-humble-teleop-twist-joy
-sudo apt install -y humble-rmw-cyclonedds-cpp
+sudo apt install -y ros-humble-rmw-cyclonedds-cpp
 ```
 
 Add ssh key to github  
