@@ -28,16 +28,16 @@ sudo apt install -y ros-humble-rmw-cyclonedds-cpp
 Add ssh key to github  
 <https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account>
 
-Clone repo
+Clone repo  
 `git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git`
 
-Build packages
+Build packages  
 ```
 cd <path_to_repo>/ros2_ws
 colcon buld --symlink-install
 ```
 
-Add the following lines to your bashrc.
+Add the following lines to your bashrc.  
 ```
 source /opt/ros/humble/setup.bash
 source <path_to_repo>/ros2_ws/install/setup.bash
