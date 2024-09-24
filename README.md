@@ -13,15 +13,16 @@ sudo apt install -y ros-humble-teleop-twist-joy
 sudo apt install -y ros-humble-slam-toolbox
 sudo apt install -y ros-humble-realsense2-camera
 sudo apt install -y ros-humble-librealsense2
-ros-humble-rmw-cyclonedds-cpp
-ros2-humble-usb-cam
-ros-humble-image-transport-plugins
+sudo apt install -y humble-rmw-cyclonedds-cpp
+sudo apt install -y ros2-humble-usb-cam
+sudo apt install -y ros-humble-image-transport-plugins
 ```
 
 Remote dependencies
 ```
 sudo apt install -y ros-humble-joy
 sudo apt install -y ros-humble-teleop-twist-joy
+sudo apt install -y humble-rmw-cyclonedds-cpp
 ```
 
 # Usage
