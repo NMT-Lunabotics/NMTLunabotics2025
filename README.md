@@ -31,6 +31,12 @@ Add ssh key to github
 Clone repo  
 `git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git`
 
+Install colcon
+```
+sudo apt install python3-pip
+sudo apt install python3-colcon-common-extensions
+```
+
 Build packages  
 ```
 cd <path_to_repo>/ros2_ws
