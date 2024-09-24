@@ -16,6 +16,7 @@ sudo apt install -y ros-humble-librealsense2
 sudo apt install -y humble-rmw-cyclonedds-cpp
 sudo apt install -y ros-humble-usb-cam
 sudo apt install -y ros-humble-image-transport-plugins
+sudo apt install -y ros-humble-pointlcoud-to-laserscan
 ```
 
 Remote dependencies
@@ -40,7 +41,7 @@ sudo apt install python3-colcon-common-extensions
 Build packages  
 ```
 cd <path_to_repo>/ros2_ws
-colcon buld --symlink-install
+colcon build --symlink-install
 ```
 
 Add the following lines to your bashrc.  
