@@ -3,6 +3,8 @@ The main repository for the New Mexico Tech Lunabotics 2025 competition Team
 
 # Installation
 
+This system has been tested on Ros 2 humble with ubuntu 22. Teleop node works on Ros 2 Foxy with Ubuntu 20.
+
 Robot dependencies
 TODO: Make sure this list is complete
 ```
