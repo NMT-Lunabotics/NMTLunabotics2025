@@ -1,0 +1,168 @@
+[0.000000] (-) TimerEvent: {}
+[0.000627] (realsense2_camera_msgs) JobQueued: {'identifier': 'realsense2_camera_msgs', 'dependencies': OrderedDict()}
+[0.000664] (teleop) JobQueued: {'identifier': 'teleop', 'dependencies': OrderedDict()}
+[0.000694] (realsense2_camera) JobQueued: {'identifier': 'realsense2_camera', 'dependencies': OrderedDict([('realsense2_camera_msgs', '/home/ndev/luna/install/realsense2_camera_msgs')])}
+[0.000719] (realsense2_description) JobQueued: {'identifier': 'realsense2_description', 'dependencies': OrderedDict([('realsense2_camera_msgs', '/home/ndev/luna/install/realsense2_camera_msgs')])}
+[0.000740] (realsense2_camera_msgs) JobStarted: {'identifier': 'realsense2_camera_msgs'}
+[0.013283] (teleop) JobStarted: {'identifier': 'teleop'}
+[0.021801] (realsense2_camera_msgs) JobProgress: {'identifier': 'realsense2_camera_msgs', 'progress': 'cmake'}
+[0.022009] (realsense2_camera_msgs) Command: {'cmd': ['/usr/bin/cmake', '/home/ndev/luna/ros2_ws/src/realsense-ros/realsense2_camera_msgs', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/home/ndev/luna/install/realsense2_camera_msgs'], 'cwd': '/home/ndev/luna/build/realsense2_camera_msgs', 'env': OrderedDict([('CONDA_PROMPT_MODIFIER', '(base)'), ('USER', 'ndev'), ('XDG_SEAT', 'seat0'), ('SSH_AGENT_PID', '3318'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib'), ('HOME', '/home/ndev'), ('OLDPWD', '/home/ndev/luna/ros2_ws/src'), ('LESS', '-R'), ('CONDA_SHLVL', '1'), ('DESKTOP_SESSION', 'awesome'), ('ZSH', '/home/ndev/.oh-my-zsh'), ('LSCOLORS', 'Gxfxcxdxbxegedabagacad'), ('GTK_MODULES', 'gail:atk-bridge'), ('PAGER', 'less'), ('ROS_PYTHON_VERSION', '3'), ('NIX_PROFILES', '/nix/var/nix/profiles/default /home/ndev/.nix-profile'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('P9K_TTY', 'old'), ('COLORTERM', 'truecolor'), ('_CE_M', ''), ('ROS_DISTRO', 'foxy'), ('COLCON_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install'), ('LOGNAME', 'ndev'), ('_P9K_SSH_TTY', '/dev/pts/0'), ('_', '/usr/bin/colcon'), ('XDG_SESSION_CLASS', 'user'), ('ROS_VERSION', '2'), ('XDG_SESSION_ID', '2'), ('USERNAME', 'ndev'), ('TERM', 'xterm-256color'), ('_CE_CONDA', ''), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/foxy/bin:/home/ndev/miniconda3/bin:/home/ndev/miniconda3/condabin:/home/ndev/canspec/canspec.py:/home/ndev/ovito-basic-3.10.1-x86_64/bin:/var/ros/nixWrappers:/home/ndev/.cargo/bin:/root/.cargo/bin:/usr/local/bin:/home/ndev/bin:/home/ndev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/ndev/bin:/home/ndev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/var/ros/nixWrappers'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/a90565b1_5af0_4131_8dc0_512abb7289a7'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':1'), ('LANG', 'en_US.UTF-8'), ('RMW_IMPLEMENTATION', 'rmw_cyclonedds_cpp'), ('XDG_SESSION_DESKTOP', 'awesome'), ('GNOME_TERMINAL_SERVICE', ':1.14'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/tmp/ssh-qYzGKK4de0xT/agent.3253'), ('CONDA_PYTHON_EXE', '/home/ndev/miniconda3/bin/python'), ('AMENT_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install/teleop:/opt/ros/foxy'), ('ROS_DOMAIN_ID', '1'), ('SHELL', '/usr/bin/zsh'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'awesome'), ('_JAVA_AWT_WM_NONREPARENTING', '1'), ('CONDA_DEFAULT_ENV', 'base'), ('NIX_SSL_CERT_FILE', '/etc/ssl/certs/ca-certificates.crt'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('P9K_SSH', '0'), ('XDG_VTNR', '2'), ('PWD', '/home/ndev/luna/build/realsense2_camera_msgs'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-awesome:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/awesome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop:/home/ndev/.nix-profile/share:/nix/var/nix/profiles/default/share:/home/ndev/.nix-profile/share:/nix/var/nix/profiles/default/share'), ('_P9K_TTY', '/dev/pts/0'), ('VIRTUAL_ENV_DISABLE_PROMPT', '1'), ('CONDA_EXE', '/home/ndev/miniconda3/bin/conda'), ('PYTHONPATH', '/opt/ros/foxy/lib/python3.8/site-packages'), ('CONDA_PREFIX', '/home/ndev/miniconda3'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install/teleop:/opt/ros/foxy')]), 'shell': False}
+[0.030246] (teleop) JobProgress: {'identifier': 'teleop', 'progress': 'cmake'}
+[0.032326] (teleop) Command: {'cmd': ['/usr/bin/cmake', '/home/ndev/luna/ros2_ws/src/teleop', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/home/ndev/luna/install/teleop'], 'cwd': '/home/ndev/luna/build/teleop', 'env': OrderedDict([('CONDA_PROMPT_MODIFIER', '(base)'), ('USER', 'ndev'), ('XDG_SEAT', 'seat0'), ('SSH_AGENT_PID', '3318'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib'), ('HOME', '/home/ndev'), ('OLDPWD', '/home/ndev/luna/ros2_ws/src'), ('LESS', '-R'), ('CONDA_SHLVL', '1'), ('DESKTOP_SESSION', 'awesome'), ('ZSH', '/home/ndev/.oh-my-zsh'), ('LSCOLORS', 'Gxfxcxdxbxegedabagacad'), ('GTK_MODULES', 'gail:atk-bridge'), ('PAGER', 'less'), ('ROS_PYTHON_VERSION', '3'), ('NIX_PROFILES', '/nix/var/nix/profiles/default /home/ndev/.nix-profile'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('P9K_TTY', 'old'), ('COLORTERM', 'truecolor'), ('_CE_M', ''), ('ROS_DISTRO', 'foxy'), ('COLCON_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install'), ('LOGNAME', 'ndev'), ('_P9K_SSH_TTY', '/dev/pts/0'), ('_', '/usr/bin/colcon'), ('XDG_SESSION_CLASS', 'user'), ('ROS_VERSION', '2'), ('XDG_SESSION_ID', '2'), ('USERNAME', 'ndev'), ('TERM', 'xterm-256color'), ('_CE_CONDA', ''), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/foxy/bin:/home/ndev/miniconda3/bin:/home/ndev/miniconda3/condabin:/home/ndev/canspec/canspec.py:/home/ndev/ovito-basic-3.10.1-x86_64/bin:/var/ros/nixWrappers:/home/ndev/.cargo/bin:/root/.cargo/bin:/usr/local/bin:/home/ndev/bin:/home/ndev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/ndev/bin:/home/ndev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/var/ros/nixWrappers'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/a90565b1_5af0_4131_8dc0_512abb7289a7'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':1'), ('LANG', 'en_US.UTF-8'), ('RMW_IMPLEMENTATION', 'rmw_cyclonedds_cpp'), ('XDG_SESSION_DESKTOP', 'awesome'), ('GNOME_TERMINAL_SERVICE', ':1.14'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/tmp/ssh-qYzGKK4de0xT/agent.3253'), ('CONDA_PYTHON_EXE', '/home/ndev/miniconda3/bin/python'), ('AMENT_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install/teleop:/opt/ros/foxy'), ('ROS_DOMAIN_ID', '1'), ('SHELL', '/usr/bin/zsh'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'awesome'), ('_JAVA_AWT_WM_NONREPARENTING', '1'), ('CONDA_DEFAULT_ENV', 'base'), ('NIX_SSL_CERT_FILE', '/etc/ssl/certs/ca-certificates.crt'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('P9K_SSH', '0'), ('XDG_VTNR', '2'), ('PWD', '/home/ndev/luna/build/teleop'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-awesome:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/awesome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop:/home/ndev/.nix-profile/share:/nix/var/nix/profiles/default/share:/home/ndev/.nix-profile/share:/nix/var/nix/profiles/default/share'), ('_P9K_TTY', '/dev/pts/0'), ('VIRTUAL_ENV_DISABLE_PROMPT', '1'), ('CONDA_EXE', '/home/ndev/miniconda3/bin/conda'), ('PYTHONPATH', '/opt/ros/foxy/lib/python3.8/site-packages'), ('CONDA_PREFIX', '/home/ndev/miniconda3'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/ndev/luna/ros2_ws/install/teleop:/opt/ros/foxy')]), 'shell': False}
+[0.099877] (-) TimerEvent: {}
+[0.143575] (realsense2_camera_msgs) StdoutLine: {'line': b'-- The C compiler identification is GNU 9.4.0\n'}
+[0.144437] (teleop) StdoutLine: {'line': b'-- The C compiler identification is GNU 9.4.0\n'}
+[0.200262] (-) TimerEvent: {}
+[0.250460] (realsense2_camera_msgs) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 9.4.0\n'}
+[0.250742] (teleop) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 9.4.0\n'}
+[0.256751] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc\n'}
+[0.256975] (teleop) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc\n'}
+[0.300487] (-) TimerEvent: {}
+[0.351356] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc -- works\n'}
+[0.352054] (teleop) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc -- works\n'}
+[0.354574] (teleop) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.355223] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.400677] (-) TimerEvent: {}
+[0.448472] (teleop) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.448826] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.456123] (teleop) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.456528] (teleop) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.457556] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.457858] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.459094] (teleop) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++\n'}
+[0.459840] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++\n'}
+[0.500814] (-) TimerEvent: {}
+[0.574493] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ -- works\n'}
+[0.574969] (teleop) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ -- works\n'}
+[0.576624] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.576901] (teleop) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.600943] (-) TimerEvent: {}
+[0.674102] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.674425] (teleop) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.685423] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.685791] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.686716] (teleop) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.687120] (teleop) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.690508] (teleop) StdoutLine: {'line': b'-- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)\n'}
+[0.690626] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)\n'}
+[0.701093] (-) TimerEvent: {}
+[0.718330] (teleop) StdoutLine: {'line': b'-- Found PythonInterp: /home/ndev/miniconda3/bin/python3 (found suitable version "3.11.5", minimum required is "3") \n'}
+[0.718654] (teleop) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /home/ndev/miniconda3/bin/python3\n'}
+[0.718915] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found PythonInterp: /home/ndev/miniconda3/bin/python3 (found suitable version "3.11.5", minimum required is "3") \n'}
+[0.719137] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /home/ndev/miniconda3/bin/python3\n'}
+[0.801266] (-) TimerEvent: {}
+[0.889006] (teleop) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.889267] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.901701] (-) TimerEvent: {}
+[0.921506] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.0.1 (/opt/ros/foxy/share/rosidl_default_generators/cmake)\n'}
+[0.921730] (teleop) StdoutLine: {'line': b'-- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)\n'}
+[0.925751] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.933331] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)\n'}
+[0.968251] (teleop) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.974374] (teleop) StdoutLine: {'line': b'-- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)\n'}
+[1.001900] (-) TimerEvent: {}
+[1.086003] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  \n'}
+[1.093377] (teleop) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  \n'}
+[1.101971] (-) TimerEvent: {}
+[1.114536] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/foxy/include  \n'}
+[1.123927] (teleop) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/foxy/include  \n'}
+[1.194112] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.196307] (teleop) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.202321] (-) TimerEvent: {}
+[1.219006] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)\n'}
+[1.230589] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found std_msgs: 2.0.5 (/opt/ros/foxy/share/std_msgs/cmake)\n'}
+[1.247970] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)\n'}
+[1.248091] (teleop) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)\n'}
+[1.249556] (teleop) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_cyclonedds_cpp' as default\n"}
+[1.250856] (teleop) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[1.302488] (-) TimerEvent: {}
+[1.332234] (teleop) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[1.332572] (teleop) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.361273] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Found PythonInterp: /home/ndev/miniconda3/bin/python3 (found version "3.11.5") \n'}
+[1.402874] (realsense2_camera_msgs) StderrLine: {'line': b'CMake Error at /opt/ros/foxy/share/rosidl_adapter/cmake/rosidl_adapt_interfaces.cmake:60 (message):\n'}
+[1.403147] (-) TimerEvent: {}
+[1.403265] (realsense2_camera_msgs) StderrLine: {'line': b'  execute_process(/home/ndev/miniconda3/bin/python3 -m rosidl_adapter\n'}
+[1.403333] (realsense2_camera_msgs) StderrLine: {'line': b'  --package-name realsense2_camera_msgs --arguments-file\n'}
+[1.403384] (realsense2_camera_msgs) StderrLine: {'line': b'  /home/ndev/luna/build/realsense2_camera_msgs/rosidl_adapter__arguments__realsense2_camera_msgs.json\n'}
+[1.403441] (realsense2_camera_msgs) StderrLine: {'line': b'  --output-dir\n'}
+[1.403487] (realsense2_camera_msgs) StderrLine: {'line': b'  /home/ndev/luna/build/realsense2_camera_msgs/rosidl_adapter/realsense2_camera_msgs\n'}
+[1.403536] (realsense2_camera_msgs) StderrLine: {'line': b'  --output-file\n'}
+[1.403730] (realsense2_camera_msgs) StderrLine: {'line': b'  /home/ndev/luna/build/realsense2_camera_msgs/rosidl_adapter/realsense2_camera_msgs.idls)\n'}
+[1.403787] (realsense2_camera_msgs) StderrLine: {'line': b'  returned error code 1:\n'}
+[1.403835] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.403882] (realsense2_camera_msgs) StderrLine: {'line': b"  AttributeError processing template 'msg.idl.em'\n"}
+[1.403932] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.403985] (realsense2_camera_msgs) StderrLine: {'line': b'  Traceback (most recent call last):\n'}
+[1.404037] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404089] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/resource/__init__.py", line 51, in evaluate_template\n'}
+[1.404147] (realsense2_camera_msgs) StderrLine: {'line': b'      em.BUFFERED_OPT: True,\n'}
+[1.404200] (realsense2_camera_msgs) StderrLine: {'line': b'      ^^^^^^^^^^^^^^^\n'}
+[1.404253] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404306] (realsense2_camera_msgs) StderrLine: {'line': b"  AttributeError: module 'em' has no attribute 'BUFFERED_OPT'\n"}
+[1.404358] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404412] (realsense2_camera_msgs) StderrLine: {'line': b'  \n'}
+[1.404463] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404514] (realsense2_camera_msgs) StderrLine: {'line': b'  During handling of the above exception, another exception occurred:\n'}
+[1.404567] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404619] (realsense2_camera_msgs) StderrLine: {'line': b'  \n'}
+[1.404681] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404735] (realsense2_camera_msgs) StderrLine: {'line': b'  Traceback (most recent call last):\n'}
+[1.404788] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.404841] (realsense2_camera_msgs) StderrLine: {'line': b'    File "<frozen runpy>", line 198, in _run_module_as_main\n'}
+[1.404892] (realsense2_camera_msgs) StderrLine: {'line': b'    File "<frozen runpy>", line 88, in _run_code\n'}
+[1.404944] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/__main__.py", line 19, in <module>\n'}
+[1.404997] (realsense2_camera_msgs) StderrLine: {'line': b'      sys.exit(main())\n'}
+[1.405049] (realsense2_camera_msgs) StderrLine: {'line': b'               ^^^^^^\n'}
+[1.405100] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/main.py", line 53, in main\n'}
+[1.405149] (realsense2_camera_msgs) StderrLine: {'line': b'      abs_idl_file = convert_to_idl(\n'}
+[1.405196] (realsense2_camera_msgs) StderrLine: {'line': b'                     ^^^^^^^^^^^^^^^\n'}
+[1.405250] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/__init__.py", line 19, in convert_to_idl\n'}
+[1.405299] (realsense2_camera_msgs) StderrLine: {'line': b'      return convert_msg_to_idl(\n'}
+[1.405346] (realsense2_camera_msgs) StderrLine: {'line': b'             ^^^^^^^^^^^^^^^^^^^\n'}
+[1.405392] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/msg/__init__.py", line 39, in convert_msg_to_idl\n'}
+[1.405440] (realsense2_camera_msgs) StderrLine: {'line': b"      expand_template('msg.idl.em', data, output_file, encoding='iso-8859-1')\n"}
+[1.405487] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/resource/__init__.py", line 23, in expand_template\n'}
+[1.405534] (realsense2_camera_msgs) StderrLine: {'line': b'      content = evaluate_template(template_name, data)\n'}
+[1.405579] (realsense2_camera_msgs) StderrLine: {'line': b'                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n'}
+[1.405641] (realsense2_camera_msgs) StderrLine: {'line': b'    File "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_adapter/resource/__init__.py", line 69, in evaluate_template\n'}
+[1.405741] (realsense2_camera_msgs) StderrLine: {'line': b'      _interpreter.shutdown()\n'}
+[1.405807] (realsense2_camera_msgs) StderrLine: {'line': b'      ^^^^^^^^^^^^^^^^^^^^^\n'}
+[1.405855] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.405903] (realsense2_camera_msgs) StderrLine: {'line': b"  AttributeError: 'NoneType' object has no attribute 'shutdown'\n"}
+[1.405951] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.405999] (realsense2_camera_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[1.406047] (realsense2_camera_msgs) StderrLine: {'line': b'  /opt/ros/foxy/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:130 (rosidl_adapt_interfaces)\n'}
+[1.406106] (realsense2_camera_msgs) StderrLine: {'line': b'  CMakeLists.txt:39 (rosidl_generate_interfaces)\n'}
+[1.406156] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.406204] (realsense2_camera_msgs) StderrLine: {'line': b'\n'}
+[1.406252] (realsense2_camera_msgs) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[1.406311] (realsense2_camera_msgs) StdoutLine: {'line': b'See also "/home/ndev/luna/build/realsense2_camera_msgs/CMakeFiles/CMakeOutput.log".\n'}
+[1.415794] (realsense2_camera_msgs) CommandEnded: {'returncode': 1}
+[1.421676] (teleop) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed\n'}
+[1.422729] (teleop) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads\n'}
+[1.452227] (realsense2_camera_msgs) JobEnded: {'identifier': 'realsense2_camera_msgs', 'rc': 1}
+[1.503395] (-) TimerEvent: {}
+[1.515423] (teleop) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads - not found\n'}
+[1.516033] (teleop) StdoutLine: {'line': b'-- Looking for pthread_create in pthread\n'}
+[1.603720] (-) TimerEvent: {}
+[1.628151] (teleop) StdoutLine: {'line': b'-- Looking for pthread_create in pthread - found\n'}
+[1.628447] (teleop) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.704176] (-) TimerEvent: {}
+[1.743971] (teleop) StdoutLine: {'line': b'-- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)\n'}
+[1.804269] (-) TimerEvent: {}
+[1.823189] (teleop) StdoutLine: {'line': b'-- Found teleop_twist_joy: 2.4.3 (/opt/ros/foxy/share/teleop_twist_joy/cmake)\n'}
+[1.825736] (teleop) StdoutLine: {'line': b'-- Found joy: 3.0.1 (/opt/ros/foxy/share/joy/cmake)\n'}
+[1.827101] (teleop) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.9.8 (/opt/ros/foxy/share/ament_lint_auto/cmake)\n'}
+[1.904495] (-) TimerEvent: {}
+[1.924791] (teleop) StdoutLine: {'line': b"-- Added test 'copyright' to check source files copyright and LICENSE\n"}
+[1.926603] (teleop) StdoutLine: {'line': b"-- Added test 'flake8' to check Python code syntax and style conventions\n"}
+[1.927144] (teleop) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[1.927620] (teleop) StdoutLine: {'line': b"-- Added test 'pep257' to check Python code against some of the style conventions in PEP 257\n"}
+[1.928691] (teleop) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[1.932708] (teleop) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.935385] (teleop) StdoutLine: {'line': b'-- Generating done\n'}
+[1.935873] (teleop) StdoutLine: {'line': b'-- Build files have been written to: /home/ndev/luna/build/teleop\n'}
+[1.945064] (teleop) JobEnded: {'identifier': 'teleop', 'rc': 'SIGINT'}
+[1.956618] (realsense2_camera) JobSkipped: {'identifier': 'realsense2_camera'}
+[1.956809] (realsense2_description) JobSkipped: {'identifier': 'realsense2_description'}
+[1.956873] (-) EventReactorShutdown: {}
