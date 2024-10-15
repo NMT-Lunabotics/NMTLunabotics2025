@@ -26,9 +26,9 @@ def generate_launch_description():
             parameters=[{
                 'require_enable_button': False,
                 'axis_linear.x': 1,
-                'scale_linear.x': 1.0,
+                'scale_linear.x': 0.25,
                 'axis_angular.yaw': 0,
-                'scale_angular.yaw': 2.0,
+                'scale_angular.yaw': 1.0,
                 'inverted_reverse': False
             }]
         ),
