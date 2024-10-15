@@ -35,7 +35,7 @@ def generate_launch_description():
             'depth_topic': '/camera/camera/depth/image_rect_raw',
             'rgb_topic': '/camera/camera/color/image_raw',
             'camera_info_topic': '/camera/camera/color/camera_info',
-            'rtabmapviz': 'true',
+            'rtabmapviz': 'false',
             'localization': 'true',
             'approx_sync': 'true',
         }.items()
