@@ -1,9 +1,9 @@
 motor_control_node:
   ros__parameters:
     cmd_vel_topic: "/cmd_vel"
-    wheel_base: 0.5
-    wheel_diameter: 0.15
-    max_rpm: 100
-    min_rpm: 10
+    wheel_base: 0.161
+    wheel_diameter: 0.067
+    max_rpm: 300
+    min_rpm: 5
     arduino_serial_device: "/dev/ttyACM0" 
 
