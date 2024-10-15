@@ -1,0 +1,90 @@
+[0.142s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--packages-select', 'motor_control']
+[0.142s] DEBUG:colcon:Parsed command line arguments: Namespace(allow_overriding=[], ament_cmake_args=None, base_paths=['.'], build_base='build', catkin_cmake_args=None, catkin_skip_building_tests=False, cmake_args=None, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, cmake_target=None, cmake_target_skip_unavailable=False, continue_on_error=False, event_handlers=None, executor='parallel', ignore_user_meta=False, install_base='install', log_base=None, log_level=None, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7faa43b62070>>, merge_install=False, metas=['./colcon.meta'], mixin=None, mixin_files=None, mixin_verb=('build',), packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_end=None, packages_ignore=None, packages_ignore_regex=None, packages_select=['motor_control'], packages_select_build_failed=False, packages_select_by_dep=None, packages_select_regex=None, packages_select_test_failures=False, packages_skip=None, packages_skip_build_finished=False, packages_skip_by_dep=None, packages_skip_regex=None, packages_skip_test_passed=False, packages_skip_up_to=None, packages_start=None, packages_up_to=None, packages_up_to_regex=None, parallel_workers=16, paths=None, symlink_install=False, test_result_base=None, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7faa43b62070>, verb_name='build', verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7faa43b626d0>)
+[0.256s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.256s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.256s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.256s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.256s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.257s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.257s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/ndev/luna/ros2_ws/src/motor_control'
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.257s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.267s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_python' and name 'motor_control'
+[0.267s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.267s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.267s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.267s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.267s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.279s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.279s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.281s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 2 installed packages in /home/ndev/luna/ros2_ws/install
+[0.282s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 272 installed packages in /opt/ros/foxy
+[0.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_args' from command line to 'None'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_target' from command line to 'None'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_clean_cache' from command line to 'False'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_clean_first' from command line to 'False'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'cmake_force_configure' from command line to 'False'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'ament_cmake_args' from command line to 'None'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'catkin_cmake_args' from command line to 'None'
+[0.344s] Level 5:colcon.colcon_core.verb:set package 'motor_control' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.344s] DEBUG:colcon.colcon_core.verb:Building package 'motor_control' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control', 'merge_install': False, 'path': '/home/ndev/luna/ros2_ws/src/motor_control', 'symlink_install': False, 'test_result_base': None}
+[0.344s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.345s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.345s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/ndev/luna/ros2_ws/src/motor_control' with build type 'ament_python'
+[0.345s] Level 1:colcon.colcon_core.shell:create_environment_hook('motor_control', 'ament_prefix_path')
+[0.347s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.347s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/ament_prefix_path.ps1'
+[0.347s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/ament_prefix_path.dsv'
+[0.348s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/ament_prefix_path.sh'
+[0.348s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.348s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.523s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/ndev/luna/ros2_ws/src/motor_control'
+[0.523s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.523s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.893s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/ndev/luna/ros2_ws/src/motor_control': CONDA_PROMPT_MODIFIER=(base) PYTHONPATH=/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/motor_control build --build-base /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build install --record /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/install.log --install-scripts $base/lib/motor_control --single-version-externally-managed install_data
+[1.137s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/ndev/luna/ros2_ws/src/motor_control' returned '0': CONDA_PROMPT_MODIFIER=(base) PYTHONPATH=/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/motor_control build --build-base /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build install --record /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/install.log --install-scripts $base/lib/motor_control --single-version-externally-managed install_data
+[1.140s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control' for CMake module files
+[1.140s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control' for CMake config files
+[1.141s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib'
+[1.141s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/bin'
+[1.141s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/pkgconfig/motor_control.pc'
+[1.142s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages'
+[1.142s] Level 1:colcon.colcon_core.shell:create_environment_hook('motor_control', 'pythonpath')
+[1.142s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/pythonpath.ps1'
+[1.142s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/pythonpath.dsv'
+[1.143s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/hook/pythonpath.sh'
+[1.143s] Level 1:colcon.colcon_core.environment:checking '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/bin'
+[1.143s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(motor_control)
+[1.144s] INFO:colcon.colcon_core.shell:Creating package script '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/package.ps1'
+[1.144s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/package.dsv'
+[1.145s] INFO:colcon.colcon_core.shell:Creating package script '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/package.sh'
+[1.145s] INFO:colcon.colcon_core.shell:Creating package script '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/package.bash'
+[1.146s] INFO:colcon.colcon_core.shell:Creating package script '/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/package.zsh'
+[1.147s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/colcon-core/packages/motor_control)
+[1.147s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.148s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.148s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.148s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.155s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.156s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.156s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.160s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.161s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/ndev/luna/ros2_ws/src/motor_control/install/local_setup.ps1'
+[1.162s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/ndev/luna/ros2_ws/src/motor_control/install/_local_setup_util_ps1.py'
+[1.163s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/ndev/luna/ros2_ws/src/motor_control/install/setup.ps1'
+[1.164s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/ndev/luna/ros2_ws/src/motor_control/install/local_setup.sh'
+[1.164s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/ndev/luna/ros2_ws/src/motor_control/install/_local_setup_util_sh.py'
+[1.165s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/ndev/luna/ros2_ws/src/motor_control/install/setup.sh'
+[1.166s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/ndev/luna/ros2_ws/src/motor_control/install/local_setup.bash'
+[1.166s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/ndev/luna/ros2_ws/src/motor_control/install/setup.bash'
+[1.167s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/ndev/luna/ros2_ws/src/motor_control/install/local_setup.zsh'
+[1.167s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/ndev/luna/ros2_ws/src/motor_control/install/setup.zsh'

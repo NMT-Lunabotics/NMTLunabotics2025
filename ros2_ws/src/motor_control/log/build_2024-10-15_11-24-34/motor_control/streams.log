@@ -1,0 +1,41 @@
+[0.547s] Invoking command in '/home/ndev/luna/ros2_ws/src/motor_control': CONDA_PROMPT_MODIFIER=(base) PYTHONPATH=/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/motor_control build --build-base /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build install --record /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/install.log --install-scripts $base/lib/motor_control --single-version-externally-managed install_data
+[0.710s] running egg_info
+[0.711s] creating build/motor_control/motor_control.egg-info
+[0.711s] writing build/motor_control/motor_control.egg-info/PKG-INFO
+[0.711s] writing dependency_links to build/motor_control/motor_control.egg-info/dependency_links.txt
+[0.711s] writing entry points to build/motor_control/motor_control.egg-info/entry_points.txt
+[0.711s] writing requirements to build/motor_control/motor_control.egg-info/requires.txt
+[0.711s] writing top-level names to build/motor_control/motor_control.egg-info/top_level.txt
+[0.712s] writing manifest file 'build/motor_control/motor_control.egg-info/SOURCES.txt'
+[0.741s] reading manifest file 'build/motor_control/motor_control.egg-info/SOURCES.txt'
+[0.742s] writing manifest file 'build/motor_control/motor_control.egg-info/SOURCES.txt'
+[0.742s] running build
+[0.742s] running build_py
+[0.742s] creating /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build
+[0.742s] creating /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib
+[0.742s] creating /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib/motor_control
+[0.743s] copying motor_control/motor_control_node.py -> /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib/motor_control
+[0.743s] copying motor_control/__init__.py -> /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib/motor_control
+[0.743s] running install
+[0.743s] running install_lib
+[0.744s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control
+[0.744s] copying /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib/motor_control/motor_control_node.py -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control
+[0.744s] copying /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build/lib/motor_control/__init__.py -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control
+[0.745s] byte-compiling /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control/motor_control_node.py to motor_control_node.cpython-38.pyc
+[0.746s] byte-compiling /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control/__init__.py to __init__.cpython-38.pyc
+[0.746s] running install_data
+[0.746s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/ament_index
+[0.746s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/ament_index/resource_index
+[0.747s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/ament_index/resource_index/packages
+[0.747s] copying resource/motor_control -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/ament_index/resource_index/packages
+[0.747s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/launch
+[0.747s] copying launch/motor_control_launch.py -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/launch
+[0.747s] creating /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/config
+[0.747s] copying config/motor_control_params.yaml -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control/config
+[0.747s] copying package.xml -> /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/share/motor_control
+[0.747s] running install_egg_info
+[0.748s] Copying build/motor_control/motor_control.egg-info to /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages/motor_control-0.0.1-py3.8.egg-info
+[0.749s] running install_scripts
+[0.764s] Installing motor_control_node script to /home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/motor_control
+[0.764s] writing list of installed files to '/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/install.log'
+[0.791s] Invoked command in '/home/ndev/luna/ros2_ws/src/motor_control' returned '0': CONDA_PROMPT_MODIFIER=(base) PYTHONPATH=/home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ndev/luna/ros2_ws/src/motor_control/install/motor_control/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/motor_control build --build-base /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/build install --record /home/ndev/luna/ros2_ws/src/motor_control/build/motor_control/install.log --install-scripts $base/lib/motor_control --single-version-externally-managed install_data
