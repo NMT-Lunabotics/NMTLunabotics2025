@@ -30,7 +30,7 @@ def generate_launch_description():
     slam_mapping_launch_path = os.path.join(
         FindPackageShare('slam_config').find('slam_config'),
         'launch',
-        'rtabmap_realsense_launch.py'
+        'slam_launch.py'
     )
 
     # Include the motor control launch file if 'launch_motors' is true

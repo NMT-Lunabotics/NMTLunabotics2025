@@ -26,6 +26,7 @@ def generate_launch_description():
         launch_arguments={
             'enable_color': 'true',
             'enable_sync': 'true',
+            'initial_reset': 'true',
         }.items()
     )
 
@@ -38,7 +39,9 @@ def generate_launch_description():
             'camera_info_topic': '/camera/camera/color/camera_info',
             'rtabmapviz': 'false',
             'localization': 'true',
-            'approx_sync': 'true',
+            'approx_sync': 'false',
+            'queue_size' : '100',
+            'args': 'delete_db_on_start',
         }.items()
     )
 
