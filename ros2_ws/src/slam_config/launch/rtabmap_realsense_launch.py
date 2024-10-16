@@ -24,7 +24,8 @@ def generate_launch_description():
     realsense_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(realsense_launch_path),
         launch_arguments={
-            'enable_color': 'true',  # Directly set the enable_color parameter
+            'enable_color': 'true',
+            'enable_sync': 'true',
         }.items()
     )
 
