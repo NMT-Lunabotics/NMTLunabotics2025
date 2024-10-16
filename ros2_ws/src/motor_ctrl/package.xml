@@ -1,21 +1,29 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>motor_ctrl</name>
   <version>0.0.1</version>
   <description>The motor_ctrl package</description>
 
-  <maintainer email="niallcdevlin@gmail.com">Niall Devlin</maintainer>
+  <maintainer email="chasead7@gmail.com">Chase Dunaway</maintainer>
   <license>GPLv3</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>can_raw</build_depend>  <!-- Replace with actual package name -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>can_raw</exec_depend>  <!-- Replace with actual package name -->
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>can_raw</depend>
 
+  <build_depend>rosidl_default_generators</build_depend>
+  <build_depend>rosidl_default_runtime</build_depend>
+
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
 

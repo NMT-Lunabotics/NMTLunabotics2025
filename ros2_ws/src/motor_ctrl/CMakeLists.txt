@@ -1,31 +1,23 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(motor_ctrl)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(can_raw REQUIRED)
 
-## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  geometry_msgs
-  can_raw
-)
+include_directories(include)
 
-## Declare a catkin package
-catkin_package(
-  CATKIN_DEPENDS roscpp geometry_msgs can_raw 
-)
-
-## Specify additional locations of header files
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-## Declare a C++ executable
 add_executable(${PROJECT_NAME}_node src/motor_ctrl_node.cpp)
-
+ament_target_dependencies(${PROJECT_NAME}_node rclcpp geometry_msgs can_raw)
+ament_export_dependencies(rosidl_default_runtime)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
+install(TARGETS ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_package()
