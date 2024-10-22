@@ -60,7 +60,7 @@ def generate_launch_description():
     # Include the mapping (slam) launch file if 'launch_mapping' is true
     navigation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(navigation_launch_path),
-        condition=IfCondition(LaunchConfiguration('launch_mapping'))
+        condition=IfCondition(LaunchConfiguration('launch_nav'))
     )
 
     # Log messages to indicate what is being launched
