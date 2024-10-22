@@ -71,7 +71,7 @@ def generate_launch_description():
     return LaunchDescription([
         launch_motors_arg,
         launch_mapping_arg,
-        launch_mapping_arg,
+        launch_nav_arg,
         motor_control_launch,
         slam_mapping_launch,
         navigation_launch,
