@@ -20,6 +20,12 @@ def generate_launch_description():
         description='Launch slam_config if true'
     )
     
+    launch_nav_arg = DeclareLaunchArgument(
+        'launch_nav',
+        default_value='true',
+        description='Launch navigation if true'
+    )
+    
     # Define paths to the launch files from other packages
     motor_control_launch_path = os.path.join(
         FindPackageShare('motor_control').find('motor_control'),
@@ -31,6 +37,12 @@ def generate_launch_description():
         FindPackageShare('slam_config').find('slam_config'),
         'launch',
         'slam_launch.py'
+    )
+
+    navigation_launch_path = os.path.join(
+        FindPackageShare('navigation').find('navigation'),
+        'launch',
+        'nav_launch.py'
     )
 
     # Include the motor control launch file if 'launch_motors' is true
@@ -45,15 +57,23 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('launch_mapping'))
     )
 
+    # Include the mapping (slam) launch file if 'launch_mapping' is true
+    navigation_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(navigation_launch_path),
+        condition=IfCondition(LaunchConfiguration('launch_mapping'))
+    )
+
     # Log messages to indicate what is being launched
     log_motors = LogInfo(condition=IfCondition(LaunchConfiguration('launch_motors')), msg="Launching motor control...")
     log_mapping = LogInfo(condition=IfCondition(LaunchConfiguration('launch_mapping')), msg="Launching SLAM mapping...")
+    log_mapping = LogInfo(condition=IfCondition(LaunchConfiguration('launch_nav')), msg="Launching Navigation...")
 
     return LaunchDescription([
         launch_motors_arg,
         launch_mapping_arg,
         motor_control_launch,
         slam_mapping_launch,
+        navigation_launch,
         log_motors,
         log_mapping
     ])
