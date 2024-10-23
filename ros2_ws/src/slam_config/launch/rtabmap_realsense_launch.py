@@ -39,7 +39,7 @@ def generate_launch_description():
             'camera_info_topic': '/camera/camera/color/camera_info',
             'rtabmapviz': 'false',
             'localization': 'true',
-            'approx_sync': 'false',
+            'approx_sync': 'true',
             'queue_size' : '100',
             'args': 'delete_db_on_start',
         }.items()
