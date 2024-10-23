@@ -46,7 +46,7 @@ class MotorControlNode(Node):
         omega = msg.angular.z  # Angular velocity in rad/s
 
         # Calculate left and right wheel velocities (m/s)
-        v_left = v - omega #(omega * self.wheel_base / 2.0)
+        v_left = 0.95*(v - omega) #(omega * self.wheel_base / 2.0)
         v_right = v + omega # (omega * self.wheel_base / 2.0)
 
         # Convert to RPM
