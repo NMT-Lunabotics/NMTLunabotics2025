@@ -44,7 +44,7 @@ def generate_launch_description():
         parameters=[{
             'publish_odom': 'odom',
             'publish_tf': True,
-            'max_iterations': 10
+            'max_iterations': 20
         }]
     )
 
