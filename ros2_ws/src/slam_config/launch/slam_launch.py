@@ -43,7 +43,7 @@ def generate_launch_description():
         output='screen',
         parameters=[{
             'publish_odom': 'odom',
-            'publish_tf': False
+            'publish_tf': True
         }]
     )
 
