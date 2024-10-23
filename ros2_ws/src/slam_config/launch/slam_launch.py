@@ -44,7 +44,7 @@ def generate_launch_description():
         parameters=[{
             'publish_odom': 'odom',
             'publish_tf': True,
-            'max_angular_correction_deg': 20
+            'max_angular_correction_deg': 10
         }]
     )
 
