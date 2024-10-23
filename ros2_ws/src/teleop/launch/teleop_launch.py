@@ -24,7 +24,8 @@ def generate_launch_description():
             name='teleop_twist_joy_node',
             output='screen',
             parameters=[{
-                'require_enable_button': False,
+                'require_enable_button': True,
+                'enable_button': 4,
                 'axis_linear.x': 1,
                 'scale_linear.x': 0.25,
                 'axis_angular.yaw': 0,
