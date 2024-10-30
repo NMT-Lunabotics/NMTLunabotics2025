@@ -25,9 +25,10 @@ cd NMTLunabotics2025
 # USAGE
 
 `start_docker.sh`: Start docker container and enter a bash terminal  
-`docker_term.sh`: Open another terminal in the same container  
 `rtabmap.sh`: Start docker container and run rtabmap with a realsense camera  
-`teleop.sh`: Start docker container and run controller teleop
+`teleop.sh`: Start docker container and run controller teleop  
+`rviz.sh`: Run rviz in the container  
+`docker_term.sh`: Open a bash terminal in the container  
 
 # Helpful Docs
 <https://github.com/ros2/teleop_twist_joy/tree/humble/>

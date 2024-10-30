@@ -30,6 +30,7 @@ RUN apt-get -y install ros-humble-rtabmap-ros
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
+COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 
 # Compile the ros workspace
 USER $USER

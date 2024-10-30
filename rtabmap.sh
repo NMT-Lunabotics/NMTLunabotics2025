@@ -10,6 +10,7 @@ docker run -it --rm \
   --device-cgroup-rule='c 13:* rmw' \
   --device-cgroup-rule "c 81:* rmw" \
   --device-cgroup-rule "c 189:* rmw" \
+  --gpus=all \
   --name \
   luna \
   ros2_luna \
