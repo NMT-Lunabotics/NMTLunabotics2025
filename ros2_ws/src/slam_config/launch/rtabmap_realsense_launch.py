@@ -1,76 +1,80 @@
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration
+from launch.actions import IncludeLaunchDescription, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
 import os
-from ament_index_python.packages import get_package_share_directory
+
 
 def generate_launch_description():
-    # Paths to the launch files
-    realsense_launch_path = os.path.join(
-        get_package_share_directory('realsense2_camera'),
-        'launch',
-        'rs_launch.py'
-    )
-
-    rtabmap_launch_path = os.path.join(
-        get_package_share_directory('rtabmap_launch'),
-        'launch',
-        'rtabmap.launch.py'
-    )
-
-    # Include the RealSense launch file with parameters directly in launch_arguments
-    realsense_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(realsense_launch_path),
-        launch_arguments={
-            'enable_color': 'true',
-            'enable_sync': 'true',
-            'initial_reset': 'true',
-        }.items()
-    )
-
-    # Include the RTAB-Map launch file with parameters directly in launch_arguments
-    rtabmap_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(rtabmap_launch_path),
-        launch_arguments={
-            'depth_topic': '/camera/camera/depth/image_rect_raw',
-            'rgb_topic': '/camera/camera/color/image_raw',
-            'camera_info_topic': '/camera/camera/color/camera_info',
-            'rtabmapviz': 'false',
-            'localization': 'true',
-            'approx_sync': 'true',
-            'queue_size' : '100',
-            'args': 'delete_db_on_start',
-        }.items()
-    )
-
-    # Static transform publisher from base_link to camera_link
-    static_transform_publisher = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='base_to_camera_link',
-        output='screen',
-        parameters=[],
-        arguments=[
-            '0',    # x translation
-            '0',    # y translation
-            '0',    # z translation
-            '0',    # x rotation (radians)
-            '0',    # y rotation (radians)
-            '0',    # z rotation (radians)
-            'base_link',  # parent frame
-            'camera_link'  # child frame
-        ]
-    )
-
     return LaunchDescription([
-        # Launch the RealSense camera
-        realsense_launch,
+        # Include the RealSense camera launch
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory(
+                    'realsense2_camera'), 'launch', 'rs_launch.py')
+            )
+        ),
 
-        # Launch RTAB-Map with the provided parameters
-        rtabmap_launch,
+        # Group for stereo image processing
+        GroupAction([
+            Node(
+                package='stereo_image_proc',
+                executable='stereo_image_proc',
+                name='stereo_image_proc',
+                namespace='stereo',
+                output='screen'
+            ),
+            Node(
+                package='nodelet',
+                executable='nodelet',
+                name='disparity2depth',
+                namespace='stereo',
+                output='screen',
+                arguments=['standalone', 'rtabmap_util/disparity_to_depth']
+            )
+        ]),
 
-        # Publish the static transform from base_link to camera_link
-        static_transform_publisher,
+        # Odometry node using viso2_ros package
+        Node(
+            package='viso2_ros',
+            executable='stereo_odometer',
+            name='stereo_odometer',
+            output='screen',
+            remappings=[
+                ('stereo', 'stereo'),
+                ('image', 'image_rect')
+            ],
+            parameters=[
+                {'base_link_frame_id': '/base_link'},
+                {'odom_frame_id': '/odom'},
+                {'ref_frame_change_method': 1}
+            ]
+        ),
+
+        # RTAB-Map SLAM group
+        GroupAction([
+            Node(
+                package='rtabmap_slam',
+                executable='rtabmap',
+                name='rtabmap',
+                output='screen',
+                arguments=['--delete_db_on_start'],
+                parameters=[
+                    {'subscribe_depth': True},
+                    {'subscribe_laserScan': False},
+                    {'frame_id': '/base_link'},
+                    {'queue_size': 30},
+                    {'approx_sync': False},
+                    {'Vis/MinInliers': '12'}
+                ],
+                remappings=[
+                    ('rgb/image', '/camera/camera/depth/image_rect_raw'),
+                    ('rgb/camera_info', '/camera/camera/depth/image_rect_raw'),
+                    ('depth/image', '/camera/camera/depth/image_rect_raw'),
+                    ('odom', '/stereo_odometer/odometry')
+                ]
+            )
+        ])
     ])
