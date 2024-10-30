@@ -22,16 +22,12 @@ git clone git@github.com:NMT-Lunabotics/NMTLunabotics2025.git
 cd NMTLunabotics2025
 ```
 
-See [realsense-ros2-docker](https://github.com/2b-t/realsense-ros2-docker/tree/b8ceee5b17634996cca1bd7c50b12fc588c581c8?tab=readme-ov-file#2-launching) to setup docker environment  
-https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md
-
 # USAGE
 
-Run the docker image  
-`$ docker compose -f docker-compose-gui.yml up`
-
-If gui is not needed
-`$ docker compose -f docker-compose.yml up`
+`start_docker.sh`: Start docker container and enter a bash terminal  
+`docker_term.sh`: Open another terminal in the same container  
+`rtabmap.sh`: Start docker container and run rtabmap with a realsense camera  
+`teleop.sh`: Start docker container and run controller teleop
 
 # Helpful Docs
 <https://github.com/ros2/teleop_twist_joy/tree/humble/>

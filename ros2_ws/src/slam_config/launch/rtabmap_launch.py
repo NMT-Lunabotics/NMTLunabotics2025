@@ -48,14 +48,15 @@ def generate_launch_description():
                 # 'left_image_topic': '/camera/camera/infra1/image_rect_raw',
                 # 'left_camera_info_topic': '/camera/camera/infra1/camera_info',
                 # 'right_image_topic': '/camera/camera/infra2/image_rect_raw',
-                # 'right_camera_info_topic': '/camera/camera/infra2/camera_info',
+                # 'right_camera_info_topic': '/camera/camera/infra2/camera_info'
                 'frame_id': 'camera_link',
                 'subscribe_depth': 'true',
                 'subscribe_rgb': 'true',
                 'subscribe_stereo': 'false',
                 'visual_odometry': 'true',
                 'approx_sync': 'false',
-                'queue_size': '10'
+                'queue_size': '10',
+                'rtabmap_viz': 'false'
             }.items()
         ),
 
