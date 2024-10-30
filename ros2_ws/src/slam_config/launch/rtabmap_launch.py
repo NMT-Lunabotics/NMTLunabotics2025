@@ -25,15 +25,15 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(realsense_launch_file),
             launch_arguments={
                 'depth_module.depth_profile': '640x480x30',
-                'color_module.color_profile': '640x480x30',
+                'rgb_camera.color_profile': '640x480x30',
                 'enable_depth': 'true',
-                'enable_infra1': 'true',
-                'enable_infra2': 'true',
+                # 'enable_infra1': 'true',
+                # 'enable_infra2': 'true',
                 'enable_color': 'true',
-                'enable_gryo': 'true',
+                'enable_gyro': 'true',
                 'enable_accel': 'true',
                 'enable_sync': 'true',
-                'unite_imu_method': '1'
+                'unite_imu_method': '2'
             }.items()
         ),
 
@@ -44,12 +44,17 @@ def generate_launch_description():
                 'depth_topic': '/camera/camera/depth/image_rect_raw',
                 'rgb_topic': '/camera/camera/color/image_raw',
                 'camera_info_topic': '/camera/camera/color/camera_info',
+                'imu_topic': '/camera/camera/imu',
+                # 'left_image_topic': '/camera/camera/infra1/image_rect_raw',
+                # 'left_camera_info_topic': '/camera/camera/infra1/camera_info',
+                # 'right_image_topic': '/camera/camera/infra2/image_rect_raw',
+                # 'right_camera_info_topic': '/camera/camera/infra2/camera_info',
                 'frame_id': 'camera_link',
                 'subscribe_depth': 'true',
-                'subscribe_rgb': 'false',
-                'subscribe_stereo': 'true',
+                'subscribe_rgb': 'true',
+                'subscribe_stereo': 'false',
                 'visual_odometry': 'true',
-                'approx_sync': 'true',
+                'approx_sync': 'false',
                 'queue_size': '10'
             }.items()
         ),
