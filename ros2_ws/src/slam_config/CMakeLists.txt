@@ -9,7 +9,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(slam_toolbox REQUIRED)
 find_package(realsense2_camera REQUIRED)
-find_package(pointcloud_to_laserscan REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
