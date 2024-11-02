@@ -19,15 +19,6 @@ def generate_launch_description():
             parameters=[motor_ctrl_config]
         ),
 
-        # Run the motor_ctrl_node
-        Node(
-            package='motor_ctrl',
-            executable='motor_ctrl_node',
-            name='motor_ctrl_node',
-            output='screen',
-            parameters=[LaunchConfiguration('motor_ctrl_config')]
-        ),
-
         # Run the can_raw_node
         Node(
             package='can_raw',
