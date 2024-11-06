@@ -5,8 +5,8 @@ set -e
 source /opt/ros/humble/setup.bash
 source /home/luna/ros2_ws/install/setup.bash
 
-# Set up the RealSense device permissions
-# sudo udevadm control --reload-rules && sudo udevadm trigger
+export ROS_DOMAIN_ID=1
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 # Launch the ROS nodes, including the RealSense D455 camera
 exec "$@"

@@ -27,6 +27,7 @@ RUN apt-get -y install ros-humble-nav2-bringup
 RUN apt-get -y install ros-humble-realsense2-*
 RUN apt-get -y install ros-humble-rviz2
 RUN apt-get -y install ros-humble-rtabmap-ros
+RUN apt-get -y install ros-humble-rmw-cyclonedds-cpp
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
