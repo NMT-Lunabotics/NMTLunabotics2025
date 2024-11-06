@@ -36,7 +36,8 @@ def generate_launch_description():
     slam_mapping_launch_path = os.path.join(
         FindPackageShare('slam_config').find('slam_config'),
         'launch',
-        'slam_launch.py'
+        'rtabmap_launch.py'
+        # 'slam_launch.py'
     )
 
     navigation_launch_path = os.path.join(
