@@ -63,7 +63,8 @@ def generate_launch_description():
                 'visual_odometry': 'true',
                 'approx_sync': 'false',
                 'queue_size': '10',
-                'rtabmap_viz': 'false'
+                'rtabmap_viz': 'false',
+                'delete_db_on_start': 'true'
             }.items()
         ),
 
