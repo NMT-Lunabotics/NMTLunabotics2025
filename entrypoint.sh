@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
-source /home/luna/.bashrc
+. /home/luna/.bashrc
 exec "$@"
 
