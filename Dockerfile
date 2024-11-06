@@ -38,8 +38,8 @@ USER $USER
 WORKDIR /home/$USER/ros2_ws
 RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
 
-RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
-RUN echo "source /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
+RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
+RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
 RUN echo "export ROS_DOMAIN_ID=1" >> /home/$USER/.bashrc
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USER/.bashrc
 
