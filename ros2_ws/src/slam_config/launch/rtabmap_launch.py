@@ -37,13 +37,6 @@ def generate_launch_description():
             }.items()
         ),
 
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='base_link_camera_tf',
-            arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'camera_link']
-        ),
-
         # RTAB-Map SLAM launch with visual odometry
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(rtabmap_launch_file),
@@ -64,7 +57,7 @@ def generate_launch_description():
                 'approx_sync': 'false',
                 'queue_size': '10',
                 'rtabmap_viz': 'false',
-                'delete_db_on_start': 'true'
+                'database_path': ''
             }.items()
         ),
 
