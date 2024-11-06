@@ -47,13 +47,13 @@ RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USER/.bashrc
 USER root
 WORKDIR /home/$USER
 RUN chmod -R 666 /dev
-# COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 
 # Make the entrypoint script executable
-# RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Set entrypoint to use the external script
-# ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Switch back to non-root user 'luna'
 USER $USER
