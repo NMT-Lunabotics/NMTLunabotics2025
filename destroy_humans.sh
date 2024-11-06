@@ -13,5 +13,5 @@ docker run -it --rm \
   --name \
   luna \
   ros2_luna \
-  bash -c "ros2 launch robot_uprising nukes_launch.py"
+  ros2 launch robot_uprising nukes_launch.py
 
