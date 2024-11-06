@@ -53,14 +53,13 @@ export ROS_DOMAIN_ID=1
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ```
 
-# Usage
+# USAGE
 
-## Robot
-
-Run slam toolbox with rplidar
-`ros2 launch slam_config slam_launch.py`
-
-## Remote
+`start_docker.sh`: Start docker container and enter a bash terminal  
+`rtabmap.sh`: Start docker container and run rtabmap with a realsense camera  
+`teleop.sh`: Start docker container and run controller teleop  
+`rviz.sh`: Run rviz in the container  
+`docker_term.sh`: Open a bash terminal in the container  
 
 Run teleop node
 `ros2 launch teleop teleop_launch.py`
