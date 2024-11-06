@@ -38,16 +38,22 @@ USER $USER
 WORKDIR /home/$USER/ros2_ws
 RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
 
+RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
+RUN echo "source /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
+RUN echo "export ROS_DOMAIN_ID=1" >> /home/$USER/.bashrc
+RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USER/.bashrc
+
 # Copy in the entrypoint script
 USER root
 WORKDIR /home/$USER
-COPY entrypoint.sh /entrypoint.sh
+RUN chmod -R 666 /dev
+# COPY entrypoint.sh /entrypoint.sh
 
 # Make the entrypoint script executable
-RUN chmod +x /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
 
 # Set entrypoint to use the external script
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]
 
 # Switch back to non-root user 'luna'
 USER $USER
