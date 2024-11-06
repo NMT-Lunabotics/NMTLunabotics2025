@@ -1,8 +1,7 @@
 amcl:
   ros__parameters:
     use_sim_time: false
-    scan_topic: scan
-    map_topic: map
+    map_topic: /rtabmap/map
     transform_tolerance: 1.0
     min_particles: 500
     max_particles: 2000
