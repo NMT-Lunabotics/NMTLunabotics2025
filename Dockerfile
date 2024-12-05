@@ -44,9 +44,6 @@ RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon bui
 
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
-RUN echo "export ROS_DOMAIN_ID=1" >> /home/$USER/.bashrc
-RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USER/.bashrc
-RUN echo "export ROS_LOCALHOST_ONLY=0" >> /home/$USER/.bashrc
 
 # Copy in the entrypoint script
 USER root

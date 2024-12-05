@@ -2,7 +2,8 @@
 set -e
 
 # Default values
-IMAGE_NAME="luna/ros2:humble"
+ROS_DISTRO="humble"
+IMAGE_NAME="luna/ros2:$ROS_DISTRO"
 MASTER_HOSTNAME="nuc"
 IP=""
 MASTER_IP=""
@@ -111,6 +112,13 @@ if [[ "$STOP_CONTAINER" = true || "$RESTART_CONTAINER" = true  || "$BUILD_CONTAI
     exit 0
   fi
 fi
+
+# Set up environmental variables for ros
+echo "ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > $ENV_FILE
+echo "ROS_RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> $ENV_FILE
+echo "ROS_LOCALHOST_ONLY=0" >> $ENV_FILE
+echo "ROS_DISTRO=$ROS_DISTRO" >> $ENV_FILE
+
 
 # Function to validate IP address
 validate_ip() {
