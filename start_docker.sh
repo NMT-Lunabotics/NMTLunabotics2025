@@ -161,12 +161,6 @@ if ! validate_ip "$MASTER_IP"; then
   exit 1
 fi
 
-# Set ROS 2 environment variables
-export ROS_DOMAIN_ID
-
-# Write environment variables to file
-echo "ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > $ENV_FILE
-
 # No longer part of the Bourgeois 
 DOCKER_RUN_FLAGS+=("--privileged")
 DOCKER_RUN_FLAGS+=("--net=host")
@@ -256,12 +250,12 @@ fi
 
 if [[ "$RUN_USB_CAM_NODE" = true ]]; then
   echo "Running usb camera..."
-  docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch control usb_cam.launch
+  docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch usb_cam camera.launch.py
 fi
 
 if [[ "$RUN_VIEW_CAMERA_LAUNCH" = true ]]; then
   echo "Viewing ROS Camera feed..."
-  docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch control view_camera.launch
+  docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_cam_launch.py
 fi
 
 if [[ "$RUN_RVIZ" = true ]]; then

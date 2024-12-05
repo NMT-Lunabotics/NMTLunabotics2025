@@ -28,6 +28,10 @@ RUN apt-get -y install ros-humble-realsense2-*
 RUN apt-get -y install ros-humble-rviz2
 RUN apt-get -y install ros-humble-rtabmap-ros
 RUN apt-get -y install ros-humble-rmw-cyclonedds-cpp
+RUN apt-get -y install ros-humble-usb-cam
+RUN apt-get -y install ros-humble-image-view
+RUN apt-get -y install ros-humble-image-transport-plugins
+RUN apt-get -y install python3-pydantic
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
@@ -42,6 +46,7 @@ RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
 RUN echo "export ROS_DOMAIN_ID=1" >> /home/$USER/.bashrc
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /home/$USER/.bashrc
+RUN echo "export ROS_LOCALHOST_ONLY=0" >> /home/$USER/.bashrc
 
 # Copy in the entrypoint script
 USER root
