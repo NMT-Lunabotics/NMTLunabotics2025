@@ -17,11 +17,12 @@ RESTART_CONTAINER=false
 QUIET_MODE=false
 ROS_DOMAIN_ID=42
 OPEN_BASH=false
+RUN_RVIZ=false
 
 # Function to show usage
 usage() {
   echo "Usage: $0 [--start (-s) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |"
-  echo "           --motor-control (-mc) | --nav (-n) | --slam (-sl) |"
+  echo "           --motor-control (-mc) | --nav (-n) | --slam (-sl) | --rviz (-r) |"
   echo "           --command (-c) <command> | --build (-b) | --stop (-x) |"
   echo "           --restart (-R) | --bash (-bsh)] [--port (-p) <port>] [--ip (-i) <host_ip>] [--master-ip (-m) <master_ip>]"
   echo "           [--master-hostname (-n) <master_hostname>] [--display (-d)] [--quiet (-q)] [--help (-h)]"
@@ -35,6 +36,7 @@ usage() {
   echo "  --motor-control (-mc)       Run motor control using motor_control_launch.py"
   echo "  --nav (-n)                  Run navigation using nav_launch.py"
   echo "  --slam (-sl)                Run SLAM using rtabmap_launch.py"
+  echo "  --rviz (-z)                 Run rviz"
   echo "  --command (-c) <command>    Pass a command to be run in the container"
   echo "  --bash (-bsh)               Open a bash terminal in the container"
   echo "  --port (-p) <port>          Specify custom ROS master port (default is 11311)"
@@ -44,7 +46,7 @@ usage() {
   echo "  --display (-d)              Enable display support (forward X11 display)"
   echo "  --build (-b)                Build the Docker container (will stop the running container if any)"
   echo "  --stop (-x)                 Stop the running Docker container"
-  echo "  --restart (-R)              Restart the Docker container if it is running"
+  echo "  --restart (-r)              Restart the Docker container if it is running"
   echo "  --quiet (-q)                Suppress output"
   echo "  --help (-h)                 Show this help message"
   exit 1
@@ -58,8 +60,7 @@ while [[ "$#" -gt 0 ]]; do
     --usb-cam|-u) RUN_USB_CAM_NODE=true; shift ;;
     --video-stream|-v) RUN_VIEW_CAMERA_LAUNCH=true; DISPLAY_ENABLED=true; shift ;;
     --motor-control|-mc) RUN_MOTOR_CONTROL_LAUNCH=true; shift ;;
-    --nav|-n) RUN_NAV_LAUNCH=true; shift ;;
-    --slam|-sl) RUN_SLAM_LAUNCH=true; shift ;;
+    --rviz|-z) RUN_RVIZ=true; DISPLAY_ENABLED=true; shift ;;
     --command|-c) COMMAND_TO_RUN="$2"; shift 2 ;;
     --ip|-i) IP="$2"; shift 2 ;;
     --master-ip|-m) MASTER_IP="$2"; shift 2 ;;
@@ -68,7 +69,7 @@ while [[ "$#" -gt 0 ]]; do
     --display|-d) DISPLAY_ENABLED=true; shift ;;
     --build|-b) BUILD_CONTAINER=true; shift ;;
     --stop|-x) STOP_CONTAINER=true; shift ;;
-    --restart|-R) RESTART_CONTAINER=true; shift ;;
+    --restart|-r) RESTART_CONTAINER=true; shift ;;
     --quiet|-q) QUIET_MODE=true; shift ;;
     --bash|-bsh) OPEN_BASH=true; shift ;;
     --help|-h) usage; shift ;;
@@ -182,6 +183,12 @@ if [[ "$RUN_USB_CAM_NODE" = true ]]; then
   fi
 fi
 
+if [[ "$RUN_SLAM_LAUNCH" = true ]]; then
+  DOCKER_RUN_FLAGS+=("--device-cgroup-rule='c 13:* rmw'")
+  DOCKER_RUN_FLAGS+=("--device-cgroup-rule='c 81:* rmw'")
+  DOCKER_RUN_FLAGS+=("--device-cgroup-rule='c 189:* rmw'")
+fi
+
 # Enable display if requested
 if [[ "$DISPLAY_ENABLED" = true ]]; then
   echo "DISPLAY=$DISPLAY" >> $ENV_FILE
@@ -257,6 +264,11 @@ if [[ "$RUN_VIEW_CAMERA_LAUNCH" = true ]]; then
   docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch control view_camera.launch
 fi
 
+if [[ "$RUN_RVIZ" = true ]]; then
+  echo "Running rviz..."
+  docker exec -it --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh rviz2
+fi
+
 if [[ -n "$COMMAND_TO_RUN" ]]; then
   echo "Running custom command: $COMMAND_TO_RUN"
   docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
@@ -264,5 +276,5 @@ fi
 
 if [[ "$OPEN_BASH" = true || "$#" -eq 0 ]]; then
   echo "Opening bash terminal..."
-  docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID bash
+  docker exec -it --env-file $ENV_FILE $CONTAINER_ID bash
 fi
