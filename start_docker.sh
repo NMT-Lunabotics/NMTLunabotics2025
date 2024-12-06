@@ -27,7 +27,7 @@ usage() {
   echo "           --command (-c) <command> | --build (-b) | --stop (-x) |"
   echo "           --restart (-R) | --bash (-bsh)] [--port (-p) <port>] [--ip (-i) <host_ip>] [--master-ip (-m) <master_ip>]"
   echo "           [--master-hostname (-n) <master_hostname>] [--display (-d)] [--quiet (-q)] [--help (-h)]"
-  echo "This script is used to start and manage a Docker container for WALL-E the wildlife monitoring robot."
+  echo "This script is used to start and manage a Docker container for ROS."
   echo "If no IP addresses are specified, the script will attempt to determine them from the hostname. If this fails, try setting the hostname or IP."
   echo "Options:"
   echo "  --start (-s)                Start all processes on the robot (motor control, navigation, SLAM)"
