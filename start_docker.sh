@@ -172,7 +172,7 @@ DOCKER_RUN_FLAGS+=("--volume=/dev:/dev:rw")
 
 if [ "$RUN_USB_CAM_NODE" = true ]; then
     if [ -e /dev/video0 ]; then
-        DOCKER_RUN_FLAGS+=("--device=/dev/video0:rw")
+        DOCKER_RUN_FLAGS+=("--device=/dev/video0")
     else
         echo "Error: /dev/video0 does not exist."
         exit 1
