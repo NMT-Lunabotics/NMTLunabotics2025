@@ -2,9 +2,8 @@
 set -e
 
 # Default values
-ROS_DISTRO="humble"
-IMAGE_NAME="luna/ros2:$ROS_DISTRO"
-MASTER_HOSTNAME="nuc"
+IMAGE_NAME="walle/ros1:noetic"
+MASTER_HOSTNAME="raspberrypi.local"
 IP=""
 MASTER_IP=""
 ROS_MASTER_PORT=11311
@@ -12,14 +11,14 @@ DISPLAY_ENABLED=false
 DOCKER_RUN_FLAGS=()
 COMMAND_TO_RUN=""
 ENV_FILE="env_file.txt"
+RUN_ROSCORE=false
 BUILD_CONTAINER=false
 STOP_CONTAINER=false
 RESTART_CONTAINER=false
+RUN_VIEW_CAMERA_LAUNCH=false
 QUIET_MODE=false
-ROS_DOMAIN_ID=42
-OPEN_BASH=false
-RUN_RVIZ=false
 
+# Function to show usage
 usage() {
     echo "Usage: $0 [--start (-s) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |"
     echo "           --command (-c) <command> | --roscore (-r) | --build (-b) | --stop (-x) |"
@@ -35,10 +34,11 @@ usage() {
     echo "  --video-stream (-v)          View the video stream using view_camera.launch"
     echo "  --command (-c) <command>    Pass a command to be run in the container"
     echo "Options:"
+    echo "  --roscore (-r)              Run roscore"
     echo "  --port (-p) <port>          Specify custom ROS master port (default is 11311)"
     echo "  --ip (-i) <host_ip>         Specify host IP"
     echo "  --master-ip (-m) <master_ip> Specify master IP"
-    echo "  --master-hostname (-n) <master_hostname> Specify master hostname (default is nuc)"
+    echo "  --master-hostname (-n) <master_hostname> Specify master hostname (default is raspberrypi.local)"
     echo "  --display (-d)              Enable display support (forward X11 display)"
     echo "  --build (-b)                Build the Docker container (will stop the running container if any)"
     echo "  --stop (-x)                 Stop the running Docker container"
@@ -59,6 +59,7 @@ while [[ "$#" -gt 0 ]]; do
         --usb-cam|-u) RUN_USB_CAM_NODE=true; shift ;;
         --video-stream|-v) RUN_VIEW_CAMERA_LAUNCH=true; DISPLAY_ENABLED=true; shift ;;
         --command|-c) COMMAND_TO_RUN="$2"; shift 2 ;;
+        --roscore|-r) RUN_ROSCORE=true; shift ;;
         --port|-p) ROS_MASTER_PORT="$2"; shift 2 ;;
         --display|-d) DISPLAY_ENABLED=true; shift ;;
         --build|-b) BUILD_CONTAINER=true; shift ;;
@@ -77,9 +78,10 @@ if [ "$RUN_TELEOP_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_USB_CAM_NODE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ -n "$COMMAND_TO_RUN" ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_ROSCORE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 
 if [ "$ACTION_COUNT" -gt 1 ]; then
-    echo "Error: Multiple actions specified. You get ONE."
+    echo "Error: You greedy pig. Multiple actions specified. You get ONE."
     usage
     exit 1
 fi
@@ -160,8 +162,13 @@ if ! validate_ip "$MASTER_IP"; then
     exit 1
 fi
 
-# Set ROS_DOMAIN_ID
-echo "ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > $ENV_FILE
+# Set ROS_IP and ROS_MASTER_URI
+ROS_IP="$IP"
+ROS_MASTER_URI="http://$MASTER_IP:$ROS_MASTER_PORT"
+
+# Write environment variables to file
+echo "ROS_IP=$ROS_IP" > $ENV_FILE
+echo "ROS_MASTER_URI=$ROS_MASTER_URI" >> $ENV_FILE
 
 # No longer part of the Bourgeois 
 DOCKER_RUN_FLAGS+=("--privileged")
@@ -217,20 +224,25 @@ else
     DOCKER_EXEC_FLAGS="-it"
 fi
 
+if [ "$RUN_ROSCORE" = true ]; then
+    echo "Running roscore..."
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh roscore
+fi
+
 # Execute the specified option
 
 if [ "$RUN_ROBOT_LAUNCH" = true ]; then
     echo "Determining tolerable amounts of sentience..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch robot_uprising nukes_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh roslaunch control robot_start.launch
 elif [ "$RUN_TELEOP_LAUNCH" = true ]; then
     echo "Running joystick control..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch teleop teleop_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh roslaunch control teleop.launch
 elif [ "$RUN_USB_CAM_NODE" = true ]; then
     echo "Running usb camera..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera usb_cam_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh roslaunch control usb_cam.launch
 elif [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
     echo "Viewing ROS Camera feed..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_camera_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh roslaunch control view_camera.launch
 elif [ -n "$COMMAND_TO_RUN" ]; then
     echo "Running custom command: $COMMAND_TO_RUN"
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
