@@ -32,6 +32,8 @@ RUN apt-get -y install ros-humble-usb-cam
 RUN apt-get -y install ros-humble-image-view
 RUN apt-get -y install ros-humble-image-transport-plugins
 RUN apt-get -y install python3-pydantic
+RUN apt-get -y install v4l-utils
+
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
