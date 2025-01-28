@@ -130,14 +130,14 @@ if [[ -z "$IP" ]]; then
     IP=$(hostname -I | awk '{print $1}')
     if [[ -z "$IP" ]]; then
         echo "Error: Unable to determine the host IP address."
-        exit 1
+        # exit 1
     fi
 fi
 
 # Validate the IP address
 if ! validate_ip "$IP"; then
     echo "Error: Invalid IP address format: $IP"
-    exit 1
+    # exit 1
 fi
 
 # Determine the master IP if not provided
@@ -150,14 +150,14 @@ if [[ -z "$MASTER_IP" ]]; then
 
     if [[ -z "$MASTER_IP" ]]; then
         echo "Error: Unable to determine the master IP address."
-        exit 1
+        # exit 1
     fi
 fi
 
 # Validate the master IP address
 if ! validate_ip "$MASTER_IP"; then
     echo "Error: Invalid master IP address format: $MASTER_IP"
-    exit 1
+    # exit 1
 fi
 
 # Set ROS_DOMAIN_ID
@@ -172,7 +172,7 @@ DOCKER_RUN_FLAGS+=("--volume=/dev:/dev:rw")
 
 if [ "$RUN_USB_CAM_NODE" = true ]; then
     if [ -e /dev/video0 ]; then
-        DOCKER_RUN_FLAGS+=("--device=/dev/video0")
+        DOCKER_RUN_FLAGS+=("--device=/dev/video0:rw")
     else
         echo "Error: /dev/video0 does not exist."
         exit 1
