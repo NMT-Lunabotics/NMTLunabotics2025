@@ -230,7 +230,7 @@ elif [ "$RUN_USB_CAM_NODE" = true ]; then
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera usb_cam_launch.py
 elif [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
     echo "Viewing ROS Camera feed..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_camera_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_cam_launch.py
 elif [ -n "$COMMAND_TO_RUN" ]; then
     echo "Running custom command: $COMMAND_TO_RUN"
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
