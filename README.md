@@ -25,13 +25,14 @@ cd NMTLunabotics2025
 # USAGE
 
 `start_docker.sh`: Start docker container and enter a bash terminal  
-Usage: ./start_docker.sh [--start (-s) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |
-           --command (-c) <command> | --roscore (-r) | --build (-b) | --stop (-x) |
-           --restart (-R)] [--port (-p) <port>] [--ip (-i) <host_ip>] [--master-ip (-m) <master_ip>]
-           [--master-hostname (-n) <master_hostname>] [--display (-d)] [--quiet (-q)] [--help (-h)]
-This script is used to start and manage a Docker container for WALL-E the wildlife monitoring robot.
-If no IP addresses are specified, the script will attempt to determine them from the hostname. If this fails, try setting the hostname or IP.
-If no action is specified, the script will open an interactive bash terminal in the container.
+```
+Usage: ./start_docker.sh [--start (-s) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |  
+           --command (-c) <command> | --roscore (-r) | --build (-b) | --stop (-x) |  
+           --restart (-R)] [--port (-p) <port>] [--ip (-i) <host_ip>] [--master-ip (-m) <master_ip>]  
+           [--master-hostname (-n) <master_hostname>] [--display (-d)] [--quiet (-q)] [--help (-h)]  
+This script is used to start and manage a Docker container for WALL-E the wildlife monitoring robot.  
+If no IP addresses are specified, the script will attempt to determine them from the hostname. If this fails, try setting the hostname or IP.  
+If no action is specified, the script will open an interactive bash terminal in the container.  
 Actions (pick ONE):
   --start (-s)                Start all processes on the robot
   --teleop (-t)               Run joystick control using teleop.launch
@@ -49,7 +50,7 @@ Options:
   --restart (-R)              Restart the Docker container if it is running
   --quiet (-q)                Suppress output
   --help (-h)                 Show this help message
-
+```
 
 # Helpful Docs
 <https://github.com/ros2/teleop_twist_joy/tree/humble/>
