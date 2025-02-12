@@ -3,12 +3,12 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import serial
 
-class SerialNode(Node):
+class SerialBridge(Node):
     def __init__(self):
         super().__init__('serial_node')
         
         # Declare parameters
-        self.declare_parameter('baud_rate', 9600)
+        self.declare_parameter('baud_rate', 11520)
         self.declare_parameter('serial_device', '/dev/ttyUSB0')
         
         # Get parameters
@@ -39,7 +39,7 @@ class SerialNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = SerialNode()
+    node = SerialBridge()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
