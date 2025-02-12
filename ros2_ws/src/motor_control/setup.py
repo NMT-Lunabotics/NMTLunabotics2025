@@ -1,13 +1,15 @@
 from setuptools import setup
 import os
 from glob import glob
+from setuptools import find_packages
+from rosidl_setup import generate_interfaces
 
 package_name = 'motor_control'
 
 setup(
     name=package_name,
     version='0.0.1',
-    packages=[package_name],
+    packages=find_packages(exclude=['test']),
     data_files=[
         # Install the marker
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
@@ -34,7 +36,14 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'motor_control_node = motor_control.motor_control_node:main',  # Make sure this line exists
+            'motor_control_node = motor_control.motor_control_node:main',
         ],
     },
+)
+
+generate_interfaces(
+    package_name=package_name,
+    messages=['msg/Actuators.msg', 'msg/Motors.msg'],
+    services=[],
+    actions=[],
 )

@@ -33,6 +33,7 @@ RUN apt-get -y install ros-humble-image-view
 RUN apt-get -y install ros-humble-image-transport-plugins
 RUN apt-get -y install python3-pydantic
 RUN apt-get -y install v4l-utils
+RUN apt-get -y install ros-humble-rosidl-generator-py
 
 
 # Copy in the ros workspace
