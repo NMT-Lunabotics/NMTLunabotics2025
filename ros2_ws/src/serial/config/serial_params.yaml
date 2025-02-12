@@ -1,9 +1,10 @@
 serial_node:
   ros__parameters:
-    subscribe:
-      motor_topic: "/motors"
-      actuator_target_topic: "/actuators"
-      status_led_topic: "/status_leds"
-      lcd_input_topic: "/lcd_input"
-    publish:
-      actuator_feedback_topic: "/actuator_feedback"
+    serial_device: "/dev/ttyUSB0"
+    baud_rate: 115200
+
+convert_serial_node:
+  ros__parameters:
+    motor_ctrl_topic: "/motor_control"
+    actuator_ctrl_topic: "/actuator_control"
+    actuator_feedback_topic: "/actuator_feedback"

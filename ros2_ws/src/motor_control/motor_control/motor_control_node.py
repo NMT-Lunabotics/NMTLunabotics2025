@@ -1,8 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-import serial
-import time
+from motor_control.msg import Motors
 
 
 class MotorControlNode(Node):
@@ -37,9 +36,9 @@ class MotorControlNode(Node):
         # Subscriber
         self.create_subscription(
             Twist, self.cmd_vel_topic, self.cmd_vel_callback, 10)
-
-        # Connect to Arduino
-        self.ser = serial.Serial(self.arduino_serial_device, 256000)
+        
+        # Publisher
+        self.motor_control_publisher = self.create_publisher(Motors, '/motor_control', 10)
 
     def cmd_vel_callback(self, msg):
         v = msg.linear.x  # Linear velocity in m/s
@@ -70,21 +69,12 @@ class MotorControlNode(Node):
         elif rpm_right < -self.max_rpm:
             rpm_right = -self.max_rpm
 
-        # Send the RPM values to the Arduino
-        message = f"<{int(rpm_left)},{int(rpm_right)}>"
-        # try:
-        self.ser.write(message.encode())
-        self.get_logger().info(f"Sent to Arduino: {message}")
-
-        #     # Wait for Arduino to respond, with a small timeout
-        #     time.sleep(0.1)  # Adjust delay as necessary
-        #     if self.ser.in_waiting > 0:
-        #         response = self.ser.read(self.ser.in_waiting).decode('utf-8')
-        #         self.get_logger().info(f"Arduino response: {response}")
-        #     else:
-        #         raise serial.SerialTimeoutException("No response from Arduino")
-        # except serial.SerialTimeoutException as e:
-        #     self.get_logger().error(f"Error: {str(e)}. Continuing operation.")
+        # Publish to motors topic
+        msg = Motors()
+        msg.left = rpm_left
+        msg.right = rpm_right
+        self.motor_control_publisher.publish(msg)
+        
 
 
 def main(args=None):

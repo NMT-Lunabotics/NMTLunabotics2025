@@ -19,6 +19,9 @@ setup(
         # Install the configuration file
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
 
+        # Install the message files
+        (os.path.join('share', package_name, 'msg'), glob('msg/*.msg')),
+
         # Include package.xml
         (os.path.join('share', package_name), ['package.xml']),
     ],
