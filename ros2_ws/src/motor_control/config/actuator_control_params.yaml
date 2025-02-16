@@ -1,4 +1,0 @@
-joy_topic: "joy"
-actuator_max_vel: 25           # in mm/s
-bucket_axis: 3
-arm_axis: 4

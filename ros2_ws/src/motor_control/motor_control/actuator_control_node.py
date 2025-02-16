@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
-from motor_control.msg import Actuators
+from moon_messages.msg import Actuators
 import yaml
 
 class ActuatorControlNode(Node):

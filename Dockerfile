@@ -1,6 +1,8 @@
 FROM ros:humble
 ENV DISPLAY=0
 
+VOLUME ["/dev"]
+
 RUN apt-get update && apt-get install -y sudo
 
 # Create a non-root user named 'luna'

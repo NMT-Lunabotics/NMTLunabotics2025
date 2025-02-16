@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from motor_control.msg import Motors
+from moon_messages.msg import Motors
 
 
 class MotorControlNode(Node):

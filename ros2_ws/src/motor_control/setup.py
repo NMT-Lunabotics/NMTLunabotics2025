@@ -2,7 +2,6 @@ from setuptools import setup
 import os
 from glob import glob
 from setuptools import find_packages
-from rosidl_setup import generate_interfaces
 
 package_name = 'motor_control'
 
@@ -21,9 +20,6 @@ setup(
         # Install the configuration file
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
 
-        # Install the message files
-        (os.path.join('share', package_name, 'msg'), glob('msg/*.msg')),
-
         # Include package.xml
         (os.path.join('share', package_name), ['package.xml']),
     ],
@@ -37,13 +33,7 @@ setup(
     entry_points={
         'console_scripts': [
             'motor_control_node = motor_control.motor_control_node:main',
+            'actuator_control_node = motor_control.actuator_control_node:main',
         ],
     },
-)
-
-generate_interfaces(
-    package_name=package_name,
-    messages=['msg/Actuators.msg', 'msg/Motors.msg'],
-    services=[],
-    actions=[],
 )
