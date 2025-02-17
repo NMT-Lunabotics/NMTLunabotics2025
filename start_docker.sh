@@ -63,18 +63,19 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Check if multiple actions are specified
-# ACTION_COUNT=0
-# if [ "$RUN_ROBOT_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
-# if [ "$RUN_TELEOP_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
-# if [ "$RUN_USB_CAM_NODE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
-# if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
-# if [ -n "$COMMAND_TO_RUN" ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+ACTION_COUNT=0
+if [ "$RUN_ROBOT_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_MOTOR_CTRL" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_TELEOP_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_USB_CAM_NODE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ -n "$COMMAND_TO_RUN" ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 
-# if [ "$ACTION_COUNT" -gt 1 ]; then
-#     echo "Error: Multiple actions specified. You get ONE."
-#     usage
-#     exit 1
-# fi
+if [ "$ACTION_COUNT" -gt 1 ]; then
+    echo "Error: Multiple actions specified. You get ONE."
+    usage
+    exit 1
+fi
 
 # Check if the container is already running
 RUNNING=false
@@ -211,58 +212,25 @@ fi
 
 # Execute the specified option
 
-# if [ "$RUN_ROBOT_LAUNCH" = true ]; then
-#     echo "Determining tolerable amounts of sentience..."
-#     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch robot_uprising nukes_launch.py
-# elif [ "$RUN_TELEOP_LAUNCH" = true ]; then
-#     echo "Running joystick control..."
-#     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch teleop teleop_launch.py
-# elif [ "$RUN_USB_CAM_NODE" = true ]; then
-#     echo "Running usb camera..."
-#     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera usb_cam_launch.py
-# elif [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
-#     echo "Viewing ROS Camera feed..."
-#     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_cam_launch.py
-# elif [ -n "$COMMAND_TO_RUN" ]; then
-#     echo "Running custom command: $COMMAND_TO_RUN"
-#     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
-# else
-#     echo "No options specified. Opening interactive bash terminal in the container..."
-#     docker exec -it --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh bash
-# fi
-
-OPEN_BASH=true
 if [ "$RUN_ROBOT_LAUNCH" = true ]; then
     echo "Determining tolerable amounts of sentience..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch robot_uprising nukes_launch.py
-    OPEN_BASH=false
-fi
-if [ "$RUN_MOTOR_CTRL" = true ]; then
+elif [ "$RUN_MOTOR_CTRL" = true ]; then
     echo "Running motor control..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch motor_control motor_control_launch.py
-    OPEN_BASH=false
-fi
-if [ "$RUN_TELEOP_LAUNCH" = true ]; then
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch motor_ctrl motor_ctrl_launch.py
+elif [ "$RUN_TELEOP_LAUNCH" = true ]; then
     echo "Running joystick control..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch teleop teleop_launch.py
-    OPEN_BASH=false
-fi
-if [ "$RUN_USB_CAM_NODE" = true ]; then
+elif [ "$RUN_USB_CAM_NODE" = true ]; then
     echo "Running usb camera..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera usb_cam_launch.py
-    OPEN_BASH=false
-fi
-if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
+elif [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
     echo "Viewing ROS Camera feed..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_cam_launch.py
-    OPEN_BASH=false
-fi
-if [ -n "$COMMAND_TO_RUN" ]; then
+elif [ -n "$COMMAND_TO_RUN" ]; then
     echo "Running custom command: $COMMAND_TO_RUN"
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
-    OPEN_BASH=false
-fi
-if [ "$OPEN_BASH" = true ]; then
+else
     echo "No options specified. Opening interactive bash terminal in the container..."
     docker exec -it --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh bash
 fi
