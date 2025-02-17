@@ -1,6 +1,1 @@
-[submodule "realsense-ros2-docker"]
-	path = realsense-ros2-docker
-	url = https://github.com/2b-t/realsense-ros2-docker.git
-[submodule "ros2_ws/src/csm"]
-	path = ros2_ws/src/csm
-	url = https://github.com/AlexKaravaev/csm.git
+
