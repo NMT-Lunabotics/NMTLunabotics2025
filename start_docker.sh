@@ -217,7 +217,7 @@ if [ "$RUN_ROBOT_LAUNCH" = true ]; then
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch robot_uprising nukes_launch.py
 elif [ "$RUN_MOTOR_CTRL" = true ]; then
     echo "Running motor control..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch motor_ctrl motor_ctrl_launch.py
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch motor_control motor_control_launch.py
 elif [ "$RUN_TELEOP_LAUNCH" = true ]; then
     echo "Running joystick control..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch teleop teleop_launch.py
