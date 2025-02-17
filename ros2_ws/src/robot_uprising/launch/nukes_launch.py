@@ -16,13 +16,13 @@ def generate_launch_description():
     
     launch_mapping_arg = DeclareLaunchArgument(
         'launch_mapping',
-        default_value='true',
+        default_value='false',
         description='Launch slam_config if true'
     )
     
     launch_nav_arg = DeclareLaunchArgument(
         'launch_nav',
-        default_value='true',
+        default_value='false',
         description='Launch navigation if true'
     )
     

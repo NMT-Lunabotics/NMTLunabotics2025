@@ -42,10 +42,10 @@ class ActuatorControlNode(Node):
         arm_value = msg.axes[arm_axis] * actuator_max_vel
 
         actuators_msg = Actuators()
-        actuators_msg.armPos = -1;
-        actuators_msg.bucketPos = -1;
-        actuators_msg.bucketVel = bucket_value
-        actuators_msg.armVel = arm_value
+        actuators_msg.arm_pos = -1;
+        actuators_msg.bucket_pos = -1;
+        actuators_msg.bucket_vel = bucket_value
+        actuators_msg.arm_vel = arm_value
 
         self.publisher_.publish(actuators_msg)
         

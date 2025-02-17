@@ -15,15 +15,22 @@ class SerialConvertNode(Node):
         self.actuator_control_subscriber = self.create_subscription(Actuators, 'actuator_control', self.actuator_control_subscriber, 10)
         self.motor_control_subscriber = self.create_subscription(Motors, 'motor_control', self.motor_control_subscriber, 10)
 
+        self.last_act_serial_msg = String()
+        self.last_motor_serial_msg = String()
+
     def actuator_control_subscriber(self, msg):
         actuator_control_msg = String()
-        actuator_control_msg.data = f'A,{msg.armPos},{msg.bucketPos},{msg.armVel},{msg.bucketVel}'
-        self.serial_write_publisher.publish(actuator_control_msg)
+        actuator_control_msg.data = f'<A,{msg.arm_pos},{msg.bucket_pos},{msg.arm_vel},{msg.bucket_vel}>'
+        if actuator_control_msg.data != self.last_act_serial_msg.data:
+            self.last_act_serial_msg = actuator_control_msg
+            self.serial_write_publisher.publish(actuator_control_msg)
     
     def motor_control_subscriber(self, msg):
         motor_control_msg = String()
-        motor_control_msg.data = f'M,{msg.rpm_left},{msg.rpm_right}'
-        self.serial_write_publisher.publish(motor_control_msg)
+        motor_control_msg.data = f'<M,{msg.left},{msg.right}>'
+        if motor_control_msg.data != self.last_motor_serial_msg.data:
+            self.last_motor_serial_msg = motor_control_msg
+            self.serial_write_publisher.publish(motor_control_msg)
 
 def main(args=None):
     rclpy.init(args=args)

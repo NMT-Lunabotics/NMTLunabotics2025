@@ -71,8 +71,8 @@ class MotorControlNode(Node):
 
         # Publish to motors topic
         msg = Motors()
-        msg.left = rpm_left
-        msg.right = rpm_right
+        msg.left = int(rpm_left)
+        msg.right = int(rpm_right)
         self.motor_control_publisher.publish(msg)
         
 

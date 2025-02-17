@@ -8,7 +8,7 @@ class SerialBridgeNode(Node):
         super().__init__('serial_bridge_node')
         
         # Declare parameters
-        self.declare_parameter('baud_rate', 11520)
+        self.declare_parameter('baud_rate', 2000000)
         self.declare_parameter('serial_device', '/dev/ttyUSB0')
         
         # Get parameters
