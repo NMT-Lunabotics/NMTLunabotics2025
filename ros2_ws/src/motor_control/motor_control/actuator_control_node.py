@@ -33,6 +33,14 @@ class ActuatorControlNode(Node):
         # Create a publisher for the actuator control messages
         self.publisher_ = self.create_publisher(Actuators, '/actuator_control', 10)
 
+    def velocity_deadzone(self, axis_value):
+        if axis_value < -0.5:
+            return -5
+        elif axis_value > 0.5:
+            return 5
+        else:
+            return 0
+
     def joy_callback(self, msg):
         actuator_max_vel = self.get_parameter('actuator_max_vel').get_parameter_value().integer_value
         bucket_axis = self.get_parameter('bucket_axis').get_parameter_value().integer_value
@@ -41,13 +49,22 @@ class ActuatorControlNode(Node):
         bucket_value = msg.axes[bucket_axis] * actuator_max_vel
         arm_value = msg.axes[arm_axis] * actuator_max_vel
 
+        bucket_value = self.velocity_deadzone(bucket_value)
+        arm_value = self.velocity_deadzone(arm_value)
+        
         actuators_msg = Actuators()
-        actuators_msg.arm_pos = -1;
-        actuators_msg.bucket_pos = -1;
+        
+        ## TODO: Once feedback is enabled, change the arm and bucket position messages
+        actuators_msg.arm_pos = -1
+        actuators_msg.bucket_pos = -1
+        ##
+        
         actuators_msg.bucket_vel = bucket_value
         actuators_msg.arm_vel = arm_value
 
         self.publisher_.publish(actuators_msg)
+        
+
         
 
 def main(args=None):
