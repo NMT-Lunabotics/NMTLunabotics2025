@@ -36,10 +36,10 @@ def generate_launch_description():
             launch_arguments={
                 'depth_module.depth_profile': '640x480x30',
                 'rgb_camera.color_profile': '640x480x30',
-                'enable_depth': 'true',
+                'enable_depth': 'false',
                 # 'enable_infra1': 'true',
                 # 'enable_infra2': 'true',
-                'enable_color': 'false',
+                'enable_color': 'true',
                 'enable_gyro': 'true',
                 'enable_accel': 'true',
                 'enable_sync': 'false',
