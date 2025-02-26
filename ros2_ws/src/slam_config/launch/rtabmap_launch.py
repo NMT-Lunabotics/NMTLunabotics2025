@@ -36,14 +36,14 @@ def generate_launch_description():
             launch_arguments={
                 'depth_module.depth_profile': '640x480x30',
                 'rgb_camera.color_profile': '640x480x30',
-                'enable_depth': 'false',
+                'enable_depth': 'true',
                 # 'enable_infra1': 'true',
                 # 'enable_infra2': 'true',
                 'enable_color': 'true',
                 'enable_gyro': 'true',
                 'enable_accel': 'true',
-                'enable_sync': 'false',
-                # 'unite_imu_method': '2'
+                'enable_sync': 'true',
+                'unite_imu_method': '2'
             }.items()
         ),
 
@@ -64,7 +64,7 @@ def generate_launch_description():
                 'subscribe_rgb': 'true',
                 'subscribe_stereo': 'false',
                 'visual_odometry': 'true',
-                'approx_sync': 'true',
+                'approx_sync': 'false',
                 'queue_size': '10',
                 'rtabmap_viz': 'true',
                 'database_path': ''
