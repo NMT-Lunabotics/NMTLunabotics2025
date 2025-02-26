@@ -39,7 +39,7 @@ def generate_launch_description():
                 'enable_depth': 'true',
                 # 'enable_infra1': 'true',
                 # 'enable_infra2': 'true',
-                'enable_color': 'true',
+                'enable_color': 'false',
                 'enable_gyro': 'true',
                 'enable_accel': 'true',
                 'enable_sync': 'false',
@@ -64,9 +64,9 @@ def generate_launch_description():
                 'subscribe_rgb': 'true',
                 'subscribe_stereo': 'false',
                 'visual_odometry': 'true',
-                'approx_sync': 'false',
+                'approx_sync': 'true',
                 'queue_size': '10',
-                'rtabmap_viz': 'false',
+                'rtabmap_viz': 'true',
                 'database_path': ''
             }.items()
         ),
