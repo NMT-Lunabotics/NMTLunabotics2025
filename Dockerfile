@@ -1,4 +1,4 @@
-FROM ros:humble
+FROM ros:humble-desktop
 ENV DISPLAY=0
 
 RUN apt-get update && apt-get install -y sudo
