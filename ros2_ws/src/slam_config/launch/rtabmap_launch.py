@@ -6,6 +6,16 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 import os
 
+ARGUMENTS = [
+    DeclareLaunchArgument('rviz', default_value='false',
+                          choices=['true', 'false'], description='Start RViz'),
+    DeclareLaunchArgument('rtabmapviz', default_value='false', choices=['true', 'false'],
+                          description='Start RTAB-Map visualizer'),
+    DeclareLaunchArgument('localization', default_value='false', choices=['true', 'false'],
+                          description='Start RTAB-Map in localization mode (meaning that a map is already made)'),
+    DeclareLaunchArgument('nav2', default_value='true', choices=['true', 'false'],
+                          description='Start Navigation2')
+]
 
 def generate_launch_description():
     # Path to the RealSense camera and RTAB-Map launch files
@@ -32,8 +42,8 @@ def generate_launch_description():
                 'enable_color': 'true',
                 'enable_gyro': 'true',
                 'enable_accel': 'true',
-                'enable_sync': 'true',
-                'unite_imu_method': '2'
+                'enable_sync': 'false',
+                # 'unite_imu_method': '2'
             }.items()
         ),
 
