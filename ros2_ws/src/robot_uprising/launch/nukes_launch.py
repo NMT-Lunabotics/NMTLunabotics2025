@@ -16,7 +16,7 @@ def generate_launch_description():
     
     launch_mapping_arg = DeclareLaunchArgument(
         'launch_mapping',
-        default_value='false',
+        default_value='true',
         description='Launch slam_config if true'
     )
     
