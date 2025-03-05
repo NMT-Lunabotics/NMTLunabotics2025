@@ -66,7 +66,7 @@ def generate_launch_description():
             'subscribe_stereo': 'false',
             'subscribe_scan': 'true',
             'visual_odometry': 'true',
-            'approx_sync': 'false',
+            'approx_sync': 'true',
             'queue_size': '10',
             'rtabmap_viz': 'false',
             'database_path': ''
