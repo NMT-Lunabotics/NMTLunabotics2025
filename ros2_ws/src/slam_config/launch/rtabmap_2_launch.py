@@ -78,6 +78,5 @@ def generate_launch_description():
         rplidar_launch,
         realsense_launch,
         imu_filter_node,
-        rtabmap_odom_node,
-        rtabmap_slam_node
+        rtabmap_launch
     ])
