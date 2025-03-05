@@ -63,7 +63,7 @@ def generate_launch_description():
                 'subscribe_depth': 'true',
                 'subscribe_rgb': 'true',
                 'subscribe_stereo': 'false',
-                'visual_odometry': 'true',
+                'visual_odometry': 'false',
                 'approx_sync': 'false',
                 'queue_size': '10',
                 'rtabmap_viz': 'true',
