@@ -72,20 +72,13 @@ def generate_launch_description():
             'database_path': ''
         }.items()
     )
-    
-    # Launch arguments
-    return LaunchDescription([
-        rplidar_launch,
-        realsense_launch,
-        imu_filter_node,
-        rtabmap_launch
-    ])
 
     static_transform_publisher = Node(
         package='tf2_ros', executable='static_transform_publisher', output='screen',
         arguments=['0', '0', '0', '0', '0', '0', 'camera_link', 'laser']
     )
 
+    # Launch arguments
     return LaunchDescription([
         rplidar_launch,
         realsense_launch,
