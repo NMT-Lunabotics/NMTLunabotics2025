@@ -49,7 +49,7 @@ def generate_launch_description():
         parameters=[{'use_mag': False, 
                         'world_frame':'enu', 
                         'publish_tf':False}],
-        remappings=[('imu/data_raw', '/camera/camera/imu')]),
+        remappings=[('imu/data_raw', '/camera/camera/imu')])
 
     rtabmap_parameters = [{
         'frame_id':'camera_link',
@@ -67,13 +67,13 @@ def generate_launch_description():
     rtabmap_odom_node = Node(
         package='rtabmap_odom', executable='rgbd_odometry', output='screen',
         parameters=rtabmap_parameters,
-        remappings=rtabmap_remappings),
+        remappings=rtabmap_remappings)
     
     rtabmap_slam_node = Node(
             package='rtabmap_slam', executable='rtabmap', output='screen',
             parameters=rtabmap_parameters,
             remappings=rtabmap_remappings,
-            arguments=['-d']),
+            arguments=['-d'])
 
 
     # Launch arguments
