@@ -51,29 +51,26 @@ def generate_launch_description():
                         'publish_tf':False}],
         remappings=[('imu/data_raw', '/camera/camera/imu')])
 
-    rtabmap_parameters = [{
-        'frame_id':'camera_link',
-        'subscribe_depth':True,
-        'subscribe_odom_info':True,
-        'approx_sync':False,
-        'wait_imu_to_init':True}]
-    
-    rtabmap_remappings=[
-        ('imu', 'imu/data'),
-        ('rgb/image', '/camera/camera/color/image_raw'),
-        ('rgb/camera_info', '/camera/camera/color/camera_info'),
-        ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw')]
-    
-    rtabmap_odom_node = Node(
-        package='rtabmap_odom', executable='rgbd_odometry', output='screen',
-        parameters=rtabmap_parameters,
-        remappings=rtabmap_remappings)
-    
-    rtabmap_slam_node = Node(
-            package='rtabmap_slam', executable='rtabmap', output='screen',
-            parameters=rtabmap_parameters,
-            remappings=rtabmap_remappings,
-            arguments=['-d'])
+    rtabmap_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(rtabmap_launch_file),
+        launch_arguments={
+            'depth_topic': '/camera/camera/depth/image_rect_raw',
+            'rgb_topic': '/camera/camera/color/image_raw',
+            'camera_info_topic': '/camera/camera/color/camera_info',
+            'imu_topic': '/camera/camera/imu',
+            'scan_topic': '/scan',
+            'wait_imu_to_init': 'true',
+            'frame_id': 'camera_link',
+            'subscribe_depth': 'true',
+            'subscribe_rgb': 'true',
+            'subscribe_stereo': 'false',
+            'visual_odometry': 'true',
+            'approx_sync': 'false',
+            'queue_size': '10',
+            'rtabmap_viz': 'false',
+            'database_path': ''
+        }.items()
+    )
 
 
     # Launch arguments
