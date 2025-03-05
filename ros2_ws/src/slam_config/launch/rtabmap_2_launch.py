@@ -35,7 +35,7 @@ def generate_launch_description():
                 'enable_gyro': 'true',
                 'enable_accel': 'true',
                 'enable_sync': 'true',
-                'alight_depth.enable': 'true',
+                'align_depth.enable': 'true',
                 'unite_imu_method': '2'
             }.items()
         )
@@ -54,15 +54,15 @@ def generate_launch_description():
     rtabmap_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rtabmap_launch_file),
         launch_arguments={
-            'depth_topic': '/camera/camera/depth/image_rect_raw',
+            'depth_topic': '/camera/camera/aligned_depth_to_color/image_raw',
             'rgb_topic': '/camera/camera/color/image_raw',
             'camera_info_topic': '/camera/camera/color/camera_info',
-            'imu_topic': '/camera/camera/imu',
+            'imu_topic': '/imu/data',
             'scan_topic': '/scan',
             'wait_imu_to_init': 'true',
             'frame_id': 'camera_link',
             'subscribe_depth': 'true',
-            'subscribe_rgb': 'true',
+            'subscribe_rgbd': 'true',
             'subscribe_stereo': 'false',
             'visual_odometry': 'true',
             'approx_sync': 'false',
