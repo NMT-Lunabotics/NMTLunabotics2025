@@ -64,6 +64,7 @@ def generate_launch_description():
             'subscribe_depth': 'true',
             'subscribe_rgbd': 'true',
             'subscribe_stereo': 'false',
+            'subscribe_scan': 'true',
             'visual_odometry': 'true',
             'approx_sync': 'false',
             'queue_size': '10',
