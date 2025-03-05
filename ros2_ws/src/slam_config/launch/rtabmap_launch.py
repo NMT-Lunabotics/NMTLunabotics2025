@@ -62,7 +62,7 @@ def generate_launch_description():
             'wait_imu_to_init': 'true',
             'frame_id': 'camera_link',
             'subscribe_depth': 'true',
-            'subscribe_rgbd': 'true',
+            'subscribe_rgb': 'true',
             'subscribe_stereo': 'false',
             'subscribe_scan': 'true',
             'visual_odometry': 'true',
