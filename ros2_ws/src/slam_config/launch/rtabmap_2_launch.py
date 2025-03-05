@@ -61,7 +61,7 @@ def generate_launch_description():
     rtabmap_remappings=[
         ('imu', 'imu/data'),
         ('rgb/image', '/camera/camera/color/image_raw'),
-        ('rgb/camera_info', '/camera/color/camera_info'),
+        ('rgb/camera_info', '/camera/camera/color/camera_info'),
         ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw')]
     
     rtabmap_odom_node = Node(
