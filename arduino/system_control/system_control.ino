@@ -1,17 +1,13 @@
 //#include "helpers.hpp"
 //#include "main_bus.hpp"
 //#include <Arduino_CAN.h>
+#include <Wire.h>
 bool emergency_stop = false;
 //------------------------------------------
 //big motors
 //------------------------------------------
-const int motor1_pwm_pin = 3;   // Motor 1 speed (PWM)
-const int motor1_dir_pin1 = 4;  // Motor 1 direction pin 1
-const int motor1_dir_pin2 = 5;  // Motor 1 direction pin 2
-
-const int motor2_pwm_pin = 6;   // Motor 2 speed (PWM)
-const int motor2_dir_pin1 = 7;  // Motor 2 direction pin 1
-const int motor2_dir_pin2 = 8;  // Motor 2 direction pin 2
+char motor1_address = 0x58;     // Motor 1 I2C address
+char motor2_address = 0x58;     // Motor 2 I2C address  // TODO change address
 
 const float rpm_to_pwm_constant = 2.5;  // Conversion between rpm and pwm values
 //------------------------------------------
@@ -61,16 +57,9 @@ int dual_max_error = 5;
 int dual_error_factor = 12;
 
 void setup() {
-  Serial.begin(2000000);  // Set baud rate to match Python script 
-
-  // Set motor control pins as output
-  pinMode(motor1_pwm_pin, OUTPUT);
-  pinMode(motor1_dir_pin1, OUTPUT);
-  pinMode(motor1_dir_pin2, OUTPUT);
-
-  pinMode(motor2_pwm_pin, OUTPUT);
-  pinMode(motor2_dir_pin1, OUTPUT);
-  pinMode(motor2_dir_pin2, OUTPUT);
+  Serial.begin(9600);  // Set baud rate to match Python script  2000000
+  delay(100);
+  Wire.begin(); // Start I2C communication
 
   // Set bucket actuator pins as output and potentiometer as analog input pin
   pinMode(bucket_speed_pin, OUTPUT);
@@ -97,7 +86,7 @@ void loop() {
 
       int elementCount = 0;  // Count number of inputs for actuators which allow multiple 1-2 values for input
       for (int i = 0; i < inputString.length(); i++) {
-        if (inputString[i] == ",") continue;
+        if (inputString[i] == ',') continue;
         elementCount = elementCount + 1;
       }
       switch (operation) {
@@ -135,9 +124,9 @@ void loop() {
       }
     }
   }
-  if (emergency_stop == true) {
-    set_speed(motor1_pwm_pin, motor1_dir_pin1, 0, false);
-    set_speed(motor2_pwm_pin, motor2_dir_pin1, 0, false);
+  if (emergency_stop == true) { // Set motor 1 and 2 direction (0x00 command register) to instant stop
+    sendI2CCommand(motor1_address, 0x00, 0);
+    sendI2CCommand(motor2_address, 0x00, 0);
     return;
   }
   bucketActuatorUpdate(bucket_target_pos, bucket_target_vel);
@@ -146,33 +135,19 @@ void loop() {
 
 void operateMotor(int rpm_motor1, int rpm_motor2) {
   if (emergency_stop == true) return;
-  // Convert RPM to PWM using the constant
-  int pwm_motor1 = constrain(abs(rpm_motor1) * rpm_to_pwm_constant, 0, 255);
-  int pwm_motor2 = constrain(abs(rpm_motor2) * rpm_to_pwm_constant, 0, 255);
+  // Convert RPM to PWM using the constant to get into (0-255) speed range for motor drivers
+  int motor1_speed = constrain(abs(rpm_motor1) * rpm_to_pwm_constant, 0, 255);
+  int motor2_speed = constrain(abs(rpm_motor2) * rpm_to_pwm_constant, 0, 255);
 
-  // Set motor 1 direction
-  if (rpm_motor1 >= 0) {
-    digitalWrite(motor1_dir_pin1, HIGH);
-    digitalWrite(motor1_dir_pin2, LOW);
-  } else {
-    digitalWrite(motor1_dir_pin1, LOW);
-    digitalWrite(motor1_dir_pin2, HIGH);
-  }
+  // Set motor 1 and 2 speed (0x02 speed register)
+  sendI2CCommand(motor1_address, 0x02, motor1_speed);
+  sendI2CCommand(motor2_address, 0x02, motor2_speed);
 
-  // Set motor 1 speed
-  analogWrite(motor1_pwm_pin, pwm_motor1);
-
-  // Set motor 2 direction
-  if (rpm_motor2 >= 0) {
-    digitalWrite(motor2_dir_pin1, HIGH);
-    digitalWrite(motor2_dir_pin2, LOW);
-  } else {
-    digitalWrite(motor2_dir_pin1, LOW);
-    digitalWrite(motor2_dir_pin2, HIGH);
-  }
-
-  // Set motor 2 speed
-  analogWrite(motor2_pwm_pin, pwm_motor2);
+  // Run motor 1 and 2 directions (0x00 command register) to forwards/reverse
+  if (rpm_motor1 >= 0) sendI2CCommand(motor1_address, 0x00, 1);
+  else sendI2CCommand(motor1_address, 0x00, 2); 
+  if (rpm_motor2 >= 0) sendI2CCommand(motor2_address, 0x00, 1);
+  else sendI2CCommand(motor2_address, 0x00, 2); 
 
   /*Serial.print("pwm_motor1: ");
     Serial.print(pwm_motor1);
@@ -190,7 +165,7 @@ void bucketActuatorUpdate(int bucket_target_pos, int bucket_target_vel) {  //upd
   if (current_time - bucket_last_time < dt) return;
   bucket_last_time = current_time;
 
-  int pos = map(analogRead(bucket_potentiometer_pin), bucket_potMin, bucket_potMax, 0, bucket_stroke);
+  int pos = map(analogRead(bucket_potentiometer_pin), bucket_potMin, bucket_potMax, 0, bucket_stroke);//TODO replace with replacment for potentiometer reader
 
   if (bucket_target_pos == -1) {
     speed = bucket_target_vel * 51;
@@ -229,8 +204,10 @@ void dualActuatorUpdate(int target_pos, int target_vel) {
   if (current_time - dual_last_time < dt) return;
   dual_last_time = current_time;
 
-  int pos_l = map(analogRead(dual_potentiometer_left), dual_potMin, dual_potMax, 0, dual_stroke);   //map(dual_potentiometer_left.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
-  int pos_r = map(analogRead(dual_potentiometer_right), dual_potMin, dual_potMax, 0, dual_stroke);  //map(dual_potentiometer_right.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
+  int pos_l = map(analogRead(dual_potentiometer_left), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader 
+  //map(dual_potentiometer_left.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
+  int pos_r = map(analogRead(dual_potentiometer_right), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader
+  //map(dual_potentiometer_right.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
   int error_lr = pos_l - pos_r;
   int error_l = 0;
   int error_r = 0;
@@ -294,9 +271,16 @@ void dualActuatorUpdate(int target_pos, int target_vel) {
 void set_speed(int speedPin, int dirPin, int signed_speed, bool invert_direction) {  //set speed of bucket and dual actuators
   if (emergency_stop == true) return;
   if (invert_direction) {
-    digitalWrite(dirPin, signed_speed > 0);
+    digitalWrite(dirPin, signed_speed > 0); //TODO replace with replacment for actuator PWM pin direction
   } else {
-    digitalWrite(dirPin, signed_speed < 0);
+    digitalWrite(dirPin, signed_speed < 0); //TODO replace with replacment for actuator PWM pin direction
   }
-  analogWrite(speedPin, abs(signed_speed));
+  analogWrite(speedPin, abs(signed_speed)); //TODO replace with replacment for actuator PWM pin speed
+}
+
+void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
+    Wire.beginTransmission(address);    // begin transmission with our selected driver
+    Wire.write(operationRegister);      // enter the desired register
+    Wire.write(value);                  // send the data to the register 
+    Wire.endTransmission();
 }
