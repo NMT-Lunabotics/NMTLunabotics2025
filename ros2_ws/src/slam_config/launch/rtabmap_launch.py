@@ -48,7 +48,7 @@ def generate_launch_description():
                 'enable_sync': 'true',
                 'align_depth.enable': 'true',
                 'unite_imu_method': '2',
-                'serial_no': '306322300659',
+                'serial_no': 306322300659,
                 'camera_name': 'camera_1',
             }.items()
         )
