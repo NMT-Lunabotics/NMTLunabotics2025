@@ -62,14 +62,14 @@ def generate_launch_description():
         parameters=[{'use_mag': False, 
                         'world_frame':'enu', 
                         'publish_tf':False}],
-        remappings=[('imu/data_raw', '/camera/camera/imu')])
+        remappings=[('imu/data_raw', '/camera/camera_1/imu')])
 
     rtabmap_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rtabmap_launch_file),
         launch_arguments={
-            'depth_topic': '/camera/camera/aligned_depth_to_color/image_raw',
-            'rgb_topic': '/camera/camera/color/image_raw',
-            'camera_info_topic': '/camera/camera/color/camera_info',
+            'depth_topic': '/camera/camera_1/aligned_depth_to_color/image_raw',
+            'rgb_topic': '/camera/camera_1/color/image_raw',
+            'camera_info_topic': '/camera/camera_1/color/camera_info',
             'imu_topic': '/imu/data',
             'scan_topic': '/scan',
             'wait_imu_to_init': 'true',
