@@ -24,6 +24,17 @@ def generate_launch_description():
             'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
     )
 
+    urdf_file = os.path.join(
+        get_package_share_directory('slam_config'), 'urdf', 'goliath.urdf'
+    )
+
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': open(urdf_file).read()}]
+    )
+
     realsense_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(realsense_launch_file),
             launch_arguments={
@@ -36,7 +47,9 @@ def generate_launch_description():
                 'enable_accel': 'true',
                 'enable_sync': 'true',
                 'align_depth.enable': 'true',
-                'unite_imu_method': '2'
+                'unite_imu_method': '2',
+                'serial_no': '306322300659',
+                'camera_name': 'camera_1',
             }.items()
         )
     
@@ -73,16 +86,11 @@ def generate_launch_description():
         }.items()
     )
 
-    static_transform_publisher = Node(
-        package='tf2_ros', executable='static_transform_publisher', output='screen',
-        arguments=['-.15', '0', '0', '0', '0', '0', 'camera_link', 'laser']
-    )
-
     # Launch arguments
     return LaunchDescription([
+        robot_state_publisher_node,
         rplidar_launch,
         realsense_launch,
         imu_filter_node,
         rtabmap_launch,
-        static_transform_publisher
     ])
