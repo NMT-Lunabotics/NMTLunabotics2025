@@ -22,7 +22,7 @@ def generate_launch_description():
     
     launch_nav_arg = DeclareLaunchArgument(
         'launch_nav',
-        default_value='false',
+        default_value='true',
         description='Launch navigation if true'
     )
     
