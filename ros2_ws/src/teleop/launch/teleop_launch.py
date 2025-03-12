@@ -1,8 +1,20 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument
 
 
 def generate_launch_description():
+    
+    # Declare the launch argument for device_id
+    device_id_arg = DeclareLaunchArgument(
+        'device_id',
+        default_value='0',
+        description='Joystick device ID'
+    )
+
+    # Create a LaunchConfiguration to use the argument
+    device_id = LaunchConfiguration('device_id')
     return LaunchDescription([
         # Start the joystick node
         Node(
@@ -12,7 +24,7 @@ def generate_launch_description():
             output='screen',
             # Adjust the joystick device if necessary
             parameters=[{
-                'device_id': 0,
+                'device_id': device_id,
                 'deadzone': 0.2
             }]
         ),
