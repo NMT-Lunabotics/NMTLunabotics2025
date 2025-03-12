@@ -73,7 +73,7 @@ def generate_launch_description():
             'imu_topic': '/imu/data',
             'scan_topic': '/scan',
             'wait_imu_to_init': 'true',
-            'frame_id': 'laser',
+            'frame_id': 'base_link',
             'subscribe_depth': 'true',
             'subscribe_rgb': 'true',
             'subscribe_stereo': 'false',
