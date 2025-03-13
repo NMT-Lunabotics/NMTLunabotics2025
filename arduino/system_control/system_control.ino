@@ -6,10 +6,11 @@ bool emergency_stop = false;
 //------------------------------------------
 //big motors
 //------------------------------------------
-char motor1_address = 0x58;     // Motor 1 I2C address
-char motor2_address = 0x58;     // Motor 2 I2C address  // TODO change address
+char motor1_address = 0x58;  // Motor 1 I2C address
+char motor2_address = 0x58;  // Motor 2 I2C address  // TODO change address
 
 const float rpm_to_pwm_constant = 2.5;  // Conversion between rpm and pwm values
+float last_motor_command = 0;
 //------------------------------------------
 //bucket actuator
 //------------------------------------------
@@ -31,6 +32,7 @@ int bucket_target_vel = 1;   // Defualt velocity of bucket actuator and storage 
 
 int bucket_update_rate = 50;  // Update rate to update bucket actuator at, (hz)
 
+float last_bucket_command = 0;
 //------------------------------------------
 //dual actuators
 //------------------------------------------ TODO change back to read_analog_raw(), if required
@@ -56,10 +58,12 @@ int dual_max_error = 5;
 
 int dual_error_factor = 12;
 
+float last_dual_command = 0;
+
 void setup() {
   Serial.begin(9600);  // Set baud rate to match Python script  2000000
   delay(100);
-  Wire.begin(); // Start I2C communication
+  Wire.begin();  // Start I2C communication
 
   // Set bucket actuator pins as output and potentiometer as analog input pin
   pinMode(bucket_speed_pin, OUTPUT);
@@ -74,8 +78,17 @@ void setup() {
   pinMode(dual_potentiometer_left, INPUT);
   pinMode(dual_potentiometer_right, INPUT);
 }
-
+const int timeout = 2 * 1000;  //2 seconds 
 void loop() {
+  float current_time = millis();
+  // If no command is recived within timeout seconds, stop motor, and do not update actuator position
+  if ((current_time - last_motor_command) > timeout) {
+    sendI2CCommand(motor1_address, 0x00, 0);
+    sendI2CCommand(motor2_address, 0x00, 0);
+  }
+  if ((current_time - last_bucket_command) <= timeout) bucketActuatorUpdate(bucket_target_pos, bucket_target_vel);
+  if ((current_time - last_dual_command) <= timeout) dualActuatorUpdate(dual_target_pos, dual_target_vel);
+
   if (Serial.available()) {
     String inputString = Serial.readStringUntil('>');  // Read until '>'
     if (inputString.startsWith("<")) {                 // Ensure message starts with '<'
@@ -99,23 +112,38 @@ void loop() {
         case 'M':  //<M,Motor1 speed,Motor2 speed>
           {
             //Serial.println("Recived Motor Command");
+            last_motor_command = millis();
             int rpm_motor1 = inputString.substring(0, commaIndex).toInt();
             int rpm_motor2 = inputString.substring(commaIndex + 1).toInt();
             operateMotor(rpm_motor1, rpm_motor2);
+            Serial.print("motor1 command");
+            Serial.print(rpm_motor1);
+            Serial.print("motor2 command");
+            Serial.print(rpm_motor2);
             break;
           }
         case 'B':  //<B,position> or <B,position,velocity>
           {
             //Serial.println("Recived Bucket Actuator Command");
+            last_bucket_command = millis();
             bucket_target_pos = inputString.substring(0, commaIndex).toInt();
             if (elementCount >= 2) bucket_target_vel = inputString.substring(commaIndex + 1).toInt();
+            Serial.print("bucket velocity");
+            Serial.print(bucket_target_pos);
+            Serial.print("bucket position");
+            Serial.print(bucket_target_vel);
             break;
           }
         case 'L':  //<L,position> or <L,position,velocity>
           {
             //Serial.println("Recived Dual Actuator Command");
+            last_dual_command = millis();
             dual_target_pos = inputString.substring(0, commaIndex).toInt();
             if (elementCount >= 2) dual_target_vel = inputString.substring(commaIndex + 1).toInt();
+            Serial.print("dual velocity");
+            Serial.print(dual_target_pos);
+            Serial.print("dual position");
+            Serial.print(dual_target_vel);
             break;
           }
         default:
@@ -124,13 +152,11 @@ void loop() {
       }
     }
   }
-  if (emergency_stop == true) { // Set motor 1 and 2 direction (0x00 command register) to instant stop
+  if (emergency_stop == true) {  // Set motor 1 and 2 direction (0x00 command register) to instant stop
     sendI2CCommand(motor1_address, 0x00, 0);
     sendI2CCommand(motor2_address, 0x00, 0);
     return;
   }
-  bucketActuatorUpdate(bucket_target_pos, bucket_target_vel);
-  dualActuatorUpdate(dual_target_pos, dual_target_vel);
 }
 
 void operateMotor(int rpm_motor1, int rpm_motor2) {
@@ -145,9 +171,9 @@ void operateMotor(int rpm_motor1, int rpm_motor2) {
 
   // Run motor 1 and 2 directions (0x00 command register) to forwards/reverse
   if (rpm_motor1 >= 0) sendI2CCommand(motor1_address, 0x00, 1);
-  else sendI2CCommand(motor1_address, 0x00, 2); 
+  else sendI2CCommand(motor1_address, 0x00, 2);
   if (rpm_motor2 >= 0) sendI2CCommand(motor2_address, 0x00, 1);
-  else sendI2CCommand(motor2_address, 0x00, 2); 
+  else sendI2CCommand(motor2_address, 0x00, 2);
 
   /*Serial.print("pwm_motor1: ");
     Serial.print(pwm_motor1);
@@ -165,7 +191,7 @@ void bucketActuatorUpdate(int bucket_target_pos, int bucket_target_vel) {  //upd
   if (current_time - bucket_last_time < dt) return;
   bucket_last_time = current_time;
 
-  int pos = map(analogRead(bucket_potentiometer_pin), bucket_potMin, bucket_potMax, 0, bucket_stroke);//TODO replace with replacment for potentiometer reader
+  int pos = map(analogRead(bucket_potentiometer_pin), bucket_potMin, bucket_potMax, 0, bucket_stroke);  //TODO replace with replacment for potentiometer reader
 
   if (bucket_target_pos == -1) {
     speed = bucket_target_vel * 51;
@@ -204,7 +230,7 @@ void dualActuatorUpdate(int target_pos, int target_vel) {
   if (current_time - dual_last_time < dt) return;
   dual_last_time = current_time;
 
-  int pos_l = map(analogRead(dual_potentiometer_left), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader 
+  int pos_l = map(analogRead(dual_potentiometer_left), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader
   //map(dual_potentiometer_left.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
   int pos_r = map(analogRead(dual_potentiometer_right), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader
   //map(dual_potentiometer_right.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
@@ -271,16 +297,16 @@ void dualActuatorUpdate(int target_pos, int target_vel) {
 void set_speed(int speedPin, int dirPin, int signed_speed, bool invert_direction) {  //set speed of bucket and dual actuators
   if (emergency_stop == true) return;
   if (invert_direction) {
-    digitalWrite(dirPin, signed_speed > 0); //TODO replace with replacment for actuator PWM pin direction
+    digitalWrite(dirPin, signed_speed > 0);  //TODO replace with replacment for actuator PWM pin direction
   } else {
-    digitalWrite(dirPin, signed_speed < 0); //TODO replace with replacment for actuator PWM pin direction
+    digitalWrite(dirPin, signed_speed < 0);  //TODO replace with replacment for actuator PWM pin direction
   }
-  analogWrite(speedPin, abs(signed_speed)); //TODO replace with replacment for actuator PWM pin speed
+  analogWrite(speedPin, abs(signed_speed));  //TODO replace with replacment for actuator PWM pin speed
 }
 
-void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
-    Wire.beginTransmission(address);    // begin transmission with our selected driver
-    Wire.write(operationRegister);      // enter the desired register
-    Wire.write(value);                  // send the data to the register 
-    Wire.endTransmission();
+void sendI2CCommand(byte address, byte operationRegister, byte value) {  // send command using I2C pin protocol for (MDO4 motor driver)
+  Wire.beginTransmission(address);                                       // begin transmission with our selected driver
+  Wire.write(operationRegister);                                         // enter the desired register
+  Wire.write(value);                                                     // send the data to the register
+  Wire.endTransmission();
 }
