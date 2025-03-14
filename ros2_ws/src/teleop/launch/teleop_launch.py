@@ -16,6 +16,7 @@ def generate_launch_description():
     # Create a LaunchConfiguration to use the argument
     device_id = LaunchConfiguration('device_id')
     return LaunchDescription([
+        device_id_arg,
         # Start the joystick node
         Node(
             package='joy',

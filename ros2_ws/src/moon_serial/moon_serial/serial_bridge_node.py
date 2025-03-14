@@ -30,12 +30,21 @@ class SerialBridgeNode(Node):
         self.timer = self.create_timer(0.1, self.serial_read_callback)
         
     def serial_write_callback(self, msg):
-        self.serial_conn.write(msg.data.encode())
+        try:
+            self.serial_conn.write(msg.data.encode())
+        except Exception as e:
+            self.get_logger().warn('Failed to write to serial: {}'.format(e))
         
     def serial_read_callback(self):
-        if self.serial_conn.in_waiting > 0:
-            data = self.serial_conn.readline().decode().strip()
-            self.publisher.publish(String(data=data))
+        try:
+            if self.serial_conn.in_waiting > 0:
+                try:
+                    data = self.serial_conn.readline().decode().strip()
+                    self.publisher.publish(String(data=data))
+                except UnicodeDecodeError:
+                    self.get_logger().warn('Failed to decode serial data')
+        except Exception as e:
+            self.get_logger().warn('Failed to read from serial: {}'.format(e))
 
 def main(args=None):
     rclpy.init(args=args)

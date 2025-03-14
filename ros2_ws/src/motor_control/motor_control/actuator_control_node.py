@@ -8,7 +8,6 @@ class ActuatorControlNode(Node):
     def __init__(self):
         super().__init__('actuator_control_node')
         
-        # Load parameters from YAML file
         self.declare_parameters(
             namespace='',
             parameters=[
@@ -35,11 +34,11 @@ class ActuatorControlNode(Node):
 
     def velocity_deadzone(self, axis_value):
         if axis_value < -0.5:
-            return -5
+            return -5.0
         elif axis_value > 0.5:
-            return 5
+            return 5.0
         else:
-            return 0
+            return 0.0
 
     def joy_callback(self, msg):
         actuator_max_vel = self.get_parameter('actuator_max_vel').get_parameter_value().integer_value
