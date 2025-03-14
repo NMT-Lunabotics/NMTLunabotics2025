@@ -14,9 +14,9 @@ const int ledg_pin = 7;
 const int ledb_pin = 8;
 
 //Actuators
-char a1_i2c_address = 0xB0;
-char a2_i2c_address = 0xB2;
-char a3_i2c_address = 0xB4;
+char a1_i2c_address = 0x58;
+char a2_i2c_address = 0x59;
+char a3_i2c_address = 0x5A;
 
 char speed_reg = 0x02;
 char dir_reg = 0x00;
@@ -26,7 +26,7 @@ const int pot2_pin = A1;
 const int pot3_pin = A2;
 
 //TODO implement servo logic
-const int servo_pin = 10;
+const int servo_pin = 12;
 
 bool emergency_stop = false;
 const unsigned long estop_timeout = 1000; // 1 second timeout
@@ -35,6 +35,8 @@ unsigned long last_message_time = 0;
 // PWM motor speeds
 int m1_speed = 0;
 int m2_speed = 0;
+
+int m_max_vel = 21; //rpm
 
 // Actuator targets
 int a1_speed = 0;
@@ -51,20 +53,21 @@ int a3_tgt = -1;
 // Actuator info
 //TODO get real numbers
 // Actuator stroke in mm
-int a12_stroke = 300;
-int a3_stroke = 250;
+int a12_stroke = 191;
+int a3_stroke = 140;
 
 //TODO calibrate actuators
-int a1_pot_min = 0;
-int a1_pot_max = 1023;
-int a2_pot_min = 0;
-int a2_pot_max = 1023;
-int a3_pot_min = 0;
-int a3_pot_max = 1023;
+int a1_pot_min = 32;
+int a1_pot_max = 869;
+int a2_pot_min = 32;
+int a2_pot_max = 869;
+int a3_pot_min = 29;
+int a3_pot_max = 782;
 
 int act_max_vel = 25; //mm/s
 float act_threshold = .5; //mm
 float act_error_factor = 1;
+float act_max_error = 5; // mm
 
 // Update rate
 int update_rate = 50; //hz
@@ -104,7 +107,6 @@ void loop() {
                     int m1_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
                     inputString = inputString.substring(inputString.indexOf(',') + 1);
                     int m2_speed = inputString.toInt();
-                    //TODO convert to PWM`
                     break;
                 }
                 case 'A': {
@@ -116,7 +118,6 @@ void loop() {
                     int a2_speed = a1_speed;
                     inputString = inputString.substring(inputString.indexOf(',') + 1);
                     int a3_speed = inputString.toInt();
-                    //TODO convert to 'pwm'
                     break;
                 }
             }
@@ -131,7 +132,6 @@ void loop() {
     }
 
     if (emergency_stop) {
-        //TODO make sure it stops
         motor_ctrl(0, 0);
         actuator_vel_ctrl(a1_i2c_address, 0);
         actuator_vel_ctrl(a2_i2c_address, 0);
@@ -149,15 +149,21 @@ void loop() {
     //Run motors
     motor_ctrl(m1_speed, m2_speed);
 
-=   //Get actuator feedback
+    //Get actuator feedback
     a1_pos = map(analogRead(pot1_pin), a1_pot_min, a1_pot_max, 0, a1_stroke);
     a2_pos = map(analogRead(pot2_pin), a2_pot_min, a2_pot_max, 0, a2_stroke);
     a3_pos = map(analogRead(pot3_pin), a3_pot_min, a3_pot_max, 0, a3_stroke);
 
-    //TODO send actuator feedback
+    //Send feedback
+    Serial.print("<F,");
+    Serial.print(a1_pos);
+    Serial.print(",");
+    Serial.print(a2_pos);
+    Serial.print(",");
+    Serial.print(a3_pos);
+    Serial.print(">");
     
     //Actuator control
-    //Velocity Control
     if (a3_tgt > 0) {
         float a3_error = a3_tgt - a3_pos;
         if (abs(a3_error) > act_threshold) {
@@ -172,6 +178,11 @@ void loop() {
         float a1_error = a12_tgt - a1_pos;
         float a2_error = a12_tgt - a2_pos;
         float a12_error = a1_pos - a2_pos;
+
+        if (a12_error > act_max_error) {
+            emergency_stop = true;
+            break;
+        }
 
         if (abs(a1_error) > act_threshold) {
             a1_speed = a1_error > 0 ? act_max_vel : -act_max_vel;
@@ -190,10 +201,7 @@ void loop() {
         a2_speed += factor;
     }
 
-    // Constrain all speeds
-    a1_speed = constrain(a1_speed, -act_max_vel, act_max_vel);
-    a2_speed = constrain(a2_speed, -act_max_vel, act_max_vel);
-    a3_speed = constrain(a3_speed, -act_max_vel, act_max_vel);
+    // Send it
     actuator_vel_ctrl(a3_i2c_address, a3_speed);
     actuator_vel_ctrl(a1_i2c_address, a1_speed);
     actuator_vel_ctrl(a2_i2c_address, a2_speed);
@@ -201,6 +209,14 @@ void loop() {
 }
 
 void motor_ctrl(int m1_speed, int m2_speed) {
+    // Convert motor speeds (in rpm) to PWM values (0-255)
+    // Constrain speeds to max velocity first
+    m1_speed = constrain(m1_speed, -m_max_vel, m_max_vel);
+    m2_speed = constrain(m2_speed, -m_max_vel, m_max_vel);
+
+    // Map the absolute speed values to PWM range
+    int m1_pwm = map(abs(m1_speed), 0, m_max_vel, 0, 255);
+    int m2_pwm = map(abs(m2_speed), 0, m_max_vel, 0, 255);
     if (m1_speed > 0) {
         analogWrite(dac11_pin, m1_speed);
         analogWrite(dac12_pin, 0);
@@ -219,7 +235,11 @@ void motor_ctrl(int m1_speed, int m2_speed) {
 }
 
 void actuator_vel_ctrl(char i2c_address, int speed) {
-    sendI2CCommand(i2c_address, speed_reg, abs(speed));
+    // Convert speed (in mm/s) to PWM value (0-255)
+    // Speed is clamped to max velocity
+    speed = constrain(speed, -act_max_vel, act_max_vel);
+    int pwm = map(abs(speed), 0, act_max_vel, 0, 255);
+    sendI2CCommand(i2c_address, speed_reg, pwm);
     sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
 }
 
@@ -229,6 +249,3 @@ void sendI2CCommand(byte address, byte operationRegister, byte value){      // s
     Wire.write(value);                  // send the data to the register 
     Wire.endTransmission();
 }
-
-
-//TODO figure out actuator position control
