@@ -136,13 +136,13 @@ void loop() {
         actuator_vel_ctrl(a1_i2c_address, 0);
         actuator_vel_ctrl(a2_i2c_address, 0);
         actuator_vel_ctrl(a3_i2c_address, 0);
-        break;
+        return;
     }
 
     // Update at a hz rate
     unsigned long current_time = millis();
     if (current_time - last_update_time < 1000 / update_rate) {
-        break;
+        return;
     }
     last_update_time = current_time;
 
@@ -150,8 +150,8 @@ void loop() {
     motor_ctrl(m1_speed, m2_speed);
 
     //Get actuator feedback
-    a1_pos = map(analogRead(pot1_pin), a1_pot_min, a1_pot_max, 0, a1_stroke);
-    a2_pos = map(analogRead(pot2_pin), a2_pot_min, a2_pot_max, 0, a2_stroke);
+    a1_pos = map(analogRead(pot1_pin), a1_pot_min, a1_pot_max, 0, a12_stroke);
+    a2_pos = map(analogRead(pot2_pin), a2_pot_min, a2_pot_max, 0, a12_stroke);
     a3_pos = map(analogRead(pot3_pin), a3_pot_min, a3_pot_max, 0, a3_stroke);
 
     //Send feedback
@@ -181,7 +181,7 @@ void loop() {
 
         if (a12_error > act_max_error) {
             emergency_stop = true;
-            break;
+            return;
         }
 
         if (abs(a1_error) > act_threshold) {
