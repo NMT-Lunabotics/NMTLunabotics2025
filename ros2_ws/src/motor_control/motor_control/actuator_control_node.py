@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from moon_messages.msg import Actuators
+from std_msgs.msg import Bool
 import yaml
 
 class ActuatorControlNode(Node):
@@ -14,7 +15,8 @@ class ActuatorControlNode(Node):
             ('joy_topic', '/joy'),
             ('actuator_max_vel', 25),
             ('bucket_axis', 3),
-            ('arm_axis', 4)
+            ('arm_axis', 4),
+            ('servo_btn', 0),
             ]
         )
         
@@ -30,7 +32,8 @@ class ActuatorControlNode(Node):
         self.subscription  # prevent unused variable warning
 
         # Create a publisher for the actuator control messages
-        self.publisher_ = self.create_publisher(Actuators, '/actuator_control', 10)
+        self.act_pub = self.create_publisher(Actuators, '/actuator_control', 10)
+        self.servo_pub = self.create_publisher(Bool, '/servo_control', 10)
 
     def velocity_deadzone(self, axis_value):
         if axis_value < -0.5:
@@ -48,6 +51,13 @@ class ActuatorControlNode(Node):
         bucket_value = msg.axes[bucket_axis] * actuator_max_vel
         arm_value = msg.axes[arm_axis] * actuator_max_vel
 
+        servo_msg = Bool()
+        if msg.buttons[self.get_parameter('servo_btn').get_parameter_value().integer_value] == 1:
+            servo_msg.data = True
+        else:
+            servo_msg.data = False
+        self.servo_pub.publish(servo_msg)
+
         bucket_value = self.velocity_deadzone(bucket_value)
         arm_value = self.velocity_deadzone(arm_value)
         
@@ -61,7 +71,7 @@ class ActuatorControlNode(Node):
         actuators_msg.bucket_vel = bucket_value
         actuators_msg.arm_vel = arm_value
 
-        self.publisher_.publish(actuators_msg)
+        self.act_pub.publish(actuators_msg)
         
 
         

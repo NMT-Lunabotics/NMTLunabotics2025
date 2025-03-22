@@ -1,8 +1,9 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from moon_messages.msg import Actuators
 from moon_messages.msg import Motors
+from moon_messages.msg import Led
 
 class SerialConvertNode(Node):
     def __init__(self):
@@ -14,6 +15,8 @@ class SerialConvertNode(Node):
         # Create subscribers for actuator_control and motor_control
         self.actuator_control_subscriber = self.create_subscription(Actuators, 'actuator_control', self.actuator_control_subscriber, 10)
         self.motor_control_subscriber = self.create_subscription(Motors, 'motor_control', self.motor_control_subscriber, 10)
+        self.servo_control_subscriber = self.create_subscription(Bool, 'servo_control', self.servo_control_subscriber, 10)
+        self.led_control_subscriber = self.create_subscription(Led, 'led_control', self.led_control_subscriber, 10)
 
         self.last_act_serial_msg = String()
         self.last_motor_serial_msg = String()
@@ -31,6 +34,19 @@ class SerialConvertNode(Node):
         if motor_control_msg.data != self.last_motor_serial_msg.data:
             self.last_motor_serial_msg = motor_control_msg
             self.serial_write_publisher.publish(motor_control_msg)
+    
+    def servo_control_subscriber(self, msg):
+        servo_control_msg = String()
+        if msg.data:
+            servo_control_msg.data = '<S,1>'
+        else:
+            servo_control_msg.data = '<S,0>'
+        self.serial_write_publisher.publish(servo_control_msg)
+    
+    def led_control_subscriber(self, msg):
+        led_control_msg = String()
+        led_control_msg.data = f'<L,{int(msg.red)},{int(msg.yellow)},{int(msg.green)},{int(msg.blue)}>'
+        self.serial_write_publisher.publish(led_control_msg)
 
 def main(args=None):
     rclpy.init(args=args)
