@@ -28,8 +28,8 @@ const int pot3_pin = A2;
 //TODO implement servo logic
 const int servo_pin = 12;
 
-bool emergency_stop = false;
-const unsigned long estop_timeout = 1000; // 1 second timeout
+bool timeout_stop = false;
+const unsigned long cmd_timeout = 1000; // 1 second timeout
 unsigned long last_message_time = 0;
 
 // PWM motor speeds
@@ -122,20 +122,36 @@ void loop() {
                 }
             }
             last_message_time = millis(); // Update the last message time
-            emergency_stop = false; // Reset emergency stop
+            timeout_stop = false; // Reset emergency stop
         }
     }
 
     // Check if the time since the last message exceeds the timeout
-    if (millis() - last_message_time > estop_timeout) {
-        emergency_stop = true;
+    if (millis() - last_message_time > cmd_timeout) {
+        timeout_stop = true;
     }
 
-    if (emergency_stop) {
+    if (timeout_stop) {
         motor_ctrl(0, 0);
         actuator_vel_ctrl(a1_i2c_address, 0);
         actuator_vel_ctrl(a2_i2c_address, 0);
         actuator_vel_ctrl(a3_i2c_address, 0);
+        return;
+    }
+
+    //Get actuator feedback
+    a1_pos = map(analogRead(pot1_pin), a1_pot_min, a1_pot_max, 0, a12_stroke);
+    a2_pos = map(analogRead(pot2_pin), a2_pot_min, a2_pot_max, 0, a12_stroke);
+    a3_pos = map(analogRead(pot3_pin), a3_pot_min, a3_pot_max, 0, a3_stroke);
+
+    float a1_error = a12_tgt - a1_pos;
+    float a2_error = a12_tgt - a2_pos;
+    float a3_error = a3_tgt - a3_pos;
+    float a12_error = a1_pos - a2_pos;
+
+    if (a12_error >= act_max_error) {
+        actuator_vel_ctrl(a1_i2c_address, 0);
+        actuator_vel_ctrl(a2_i2c_address, 0);
         return;
     }
 
@@ -149,11 +165,6 @@ void loop() {
     //Run motors
     motor_ctrl(m1_speed, m2_speed);
 
-    //Get actuator feedback
-    a1_pos = map(analogRead(pot1_pin), a1_pot_min, a1_pot_max, 0, a12_stroke);
-    a2_pos = map(analogRead(pot2_pin), a2_pot_min, a2_pot_max, 0, a12_stroke);
-    a3_pos = map(analogRead(pot3_pin), a3_pot_min, a3_pot_max, 0, a3_stroke);
-
     //Send feedback
     Serial.print("<F,");
     Serial.print(a1_pos);
@@ -165,7 +176,6 @@ void loop() {
     
     //Actuator control
     if (a3_tgt > 0) {
-        float a3_error = a3_tgt - a3_pos;
         if (abs(a3_error) > act_threshold) {
             a3_speed = a3_error > 0 ? act_max_vel : -act_max_vel;
         } else {
@@ -175,15 +185,6 @@ void loop() {
   
 
     if (a12_tgt > 0 ) {
-        float a1_error = a12_tgt - a1_pos;
-        float a2_error = a12_tgt - a2_pos;
-        float a12_error = a1_pos - a2_pos;
-
-        if (a12_error > act_max_error) {
-            emergency_stop = true;
-            return;
-        }
-
         if (abs(a1_error) > act_threshold) {
             a1_speed = a1_error > 0 ? act_max_vel : -act_max_vel;
         } else {
