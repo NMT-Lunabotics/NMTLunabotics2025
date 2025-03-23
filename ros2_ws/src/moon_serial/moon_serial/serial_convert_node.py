@@ -1,55 +1,54 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String, Bool
-from moon_messages.msg import Actuators
-from moon_messages.msg import Motors
-from moon_messages.msg import Led
+from moon_messages.msg import Actuators, Motors,  Leds, Bytes
+import struct
 
 class SerialConvertNode(Node):
     def __init__(self):
         super().__init__('serial_convert_node')
-
-        # Create publisher for serial_write
-        self.serial_write_publisher = self.create_publisher(String, 'serial_write', 10)
-
-        # Create subscribers for actuator_control and motor_control
-        self.actuator_control_subscriber = self.create_subscription(Actuators, 'actuator_control', self.actuator_control_subscriber, 10)
-        self.motor_control_subscriber = self.create_subscription(Motors, 'motor_control', self.motor_control_subscriber, 10)
-        self.servo_control_subscriber = self.create_subscription(Bool, 'servo_control', self.servo_control_subscriber, 10)
-        self.led_control_subscriber = self.create_subscription(Led, 'led_control', self.led_control_subscriber, 10)
-
-        self.last_act_serial_msg = String()
-        self.last_motor_serial_msg = String()
-        self.last_servo_serial_msg = String()
-
+        
+        self.last_act_serial_msg = b''
+        self.last_motor_serial_msg = b''
+        self.last_servo_serial_msg = b''
+        
+        self.serial_write_publisher = self.create_publisher(Bytes, '/serial_write', 10)
+        
+        self.create_subscription(Actuators, '/actuator_control', self.actuator_control_subscriber, 10)
+        self.create_subscription(Motors, '/motor_control', self.motor_control_subscriber, 10)
+        self.create_subscription(Bool, '/servo_control', self.servo_control_subscriber, 10)
+        self.create_subscription(Leds, '/led_control', self.led_control_subscriber, 10)
+    
     def actuator_control_subscriber(self, msg):
-        actuator_control_msg = String()
-        actuator_control_msg.data = f'<A,{msg.arm_pos},{msg.bucket_pos},{msg.arm_vel},{msg.bucket_vel}>'
-        if actuator_control_msg.data != self.last_act_serial_msg.data:
-            self.last_act_serial_msg = actuator_control_msg
-            self.serial_write_publisher.publish(actuator_control_msg)
+        data = struct.pack('>Bhhbb', ord('A'), msg.arm_pos, msg.bucket_pos, msg.arm_vel, msg.bucket_vel)
+        if data != self.last_act_serial_msg:
+            self.last_act_serial_msg = data
+            self.send_serial_data(data)
     
     def motor_control_subscriber(self, msg):
-        motor_control_msg = String()
-        motor_control_msg.data = f'<M,{msg.left},{msg.right}>'
-        if motor_control_msg.data != self.last_motor_serial_msg.data:
-            self.last_motor_serial_msg = motor_control_msg
-            self.serial_write_publisher.publish(motor_control_msg)
+        data = struct.pack('>Bbb', ord('M'), msg.left, msg.right)
+        if data != self.last_motor_serial_msg:
+            self.last_motor_serial_msg = data
+            self.send_serial_data(data)
     
     def servo_control_subscriber(self, msg):
-        servo_control_msg = String()
-        if msg.data:
-            servo_control_msg.data = '<S,1>'
-        else:
-            servo_control_msg.data = '<S,0>'
-        if servo_control_msg.data != self.last_servo_serial_msg.data:
-            self.last_servo_serial_msg = servo_control_msg
-            self.serial_write_publisher.publish(servo_control_msg)
+        data = struct.pack('>BB', ord('S'), 1 if msg.data else 0)
+        if data != self.last_servo_serial_msg:
+            self.last_servo_serial_msg = data
+            self.send_serial_data(data)
     
     def led_control_subscriber(self, msg):
-        led_control_msg = String()
-        led_control_msg.data = f'<L,{int(msg.red)},{int(msg.yellow)},{int(msg.green)},{int(msg.blue)}>'
-        self.serial_write_publisher.publish(led_control_msg)
+        data = struct.pack('>BBBBB', ord('L'), int(msg.red), int(msg.yellow), int(msg.green), int(msg.blue))
+        if data != self.last_led_serial_msg:
+            self.last_led_serial_msg = data
+            self.send_serial_data(data)
+    
+    def send_serial_data(self, data):
+        start_byte = b'\x02'
+        end_byte = b'\x03'
+        length_byte = struct.pack('>B', len(data))
+        message = start_byte + length_byte + data + end_byte
+        self.serial_write_publisher.publish(Bytes(data=message))
 
 def main(args=None):
     rclpy.init(args=args)

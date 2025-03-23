@@ -20,12 +20,16 @@ class ActuatorControlNode(Node):
             ]
         )
         
-        joy_topic = self.get_parameter('joy_topic').get_parameter_value().string_value
+        self.joy_topic = self.get_parameter('joy_topic').get_parameter_value().string_value
+        self.actuator_max_vel = self.get_parameter('actuator_max_vel').get_parameter_value().integer_value
+        self.bucket_axis = self.get_parameter('bucket_axis').get_parameter_value().integer_value
+        self.arm_axis = self.get_parameter('arm_axis').get_parameter_value().integer_value
+        self.servo_btn = self.get_parameter('servo_btn').get_parameter_value().integer_value
         
         # Subscribe to the joy topic
         self.subscription = self.create_subscription(
             Joy,
-            joy_topic,
+            self.joy_topic,
             self.joy_callback,
             10
         )
@@ -37,19 +41,15 @@ class ActuatorControlNode(Node):
 
     def velocity_deadzone(self, axis_value):
         if axis_value < -0.5:
-            return -5.0
+            return -self.actuator_max_vel
         elif axis_value > 0.5:
-            return 5.0
+            return self.actuator_max_vel
         else:
-            return 0.0
+            return 0
 
     def joy_callback(self, msg):
-        actuator_max_vel = self.get_parameter('actuator_max_vel').get_parameter_value().integer_value
-        bucket_axis = self.get_parameter('bucket_axis').get_parameter_value().integer_value
-        arm_axis = self.get_parameter('arm_axis').get_parameter_value().integer_value
-
-        bucket_value = msg.axes[bucket_axis] * actuator_max_vel
-        arm_value = msg.axes[arm_axis] * actuator_max_vel
+        bucket_value = msg.axes[self.bucket_axis] * self.actuator_max_vel
+        arm_value = msg.axes[self.arm_axis] * self.actuator_max_vel
 
         servo_msg = Bool()
         if msg.buttons[self.get_parameter('servo_btn').get_parameter_value().integer_value] == 1:

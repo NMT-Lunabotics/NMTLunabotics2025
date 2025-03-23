@@ -1,2 +1,2 @@
-int32 left
-int32 right
+int8 left
+int8 right
