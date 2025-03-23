@@ -140,6 +140,7 @@ public:
             dac1.write_pwm_raw(0);
             dac2.write_pwm_raw(abs(motor_speed));
         }
+        Serial.println(motor_speed);
     }
 
     void stop() {
@@ -152,8 +153,6 @@ public:
 
 void setup(){
     Serial.begin(2000000);
-    while (!Serial)
-        ;
     Wire.begin();
 
     // Set up actuators
@@ -249,6 +248,7 @@ void setup(){
         if (current_time - last_update_time < 1000 / update_rate) {
             continue;
         }
+
         last_update_time = current_time;
 
         int aL_pos = act_left.pos_mm();
@@ -262,7 +262,7 @@ void setup(){
         Serial.print(aR_pos);
         Serial.print(",");
         Serial.print(aB_pos);
-        Serial.print(">");
+        Serial.println(">");
 
         // Actuator control
         if (aB_tgt > 0) {
