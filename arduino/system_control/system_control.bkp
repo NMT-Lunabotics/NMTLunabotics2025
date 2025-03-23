@@ -1,312 +1,469 @@
-//#include "helpers.hpp"
-//#include "main_bus.hpp"
-//#include <Arduino_CAN.h>
 #include <Wire.h>
+#include "helpers.hpp"
+
+//TODO check pins
+
+//////// ACTUATORS ////////
+//Left side is L, right side is R, both is LR, bucket is B
+// I2C addresses for actuators
+#define AL_I2C_ADDRESS 0x58;
+#define AR_I2C_ADDRESS 0x59;
+#define AB_I2C_ADDRESS 0x5A;
+
+// I2C registers for actuators
+#define SPEED_REG = 0x02;
+#define DIR_REG = 0x00;
+
+// Actuator potentiometer read pins
+#define MEDIAN_SIZE = 15; // Median filter window size for potentionmeter smoothing
+#define POTL_PIN A0;
+#define POTR_PIN A1;
+#define POTB_PIN A2;
+
+// // Actuator targets
+int aL_speed = 0;
+int aR_speed = 0;
+int aB_speed = 0;
+
+float aL_pos = 0;
+float aR_pos = 0;
+float aB_pos = 0;
+
+int aLR_tgt = -1;
+int aB_tgt = -1;
+
+//////// MOTORS ////////
+#define DACL1_PIN 3;
+#define DACL2_PIN 5;
+#define DACR1_PIN 6;
+#define DACR2_PIN 9;
+
+//TODO implement servo logic
+#define SERVO_PIN 12;
+
 bool emergency_stop = false;
-//------------------------------------------
-//big motors
-//------------------------------------------
-char motor1_address = 0x58;  // Motor 1 I2C address
-char motor2_address = 0x58;  // Motor 2 I2C address  // TODO change address
+const unsigned long estop_timeout = 1000; // 1 second timeout
+unsigned long last_message_time = 0;
 
-const float rpm_to_pwm_constant = 2.5;  // Conversion between rpm and pwm values
-float last_motor_command = 0;
-//------------------------------------------
-//bucket actuator
-//------------------------------------------
-const int bucket_speed_pin = 3;           // Bucket actuator speed, (pwm)
-const int bucket_direction_pin = 4;       // Bucket actuator direction pin
-const int bucket_potentiometer_pin = A0;  // Bucket actuator potentiometer adjustment pin
+int motor_max_vel = 21; //rpm
 
-int bucket_max_speed = 240;  // Max bucket actuator speed, (6 mm/s)
-int bucket_threshold = 1;
-int bucket_min_pos = 17;   // Min bucket actuator position
-int bucket_max_pos = 270;  // Max bucket actuator position
+// Actuator info
+// Actuator stroke in mm
+#define ALR_STROKE = 191;
+#define AB_STROKE = 140;
 
-int bucket_stroke = 300;  // Stroke length, (mm):
-int bucket_potMin = 34;   // Calibrated min potentiometer mapping range to stroke range
-// TODO fix
-int bucket_potMax = 945;     // Calibrated max potentiometer mapping range to stroke range
-int bucket_target_pos = -1;  // (mm)
-int bucket_target_vel = 1;   // Defualt velocity of bucket actuator and storage of saved velocity
+// Actuator Calibration
+#define AL_POT_MIN = 32;
+#define AL_POT_MAX = 869;
+#define AR_POT_MIN = 32;
+#define AR_POT_MAX = 869;
+#define AB_POT_MIN = 29;
+#define AB_POT_MAX = 782;
 
-int bucket_update_rate = 50;  // Update rate to update bucket actuator at, (hz)
+float act_max_vel = 25; //mm/s
+float act_threshold = 0.5; //mm
+float act_error_factor = 1;
+float act_max_error = 5; // mm
 
-float last_bucket_command = 0;
-//------------------------------------------
-//dual actuators
-//------------------------------------------ TODO change back to read_analog_raw(), if required
-const int dual_speed_left = 3;            // Left dual actuator speed pin
-const int dual_speed_right = 5;           // Right dual actuator speed pin
-const int dual_direction_left = 4;        // Left dual actuator direction pin
-const int dual_direction_right = 6;       // Right dual actuator direction pin
-const int dual_potentiometer_left = A0;   // Left dual actuator potentiometer pin
-const int dual_potentiometer_right = A1;  // Right dual actuator potentiometer pin
+// Update rate
+int update_rate = 50; //hz
+unsigned long last_update_time = 0;
 
-int dual_target_pos = -1;  // (mm)
-int dual_target_vel = 1;   //Defualt velocity of bucket actuator and storage of saved velocity (mm/s)
+//////// Actuator Class ////////
+// Takes in the I2C address, speed register, direction register, speed, potentiometer pin, and invert direction
+// pos_mm() returns the position of the actuator in mm
+// set_speed() sets the speed of the actuator
+// sendI2CCommand() sends an I2C command to the actuator
+class Actuator {
+    char i2c_address;
+    char speed_reg;
+    char dir_reg;
 
-int dual_max_speed = 200;  // (5 mm/s)
-float dual_threshold = 1;  // in mm
+    SmoothedInput<MEDIAN_SIZE> pot;
 
-int dual_stroke = 250;  // stroke length, in mm:
-int dual_potMin = 34;   // Calibrated, pot val at min stroke
-int dual_potMax = 945;  // Calibrated, pot val at max stroke
+    bool invert_direction;
 
-int dual_update_rate = 50;  //(hz)
-int dual_max_error = 5;
+    int stroke;
+    int pot_min;
+    int pot_max;
+    int act_max_vel;
 
-int dual_error_factor = 12;
-
-float last_dual_command = 0;
-
-void setup() {
-  Serial.begin(9600);  // Set baud rate to match Python script  2000000
-  delay(100);
-  Wire.begin();  // Start I2C communication
-
-  // Set bucket actuator pins as output and potentiometer as analog input pin
-  pinMode(bucket_speed_pin, OUTPUT);
-  pinMode(bucket_direction_pin, OUTPUT);
-  pinMode(bucket_potentiometer_pin, INPUT);
-
-  // Set dual actuators pins as output and potentiometers as analog input pin
-  pinMode(dual_speed_left, OUTPUT);
-  pinMode(dual_speed_right, OUTPUT);
-  pinMode(dual_direction_left, OUTPUT);
-  pinMode(dual_direction_right, OUTPUT);
-  pinMode(dual_potentiometer_left, INPUT);
-  pinMode(dual_potentiometer_right, INPUT);
-}
-const int timeout = 2 * 1000;  //2 seconds 
-void loop() {
-  float current_time = millis();
-  // If no command is recived within timeout seconds, stop motor, and do not update actuator position
-  if ((current_time - last_motor_command) > timeout) {
-    sendI2CCommand(motor1_address, 0x00, 0);
-    sendI2CCommand(motor2_address, 0x00, 0);
-  }
-  if ((current_time - last_bucket_command) <= timeout) bucketActuatorUpdate(bucket_target_pos, bucket_target_vel);
-  if ((current_time - last_dual_command) <= timeout) dualActuatorUpdate(dual_target_pos, dual_target_vel);
-
-  if (Serial.available()) {
-    String inputString = Serial.readStringUntil('>');  // Read until '>'
-    if (inputString.startsWith("<")) {                 // Ensure message starts with '<'
-      inputString = inputString.substring(1);          // Remove the starting '<'
-      char operation = inputString[0];
-      inputString = inputString.substring(2);  // Remove operation type ie "M" or "B"
-      int commaIndex = inputString.indexOf(',');
-
-      int elementCount = 0;  // Count number of inputs for actuators which allow multiple 1-2 values for input
-      for (int i = 0; i < inputString.length(); i++) {
-        if (inputString[i] == ',') continue;
-        elementCount = elementCount + 1;
-      }
-      switch (operation) {
-        case 'E':  //<E,stop/start>
-          {
-            if (inputString.substring(0, commaIndex).toInt() == 0) emergency_stop = false;
-            else emergency_stop = true;
-            break;
-          }
-        case 'M':  //<M,Motor1 speed,Motor2 speed>
-          {
-            //Serial.println("Recived Motor Command");
-            last_motor_command = millis();
-            int rpm_motor1 = inputString.substring(0, commaIndex).toInt();
-            int rpm_motor2 = inputString.substring(commaIndex + 1).toInt();
-            operateMotor(rpm_motor1, rpm_motor2);
-            Serial.print("motor1 command");
-            Serial.print(rpm_motor1);
-            Serial.print("motor2 command");
-            Serial.print(rpm_motor2);
-            break;
-          }
-        case 'B':  //<B,position> or <B,position,velocity>
-          {
-            //Serial.println("Recived Bucket Actuator Command");
-            last_bucket_command = millis();
-            bucket_target_pos = inputString.substring(0, commaIndex).toInt();
-            if (elementCount >= 2) bucket_target_vel = inputString.substring(commaIndex + 1).toInt();
-            Serial.print("bucket velocity");
-            Serial.print(bucket_target_pos);
-            Serial.print("bucket position");
-            Serial.print(bucket_target_vel);
-            break;
-          }
-        case 'L':  //<L,position> or <L,position,velocity>
-          {
-            //Serial.println("Recived Dual Actuator Command");
-            last_dual_command = millis();
-            dual_target_pos = inputString.substring(0, commaIndex).toInt();
-            if (elementCount >= 2) dual_target_vel = inputString.substring(commaIndex + 1).toInt();
-            Serial.print("dual velocity");
-            Serial.print(dual_target_pos);
-            Serial.print("dual position");
-            Serial.print(dual_target_vel);
-            break;
-          }
-        default:
-          Serial.println("Error: Unknown operation!");
-          break;
-      }
+public:
+    Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, int stroke, int potMin, 
+             int potMax, int act_max_vel)
+        : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), potMin(potMin), 
+          potMax(potMax), act_max_vel(act_max_vel) {}
+        
+    int pos_mm() { return map(pot.read_analog_raw(), potMin, potMax, 0, stroke); }
+    
+    void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
+        Wire.beginTransmission(address);    // begin transmission with our selected driver
+        Wire.write(operationRegister);      // enter the desired register
+        Wire.write(value);                  // send the data to the register 
+        Wire.endTransmission();
     }
-  }
-  if (emergency_stop == true) {  // Set motor 1 and 2 direction (0x00 command register) to instant stop
-    sendI2CCommand(motor1_address, 0x00, 0);
-    sendI2CCommand(motor2_address, 0x00, 0);
-    return;
-  }
-}
-
-void operateMotor(int rpm_motor1, int rpm_motor2) {
-  if (emergency_stop == true) return;
-  // Convert RPM to PWM using the constant to get into (0-255) speed range for motor drivers
-  int motor1_speed = constrain(abs(rpm_motor1) * rpm_to_pwm_constant, 0, 255);
-  int motor2_speed = constrain(abs(rpm_motor2) * rpm_to_pwm_constant, 0, 255);
-
-  // Set motor 1 and 2 speed (0x02 speed register)
-  sendI2CCommand(motor1_address, 0x02, motor1_speed);
-  sendI2CCommand(motor2_address, 0x02, motor2_speed);
-
-  // Run motor 1 and 2 directions (0x00 command register) to forwards/reverse
-  if (rpm_motor1 >= 0) sendI2CCommand(motor1_address, 0x00, 1);
-  else sendI2CCommand(motor1_address, 0x00, 2);
-  if (rpm_motor2 >= 0) sendI2CCommand(motor2_address, 0x00, 1);
-  else sendI2CCommand(motor2_address, 0x00, 2);
-
-  /*Serial.print("pwm_motor1: ");
-    Serial.print(pwm_motor1);
-    Serial.print('\t');
-    Serial.print("pwm_motor2: ");
-    Serial.println(pwm_motor2);*/
-}
-
-void bucketActuatorUpdate(int bucket_target_pos, int bucket_target_vel) {  //update bucket actuator until position is reached within threshold
-  if (emergency_stop == true) return;
-  int bucket_last_time;
-  int speed;
-  int current_time = millis();
-  int dt = 1000 / bucket_update_rate;
-  if (current_time - bucket_last_time < dt) return;
-  bucket_last_time = current_time;
-
-  int pos = map(analogRead(bucket_potentiometer_pin), bucket_potMin, bucket_potMax, 0, bucket_stroke);  //TODO replace with replacment for potentiometer reader
-
-  if (bucket_target_pos == -1) {
-    speed = bucket_target_vel * 51;
-  } else {
-    int error = pos - bucket_target_pos;
-
-    if (error > bucket_threshold) {
-      speed = -bucket_max_speed;
-    } else if (error < -bucket_threshold) {
-      speed = bucket_max_speed;
-    } else {
-      speed = 1;
-    }
-  }
-
-  speed = constrain(speed, -bucket_max_speed, bucket_max_speed);
-
-  /*Serial.print("speed: ");
-  Serial.print(speed);
-  Serial.print('\t');
-  Serial.print("pos: ");
-  Serial.println(pos);*/
-
-  if ((pos < bucket_max_pos || speed <= 0) && (pos > bucket_min_pos || speed >= 0)) set_speed(bucket_speed_pin, bucket_direction_pin, -speed, false);
-  else set_speed(bucket_speed_pin, bucket_direction_pin, 0, false);
-}
-
-void dualActuatorUpdate(int target_pos, int target_vel) {
-  if (emergency_stop == true) return;
-  int speed_l = 0;
-  int speed_r = 0;
-  float dual_last_time;
-
-  float current_time = millis();
-  int dt = 1000 / dual_update_rate;
-  if (current_time - dual_last_time < dt) return;
-  dual_last_time = current_time;
-
-  int pos_l = map(analogRead(dual_potentiometer_left), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader
-  //map(dual_potentiometer_left.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
-  int pos_r = map(analogRead(dual_potentiometer_right), dual_potMin, dual_potMax, 0, dual_stroke);  //TODO replace with replacment for potentiometer reader
-  //map(dual_potentiometer_right.read_analog_raw(), dual_potMin, dual_potMax, 0, dual_stroke);
-  int error_lr = pos_l - pos_r;
-  int error_l = 0;
-  int error_r = 0;
-
-  bool doomsday = false;
-  if (error_lr > dual_max_error) {
-    doomsday = true;
-    //Serial.println("Doomsday");
-  }
-
-  if (target_pos == -1) {
-    speed_l = target_vel * 51;
-    speed_r = target_vel * 51;
-  } else {
-    error_l = pos_l - target_pos;
-    error_r = pos_r - target_pos;
-
-    if (error_l > dual_threshold) {
-      speed_l = -dual_max_speed;
-    } else if (error_l < -dual_threshold) {
-      speed_l = dual_max_speed;
-    } else {
-      speed_l = 0;
+    
+    void actuator_ctrl(int speed) {
+        // Convert speed (in mm/s) to PWM value (0-255)
+        // Speed is clamped to max velocity
+        speed = constrain(speed, -act_max_vel, act_max_vel);
+        int act_speed = map(abs(speed), 0, act_max_vel, 0, 255);
+        sendI2CCommand(i2c_address, speed_reg, act_speed);
+        sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
     }
 
-    if (error_r > dual_threshold) {
-      speed_r = -dual_max_speed;
-    } else if (error_r < -dual_threshold) {
-      speed_r = dual_max_speed;
-    } else {
-      speed_r = 0;
+    void stop() {
+        actuator_ctrl(0);
     }
-  }
-
-  int factor = dual_error_factor * error_lr;
-  speed_l -= factor;
-  speed_r += factor;
-
-  speed_l = constrain(speed_l, -255, 255);
-  speed_r = constrain(speed_r, -255, 255);
-
-  /*Serial.print("speed_l: ");
-  Serial.print(speed_l);
-  Serial.print('\t');
-  Serial.print("speed_r: ");
-  Serial.print(speed_r);
-  Serial.print('\t');
-  Serial.print("pos_l: ");
-  Serial.print(pos_l);
-  Serial.print('\t');
-  Serial.print("pos_r: ");
-  Serial.print(pos_r);
-  Serial.print('\t');
-  Serial.print("factor: ");
-  Serial.println(factor);*/
-
-  set_speed(dual_speed_left, dual_direction_left, -speed_l, false);
-  set_speed(dual_speed_right, dual_direction_right, -speed_r, false);
 }
 
-void set_speed(int speedPin, int dirPin, int signed_speed, bool invert_direction) {  //set speed of bucket and dual actuators
-  if (emergency_stop == true) return;
-  if (invert_direction) {
-    digitalWrite(dirPin, signed_speed > 0);  //TODO replace with replacment for actuator PWM pin direction
-  } else {
-    digitalWrite(dirPin, signed_speed < 0);  //TODO replace with replacment for actuator PWM pin direction
-  }
-  analogWrite(speedPin, abs(signed_speed));  //TODO replace with replacment for actuator PWM pin speed
+class Motor {
+    OutPin dac1;
+    OutPin dac2;
+
+    int motor_max_vel; //rpm
+
+public:
+    Motor(OutPin dac1, OutPin dac2, int motor_max_vel) : dac1(dac1), dac2(dac2) motor_max_vel(motor_max_vel) {}
+
+    motor_ctrl(int signed_speed) {
+        // Convert motor speeds (in rpm) to PWM values (0-255)
+        // Constrain speeds to max velocity first
+        signed_speed = constrain(signed_speed, -motor_max_vel, motor_max_vel);
+
+        // Map the absolute speed values to PWM range
+        int motor_speed = map(abs(signed_speed), 0, motor_max_vel, 0, 255);
+        if (signed_speed > 0) {
+            dac1.write_pwm_raw(motor_speed);
+            dac2.write_pwm_raw(0);
+        } else {
+            dac1.write_pwm_raw(0);
+            dac2.write_pwm_raw(abs(motor_speed));
+        }
+    }
+
+    void stop() {
+        motor_ctrl(0);
+        // Write inhibit here high in the case that we use it later on
+    }
+
 }
 
-void sendI2CCommand(byte address, byte operationRegister, byte value) {  // send command using I2C pin protocol for (MDO4 motor driver)
-  Wire.beginTransmission(address);                                       // begin transmission with our selected driver
-  Wire.write(operationRegister);                                         // enter the desired register
-  Wire.write(value);                                                     // send the data to the register
-  Wire.endTransmission();
+
+void setup(){
+    Serial.begin(2000000);
+    while (!Serial)
+        ;
+    Wire.begin();
+
+    // Set up actuators
+    Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+                      ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel);
+    Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+                      ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel);
+    Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
+                      AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel);
+
+    // Actuator speeds
+    int aL_speed = 0;
+    int aR_speed = 0;
+    int aB_speed = 0;
+
+    float aL_pos = 0;
+    float aR_pos = 0;
+    float aB_pos = 0;
+
+    int aLR_tgt = -1;
+    int aB_tgt = -1;
+
+    // Set up motors
+    Motor motor_left(DACL1_PIN, DACL2_PIN, motor_max_vel);
+    Motor motor_right(DACR1_PIN, DACR2_PIN, motor_max_vel);
+    
+    // Motor speeds
+    int mL_speed = 0;
+    int mR_speed = 0;
+
+    // Set up LEDs
+    OutPin ledr_pin(2);
+    OutPin ledy_pin(4);
+    OutPin ledg_pin(7);
+    OutPin ledb_pin(8);
+    
+    // Set up servo
+    OutPin servo_pin(12);
+
+    unsigned long current_time = millis();
+    unsigned long last_update_time = current_time;
+
+    while (true) {
+        if (Serial.available()) {
+            String inputString = Serial.readStringUntil('>');  // Read until '>'
+            if (inputString.startsWith("<")) {                 // Ensure message starts with '<'
+                inputString = inputString.substring(1);        // Remove the starting '<'
+                char operation = inputString[0];
+                inputString = inputString.substring(2);        // Remove operation type ie "M" or "B"
+                if (inputString.endsWith(">")) {
+                    inputString = inputString.substring(0, inputString.length() - 1);  // Remove the ending '>'
+                }
+    
+                switch (operation) {
+                    case 'M': {
+                        int mL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        inputString = inputString.substring(inputString.indexOf(',') + 1);
+                        int mR_speed = inputString.toInt();
+                        break;
+                    }
+                    case 'A': {
+                        int aLR_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        inputString = inputString.substring(inputString.indexOf(',') + 1);
+                        int aB_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        inputString = inputString.substring(inputString.indexOf(',') + 1);
+                        int aL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        int aR_speed = aL_speed;
+                        inputString = inputString.substring(inputString.indexOf(',') + 1);
+                        int aB_speed = inputString.toInt();
+                        break;
+                    }
+                }
+                last_message_time = millis(); // Update the last message time
+                emergency_stop = false; // Reset emergency stop
+            }
+        }
+        
+        if (emergency_stop) {
+            act_left.actuator_ctrl(0);
+            act_right.actuator_ctrl(0);
+            act_bucket.actuator_ctrl(0);
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
+            Serial.println("Estopped");
+        }
+
+        current_time = millis();
+
+        if (current_time - last_message_time > estop_timeout) {
+            emergency_stop = true;
+        }
+
+        if (current_time - last_update_time < 1000 / update_rate) {
+            continue;
+        }
+        last_update_time = current_time;
+
+        int aL_pos = act_left.pos_mm();
+        int aR_pos = act_right.pos_mm();
+        int aB_pos = act_bucket.pos_mm();
+
+        // Send feedback
+        Serial.print("<F,");
+        Serial.print(aL_pos);
+        Serial.print(",");
+        Serial.print(aR_pos);
+        Serial.print(",");
+        Serial.print(aB_pos);
+        Serial.print(">");
+
+        // Actuator control
+        if (aB_tgt > 0) {
+            float aB_error = aB_tgt - aB_pos;
+            if (abs(aB_error) > act_threshold) {
+                aB_speed = aB_error > 0 ? act_max_vel : -act_max_vel;
+            } else {
+                aB_speed = 0;
+            }
+        }
+        
+        
+        if (aLR_tgt > 0 ) {
+            float aL_error = aLR_tgt - aL_pos;
+            float aR_error = aLR_tgt - aR_pos;
+            float aLR_error = aL_pos - aR_pos;
+            
+            if (aLR_error > act_max_error) {
+                emergency_stop = true;
+                return;
+            }
+            
+            if (abs(aL_error) > act_threshold) {
+                aL_speed = aL_error > 0 ? act_max_vel : -act_max_vel;
+            } else {
+                aL_speed = 0;
+            }
+            
+            if (abs(aR_error) > act_threshold) {
+                aR_speed = aR_error > 0 ? act_max_vel : -act_max_vel;
+            } else {
+                aR_speed = 0;
+            }
+            
+            float factor = act_error_factor * aLR_error;
+            aL_speed -= factor;
+            aR_speed += factor;
+        }
+        
+        //Run motors
+        motor_left.motor_ctrl(mL_speed);
+        motor_right.motor_ctrl(mR_speed);
+
+    }
 }
+
+// void loop() {
+//     // TODO Turn LEDS on for Arduino Power, Jetson Power, ROS Connection/Teleop, Emergency Stop
+//     if (Serial.available()) {
+//         String inputString = Serial.readStringUntil('>');  // Read until '>'
+//         if (inputString.startsWith("<")) {                 // Ensure message starts with '<'
+//             inputString = inputString.substring(1);        // Remove the starting '<'
+//             char operation = inputString[0];
+//             inputString = inputString.substring(2);        // Remove operation type ie "M" or "B"
+//             if (inputString.endsWith(">")) {
+//                 inputString = inputString.substring(0, inputString.length() - 1);  // Remove the ending '>'
+//             }
+
+//             switch (operation) {
+//                 case 'M': {
+//                     int mL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+//                     inputString = inputString.substring(inputString.indexOf(',') + 1);
+//                     int mR_speed = inputString.toInt();
+//                     break;
+//                 }
+//                 case 'A': {
+//                     int aLR_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+//                     inputString = inputString.substring(inputString.indexOf(',') + 1);
+//                     int aB_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+//                     inputString = inputString.substring(inputString.indexOf(',') + 1);
+//                     int aL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+//                     int aR_speed = aL_speed;
+//                     inputString = inputString.substring(inputString.indexOf(',') + 1);
+//                     int aB_speed = inputString.toInt();
+//                     break;
+//                 }
+//             }
+//             last_message_time = millis(); // Update the last message time
+//             emergency_stop = false; // Reset emergency stop
+//         }
+//     }
+
+//     // Check if the time since the last message exceeds the timeout
+//     if (millis() - last_message_time > estop_timeout) {
+//         emergency_stop = true;
+//     }
+
+//     if (emergency_stop) {
+//         act_left.stop();
+//         act_right.stop();
+//         act_bucket.stop();
+//         motor_left.stop();
+//         motor_right.stop();
+//         Serial.println("Estopped");
+//         return;
+//     }
+
+//     // Update at a hz rate
+//     unsigned long current_time = millis();
+//     if (current_time - last_update_time < 1000 / update_rate) {
+//         return;
+//     }
+//     last_update_time = current_time;
+
+    
+//     //Get actuator feedback
+//     aL_pos = act_left.pos_mm();
+//     aR_pos = act_right.pos_mm();
+//     aB_pos = act_bucket.pos_mm();
+    
+//     //Send feedback
+//     Serial.print("<F,");
+//     Serial.print(aL_pos);
+//     Serial.print(",");
+//     Serial.print(aR_pos);
+//     Serial.print(",");
+//     Serial.print(aB_pos);
+//     Serial.print(">");
+    
+//     //Actuator control
+//     if (aB_tgt > 0) {
+//         float aB_error = aB_tgt - aB_pos;
+//         if (abs(aB_error) > act_threshold) {
+//             aB_speed = aB_error > 0 ? act_max_vel : -act_max_vel;
+//         } else {
+//             aB_speed = 0;
+//         }
+//     }
+    
+    
+//     if (aLR_tgt > 0 ) {
+//         float aL_error = aLR_tgt - aL_pos;
+//         float aR_error = aLR_tgt - aR_pos;
+//         float aLR_error = aL_pos - aR_pos;
+        
+//         if (aLR_error > act_max_error) {
+//             emergency_stop = true;
+//             return;
+//         }
+        
+//         if (abs(aL_error) > act_threshold) {
+//             aL_speed = aL_error > 0 ? act_max_vel : -act_max_vel;
+//         } else {
+//             aL_speed = 0;
+//         }
+        
+//         if (abs(aR_error) > act_threshold) {
+//             aR_speed = aR_error > 0 ? act_max_vel : -act_max_vel;
+//         } else {
+//             aR_speed = 0;
+//         }
+        
+//         float factor = act_error_factor * aLR_error;
+//         aL_speed -= factor;
+//         aR_speed += factor;
+//     }
+    
+//     //Run motors
+//     left_motor.motor_ctrl(mL_speed);
+//     right_motor.motor_ctrl(mR_speed);
+    
+// }
+
+// void motor_ctrl(int mL_speed, int mR_speed) {
+//     // Convert motor speeds (in rpm) to PWM values (0-255)
+//     // Constrain speeds to max velocity first
+//     mL_speed = constrain(mL_speed, -motor_max_vel, motor_max_vel);
+//     mR_speed = constrain(mR_speed, -motor_max_vel, motor_max_vel);
+
+//     // Map the absolute speed values to PWM range
+//     int mL_pwm = map(abs(mL_speed), 0, motor_max_vel, 0, 255);
+//     int mR_pwm = map(abs(mR_speed), 0, motor_max_vel, 0, 255);
+//     if (mL_speed > 0) {
+//         analogWrite(dac11_pin, mL_speed);
+//         analogWrite(dac12_pin, 0);
+//     } else {
+//         analogWrite(dac11_pin, 0);
+//         analogWrite(dac12_pin, abs(mL_speed));
+//     }
+
+//     if (mR_speed > 0) {
+//         analogWrite(dac21_pin, mR_speed);
+//         analogWrite(dac22_pin, 0);
+//     } else {
+//         analogWrite(dac21_pin, 0);
+//         analogWrite(dac22_pin, abs(mR_speed));
+//     }
+// }
+
+// void actuator_vel_ctrl(char i2c_address, int speed) {
+//     // Convert speed (in mm/s) to PWM value (0-255)
+//     // Speed is clamped to max velocity
+//     speed = constrain(speed, -act_max_vel, act_max_vel);
+//     int act_speed = map(abs(speed), 0, act_max_vel, 0, 255);
+//     sendI2CCommand(i2c_address, speed_reg, act_speed);
+//     sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
+// }
+
+// void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
+//     Wire.beginTransmission(address);    // begin transmission with our selected driver
+//     Wire.write(operationRegister);      // enter the desired register
+//     Wire.write(value);                  // send the data to the register 
+//     Wire.endTransmission();
+// }
