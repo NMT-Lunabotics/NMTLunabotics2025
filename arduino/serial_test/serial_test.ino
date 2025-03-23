@@ -1,7 +1,7 @@
 #include <Wire.h>
 
 void setup() {
-    Serial.begin(57600);
+    Serial.begin(115200);
     Serial.println("Starting serial test...");
 }
 

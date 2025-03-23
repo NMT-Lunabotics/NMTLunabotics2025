@@ -10,7 +10,7 @@ class SerialBridgeNode(Node):
         super().__init__('serial_bridge_node')
         
         # Declare parameters
-        self.declare_parameter('baud_rate', 57600)
+        self.declare_parameter('baud_rate', 115200)
         self.declare_parameter('serial_device', '/dev/ttyUSB0')
         self.declare_parameter('reconnect_timeout', 1.0)  # Seconds to wait before reconnection attempt
         
