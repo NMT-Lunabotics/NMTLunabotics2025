@@ -20,6 +20,7 @@ class SerialConvertNode(Node):
 
         self.last_act_serial_msg = String()
         self.last_motor_serial_msg = String()
+        self.last_servo_serial_msg = String()
 
     def actuator_control_subscriber(self, msg):
         actuator_control_msg = String()
@@ -41,7 +42,9 @@ class SerialConvertNode(Node):
             servo_control_msg.data = '<S,1>'
         else:
             servo_control_msg.data = '<S,0>'
-        self.serial_write_publisher.publish(servo_control_msg)
+        if servo_control_msg.data != self.last_servo_serial_msg.data:
+            self.last_servo_serial_msg = servo_control_msg
+            self.serial_write_publisher.publish(servo_control_msg)
     
     def led_control_subscriber(self, msg):
         led_control_msg = String()

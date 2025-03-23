@@ -66,7 +66,7 @@ float act_error_factor = 1;
 float act_max_error = 5; // mm
 
 // Update rate
-int update_rate = 50; //hz
+int update_rate = 100; //hz
 unsigned long last_update_time = 0;
 
 //////// Actuator Class ////////
@@ -140,7 +140,6 @@ public:
             dac1.write_pwm_raw(0);
             dac2.write_pwm_raw(abs(motor_speed));
         }
-        Serial.println(motor_speed);
     }
 
     void stop() {
@@ -152,7 +151,7 @@ public:
 
 
 void setup(){
-    Serial.begin(2000000);
+    Serial.begin(57600);
     Wire.begin();
 
     // Set up actuators
@@ -208,20 +207,20 @@ void setup(){
     
                 switch (operation) {
                     case 'M': {
-                        int mL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        mL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
                         inputString = inputString.substring(inputString.indexOf(',') + 1);
-                        int mR_speed = inputString.toInt();
+                        mR_speed = inputString.toInt();
                         break;
                     }
                     case 'A': {
-                        int aLR_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        aLR_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
                         inputString = inputString.substring(inputString.indexOf(',') + 1);
-                        int aB_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        aB_tgt = inputString.substring(0, inputString.indexOf(',')).toInt();
                         inputString = inputString.substring(inputString.indexOf(',') + 1);
-                        int aL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
-                        int aR_speed = aL_speed;
+                        aL_speed = inputString.substring(0, inputString.indexOf(',')).toInt();
+                        aR_speed = aL_speed;
                         inputString = inputString.substring(inputString.indexOf(',') + 1);
-                        int aB_speed = inputString.toInt();
+                        aB_speed = inputString.toInt();
                         break;
                     }
                 }
@@ -230,14 +229,14 @@ void setup(){
             }
         }
         
-        if (emergency_stop) {
-            act_left.actuator_ctrl(0);
-            act_right.actuator_ctrl(0);
-            act_bucket.actuator_ctrl(0);
-            motor_left.motor_ctrl(0);
-            motor_right.motor_ctrl(0);
-            Serial.println("Estopped");
-        }
+        // if (emergency_stop) {
+        //     act_left.actuator_ctrl(0);
+        //     act_right.actuator_ctrl(0);
+        //     act_bucket.actuator_ctrl(0);
+        //     motor_left.motor_ctrl(0);
+        //     motor_right.motor_ctrl(0);
+        //     Serial.println("Estopped");
+        // }
 
         current_time = millis();
 
@@ -256,13 +255,7 @@ void setup(){
         int aB_pos = act_bucket.pos_mm();
 
         // Send feedback
-        Serial.print("<F,");
-        Serial.print(aL_pos);
-        Serial.print(",");
-        Serial.print(aR_pos);
-        Serial.print(",");
-        Serial.print(aB_pos);
-        Serial.println(">");
+        Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos) + "," + String(mL_speed) + "," + String(mR_speed) + ">");
 
         // Actuator control
         if (aB_tgt > 0) {
