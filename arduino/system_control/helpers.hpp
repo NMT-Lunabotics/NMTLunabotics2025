@@ -12,21 +12,21 @@ private:
   float derivative;
   float integral;
 
-  float p, i, d;
+  float p, i, d, s;
 
 public:
-  PID(float p, float i, float d) : p(p), i(i), d(d) {
+  PID(float p, float i, float d, float s) : p(p), i(i), d(d), s(s) {
     error = 0;
     prev_error = 0;
     derivative = 0;
     integral = 0;
   }
 
-  float update(float error) {
+  float update(float error, float rel_error) {
     derivative = error - prev_error;
     integral += error;
     prev_error = error;
-    return p * error + i * integral + d * derivative;
+    return p * error + i * integral + d * derivative + s * rel_error;
   }
 
   void resetIntegral() {
@@ -80,52 +80,63 @@ public:
 // set_speed() sets the speed of the actuator
 // sendI2CCommand() sends an I2C command to the actuator
 class Actuator {
-    char i2c_address;
-    char speed_reg;
-    char dir_reg;
-    
-    SmoothedInput<MEDIAN_SIZE> pot;
+  char i2c_address;
+  char speed_reg;
+  char dir_reg;
+  float stroke;
+  float pot_min;
+  float pot_max;
+  float act_max_vel;
+  PID pid;
 
-    bool invert_direction;
+  SmoothedInput<MEDIAN_SIZE> pot;
 
-    int stroke;
-    int pot_min;
-    int pot_max;
-    int act_max_vel;
+  bool invert_direction;
 
 public:
-    Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, int stroke, int pot_min, 
-             int pot_max, int act_max_vel)
-        : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
-          pot_max(pot_max), act_max_vel(act_max_vel) {}
-        
-    float pos_mm() { return map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke); }
+  Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, float stroke, float pot_min, 
+       float pot_max, float act_max_vel, PID pid)
+    : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
+      pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {}
     
-    void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
-        Wire.beginTransmission(address);    // begin transmission with our selected driver
-        Wire.write(operationRegister);      // enter the desired register
-        Wire.write(value);                  // send the data to the register 
-        byte error = Wire.endTransmission(false);
-        if (error != 0) {
-            // Handle error (e.g., print error message or retry)
-            Serial.print("I2C Transmission Error: ");
-            Serial.println(error);
-        }
+  float pos_mm() { return map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke); }
+  
+  void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
+    Wire.beginTransmission(address);    // begin transmission with our selected driver
+    Wire.write(operationRegister);      // enter the desired register
+    Wire.write(value);                  // send the data to the register 
+    byte error = Wire.endTransmission(false);
+    if (error != 0) {
+      // Handle error (e.g., print error message or retry)
+      Serial.print("I2C Transmission Error: ");
+      Serial.println(error);
     }
-    
-    void actuator_ctrl(int speed) {
-        // Convert speed (in mm/s) to PWM value (0-255)
-        // Speed is clamped to max velocity
-        speed = constrain(speed, -act_max_vel, act_max_vel);
-        int act_speed = map(abs(speed), 0, act_max_vel, 0, 255);
-        sendI2CCommand(i2c_address, speed_reg, act_speed);
-        sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
-    }
+  }
+  
+  void vel_ctrl(int speed) {
+    // Convert speed (in mm/s) to PWM value (0-255)
+    // Speed is clamped to max velocity
+    speed = constrain(speed, -act_max_vel, act_max_vel);
+    int act_speed = map(abs(speed), 0, act_max_vel, 0, 255);
+    sendI2CCommand(i2c_address, speed_reg, act_speed);
+    sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
+  }
 
-    void stop() {
-        actuator_ctrl(0);
-    }
-};
+  void tgt_ctrl(int tgt, int other_pos) {
+    float tgt_error = tgt - pos_mm();
+    float rel_error = pos_mm() - other_pos;
+    float speed = pid.update(tgt_error, rel_error);
+    vel_ctrl(speed);
+  }
+
+  void stop() {
+    vel_ctrl(0);
+  }
+
+  void resetPIDIntegral() {
+    pid.resetIntegral();
+  }
+};;
 
 class Motor {
     OutPin dac1;

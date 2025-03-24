@@ -137,9 +137,9 @@ void loop() {
     }
     // TODO put back
     // if (emergency_stop) {
-    //     act_left.actuator_ctrl(0);
-    //     act_right.actuator_ctrl(0);
-    //     act_bucket.actuator_ctrl(0);
+    //     act_left.vel_ctrl_ctrl(0);
+    //     act_right.vel_ctrl_ctrl(0);
+    //     act_bucket.vel_ctrl_ctrl(0);
     //     motor_left.motor_ctrl(0);
     //     motor_right.motor_ctrl(0);
     //     Serial.println("Estopped");
@@ -197,9 +197,9 @@ void loop() {
         motor_right.motor_ctrl(mR_speed);
 
         //Run actuators
-        act_left.actuator_ctrl(aL_speed);
-        act_right.actuator_ctrl(aR_speed);
-        // act_bucket.actuator_ctrl(aB_speed);
+        act_left.vel_ctrl(aL_speed);
+        act_right.vel_ctrl(aR_speed);
+        // act_bucket.vel_ctrl(aB_speed);
 
         // //Run servo
         // //TODO implement
@@ -210,6 +210,16 @@ void loop() {
         ledg_pin.write(led_g);
         ledb_pin.write(led_b);
     }
+}
+
+void actuatorDualPID(Actuator act1, Actuator act2, int tgt, int speed) {
+    float act1_pos = act1.pos_mm();
+    float act2_pos = act2.pos_mm();
+    float error = act1_pos - act2_pos;
+    float factor = async_factor * error;
+    speed -= factor;
+    act1.vel_ctrl_ctrl(speed);
+    act2.vel_ctrl_ctrl(speed);
 }
 
 void processMessage(byte* data, int length) {
