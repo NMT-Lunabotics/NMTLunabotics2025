@@ -36,8 +36,6 @@ bool debug_mode = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float async_factor = .015;
-float tgt_factor = 0.7;
 float act_max_error = 1; // mm
 
 // Actuator targets
@@ -89,6 +87,7 @@ unsigned long current_time = 0;
 const unsigned long estop_timeout = 1000; // 1 second timeout
 unsigned long last_message_time = 0;
 bool emergency_stop = false;
+bool doomsday = false;
 
 // Set up PID controllers
 PID pidL(0.1, 0.001, 0.01, 0.01);
@@ -141,14 +140,20 @@ void loop() {
         }
     }
     // TODO put back
-    // if (emergency_stop) {
+    // if (emergency_stop || doomsday) {
     //     act_left.vel_ctrl_ctrl(0);
     //     act_right.vel_ctrl_ctrl(0);
     //     act_bucket.vel_ctrl_ctrl(0);
     //     motor_left.motor_ctrl(0);
     //     motor_right.motor_ctrl(0);
-    //     Serial.println("Estopped");
+    //     return;
     // }
+
+    if (doomsday) {
+        Serial.println("Doomsday");
+    } else if (emergency_stop) {
+        Serial.println("Estopped");
+    }
 
     current_time = millis();
 
@@ -167,6 +172,10 @@ void loop() {
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
             + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt) + ">");
 
+        if (abs(aL_pos - aR_pos) < act_max_error) {
+            doomsday = true;
+        }
+
         //Run actuators
         if (aLR_tgt >= 0) {
             act_left.tgt_ctrl(aLR_tgt, aR_pos);
@@ -175,7 +184,12 @@ void loop() {
             act_left.vel_ctrl(aL_speed, aR_pos, update_rate);
             act_right.vel_ctrl(aR_speed, aL_pos, update_rate);
         }
-        // act_bucket.vel_ctrl(aB_speed);
+
+        // if (aB_tgt >= 0) {
+        //     act_bucket.tgt_ctrl(aB_tgt);
+        // } else {
+        //     act_bucket.vel_ctrl(aB_speed);
+        // }
 
         // //Run servo
         // //TODO implement
