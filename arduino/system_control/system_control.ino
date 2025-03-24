@@ -3,7 +3,7 @@
 
 // Debug mode flag
 bool debug_mode = false;
-
+bool calibrate_actuators_flag = true;
 //TODO check pins
 
 //////// ACTUATORS ////////
@@ -121,9 +121,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
-    act_left.calibrate_pot();
-    act_right.calibrate_pot();
-    act_bucket.calibrate_pot();
+    if (calibrate_actuators_flag) {
+        calibrateActuators(act_left, act_right, act_bucket);
+    }
 }
 
 void loop() {
@@ -286,3 +286,25 @@ void processMessage(byte* data, int length) {
             break;
     }
 }
+
+void calibrateActuators(Actuator act_left, Actuator act_right, Actuator act_bucket) {
+    act_left.set_speed(act_max_vel);
+    act_right.set_speed(act_max_vel);
+    act_bucket.set_speed(act_max_vel);
+    delay(10000);
+    act_left.calibrate_pot();
+    act_right.calibrate_pot();
+    act_bucket.calibrate_pot();
+    act_left.set_speed(-act_max_vel);
+    act_right.set_speed(-act_max_vel);
+    act_bucket.set_speed(-act_max_vel);
+    delay(10000);
+    Serial.println("Calibration complete: Biases set");
+    Serial.print("Left Actuator: ");
+    Serial.println(act_left.pos_mm());
+    Serial.print("Right Actuator: ");
+    Serial.println(act_right.pos_mm());
+    Serial.print("Bucket Actuator: ");
+    Serial.println(act_bucket.pos_mm());
+    Serial.println("Calibration Complete");
+}   
