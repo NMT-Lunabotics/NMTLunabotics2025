@@ -121,6 +121,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
+    act_left.calibrate_pot();
+    act_right.calibrate_pot();
+    act_bucket.calibrate_pot();
 }
 
 void loop() {

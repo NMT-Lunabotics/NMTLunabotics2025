@@ -88,6 +88,7 @@ class Actuator {
   float pot_max;
   float act_max_vel;
   float pos_mm;
+  float pot_bias;
   PID pid;
 
   SmoothedInput<MEDIAN_SIZE> pot;
@@ -104,14 +105,21 @@ public:
     : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
       pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {}
     
+  void calibrate_pot() {
+    Serial.println("Calibrating potentiometer... ENSURE MINIMUM POSITION");
+    pot_bias = pot.read_analog_raw();
+  }
+
   float update_pos() {
-    pos_mm = f_map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke);
+    float unbiased_stroke = stroke - pot_bias; 
+    pos_mm = f_map(pot.read_analog_raw(), pot_min, pot_max, 0, unbiased_stroke);
     return pos_mm;
   }
 
   float get_pos() {
     return pos_mm;
   }
+
   
   void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
     Wire.beginTransmission(address);    // begin transmission with our selected driver
