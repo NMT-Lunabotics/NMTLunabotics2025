@@ -90,13 +90,18 @@ const unsigned long estop_timeout = 1000; // 1 second timeout
 unsigned long last_message_time = 0;
 bool emergency_stop = false;
 
+// Set up PID controllers
+PID pidL(0.1, 0.001, 0.01, 0.01);
+PID pidR(0.1, 0.001, 0.01, 0.01);
+PID pidB(0.1, 0.001, 0.01);
+
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
-                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel);
+                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
 Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
-                    ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel);
+                    ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel);
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
 
 // Set up motors
 Motor motor_left(DACL1_PIN, DACL2_PIN, motor_max_vel);
@@ -154,55 +159,30 @@ void loop() {
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
 
-        float aL_pos = act_left.pos_mm();
-        float aR_pos = act_right.pos_mm();
-        float aB_pos = act_bucket.pos_mm();
-
-        // Actuator control
-        if (aB_tgt >= 0) {
-            float aB_error = aB_tgt - aB_pos;
-            aB_speed = aB_error * tgt_factor;
-            aB_speed = constrain(aB_speed, -act_max_vel, act_max_vel);
-        }
-        
-        if (aLR_tgt >= 0 ) {
-            float aL_error = aLR_tgt - aL_pos;
-            float aR_error = aLR_tgt - aR_pos;
-            
-            aL_speed = aL_error * tgt_factor;
-            aL_speed = constrain(aL_speed, -act_max_vel, act_max_vel);
-            aR_speed = aR_error * tgt_factor;
-            aR_speed = constrain(aR_speed, -act_max_vel, act_max_vel);
-        }
-
-        float aLR_error = aL_pos - aR_pos;
-            
-        // if (aLR_error > act_max_error) {
-        //     emergency_stop = true;
-        // }
-        
-        float factor = async_factor * aLR_error;
-        aL_speed -= factor;
-        aR_speed += factor;
-
-        aL_speed = constrain(aL_speed, -act_max_vel, act_max_vel);
-        aR_speed = constrain(aR_speed, -act_max_vel, act_max_vel);
+        float aL_pos = act_left.update_pos();
+        float aR_pos = act_right.update_pos();
+        float aB_pos = act_bucket.update_pos();
         
         // Send feedback
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(factor) + ',' + String(aLR_tgt) + ">");
-
-        //Run motors
-        motor_left.motor_ctrl(mL_speed);
-        motor_right.motor_ctrl(mR_speed);
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt) + ">");
 
         //Run actuators
-        act_left.vel_ctrl(aL_speed);
-        act_right.vel_ctrl(aR_speed);
+        if (aLR_tgt >= 0) {
+            act_left.tgt_ctrl(aLR_tgt, aR_pos);
+            act_right.tgt_ctrl(aLR_tgt, aL_pos);
+        } else {
+            act_left.vel_ctrl(aL_speed, aR_pos, update_rate);
+            act_right.vel_ctrl(aR_speed, aL_pos, update_rate);
+        }
         // act_bucket.vel_ctrl(aB_speed);
 
         // //Run servo
         // //TODO implement
+
+        //Run motors
+        motor_left.motor_ctrl(mL_speed);
+        motor_right.motor_ctrl(mR_speed);
 
         //Run LEDs
         ledr_pin.write(led_r);
@@ -210,16 +190,6 @@ void loop() {
         ledg_pin.write(led_g);
         ledb_pin.write(led_b);
     }
-}
-
-void actuatorDualPID(Actuator act1, Actuator act2, int tgt, int speed) {
-    float act1_pos = act1.pos_mm();
-    float act2_pos = act2.pos_mm();
-    float error = act1_pos - act2_pos;
-    float factor = async_factor * error;
-    speed -= factor;
-    act1.vel_ctrl_ctrl(speed);
-    act2.vel_ctrl_ctrl(speed);
 }
 
 void processMessage(byte* data, int length) {
