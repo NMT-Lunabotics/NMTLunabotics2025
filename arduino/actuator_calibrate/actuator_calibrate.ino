@@ -15,7 +15,7 @@ void setup(){
   Wire.begin();                                        // Start I2C connection
 
   sendData(SPEEDBYTE, 255);
-  sendData(CMDBYTE, 2);
+  sendData(CMDBYTE, 1);
   delay(8000);
 
 
@@ -23,7 +23,7 @@ void setup(){
   Serial.println(analogRead(POTPIN));                 // Print potentiometer value
 
   sendData(SPEEDBYTE, 255);
-  sendData(CMDBYTE, 1);
+  sendData(CMDBYTE, 2);
   delay(8000);
 
   Serial.print("min:");

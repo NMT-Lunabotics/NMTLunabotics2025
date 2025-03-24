@@ -94,6 +94,10 @@ class Actuator {
 
   bool invert_direction;
 
+  float f_map(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  }
+
 public:
   Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, float stroke, float pot_min, 
        float pot_max, float act_max_vel, PID pid)
@@ -101,7 +105,7 @@ public:
       pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {}
     
   float update_pos() {
-    pos_mm = map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke);
+    pos_mm = f_map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke);
     return pos_mm;
   }
 
@@ -118,6 +122,8 @@ public:
       // Handle error (e.g., print error message or retry)
       Serial.print("I2C Transmission Error: ");
       Serial.println(error);
+      Wire.endTransmission(true); // End transmission and release the I2C bus
+      Wire.begin(); // Restart the I2C bus
     }
   }
   

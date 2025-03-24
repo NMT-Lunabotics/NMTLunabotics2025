@@ -28,15 +28,15 @@ bool debug_mode = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 35
-#define AL_POT_MAX 869
-#define AR_POT_MIN 32
-#define AR_POT_MAX 869
-#define AB_POT_MIN 29
+#define AL_POT_MIN 55
+#define AL_POT_MAX 890
+#define AR_POT_MIN 55
+#define AR_POT_MAX 890
+#define AB_POT_MIN 40
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 1; // mm
+float act_max_error = 50; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -81,7 +81,7 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 10; //hz
+int update_rate = 100; //hz
 unsigned long last_update_time = 0;
 unsigned long current_time = 0;
 const unsigned long estop_timeout = 1000; // 1 second timeout
@@ -90,9 +90,9 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-PID pidL(0.1, 0.001, 0.01, 0.01);
-PID pidR(0.1, 0.001, 0.01, 0.01);
-PID pidB(0.1, 0.001, 0.01);
+PID pidL(2.5, 0.00, 0.5, 0.2);
+PID pidR(2.5, 0.00, 0.5, 0.2);
+PID pidB(0.1, 0.0, 0.01);
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
@@ -150,16 +150,16 @@ void loop() {
     // }
 
     if (doomsday) {
-        Serial.println("Doomsday");
+        // Serial.println("Doomsday");
     } else if (emergency_stop) {
         Serial.println("Estopped");
     }
 
     current_time = millis();
 
-    if (current_time - last_message_time > estop_timeout) {
-        emergency_stop = true;
-    }
+    // if (current_time - last_message_time > estop_timeout) {
+    //     emergency_stop = true;
+    // }
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
@@ -172,11 +172,13 @@ void loop() {
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
             + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt) + ">");
 
-        if (abs(aL_pos - aR_pos) < act_max_error) {
+        if (abs(aL_pos - aR_pos) >= act_max_error) {
             doomsday = true;
         }
 
         //Run actuators
+        aLR_tgt = 0;
+        aLR_tgt = constrain(aLR_tgt, 0, ALR_STROKE);
         if (aLR_tgt >= 0) {
             act_left.tgt_ctrl(aLR_tgt, aR_pos);
             act_right.tgt_ctrl(aLR_tgt, aL_pos);
