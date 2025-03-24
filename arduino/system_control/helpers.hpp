@@ -3,7 +3,7 @@
 
 #include "arduino_lib.hpp"
 
-#define MEDIAN_SIZE 5 // Median filter window size for potentionmeter smoothing
+#define MEDIAN_SIZE 15 // Median filter window size for potentionmeter smoothing
 
 class PID {
 private:
@@ -99,13 +99,18 @@ public:
         : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
           pot_max(pot_max), act_max_vel(act_max_vel) {}
         
-    int pos_mm() { return map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke); }
+    float pos_mm() { return map(pot.read_analog_raw(), pot_min, pot_max, 0, stroke); }
     
     void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
         Wire.beginTransmission(address);    // begin transmission with our selected driver
         Wire.write(operationRegister);      // enter the desired register
         Wire.write(value);                  // send the data to the register 
-        Wire.endTransmission();
+        byte error = Wire.endTransmission(false);
+        if (error != 0) {
+            // Handle error (e.g., print error message or retry)
+            Serial.print("I2C Transmission Error: ");
+            Serial.println(error);
+        }
     }
     
     void actuator_ctrl(int speed) {

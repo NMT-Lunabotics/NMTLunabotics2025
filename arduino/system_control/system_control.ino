@@ -28,7 +28,7 @@ bool debug_mode = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 32
+#define AL_POT_MIN 35
 #define AL_POT_MAX 869
 #define AR_POT_MIN 32
 #define AR_POT_MAX 869
@@ -36,9 +36,9 @@ bool debug_mode = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_threshold = 0.5; //mm
-float act_error_factor = .01;
-float act_max_error = 5; // mm
+float async_factor = .015;
+float tgt_factor = 0.7;
+float act_max_error = 1; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -83,7 +83,7 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 20; //hz
+int update_rate = 10; //hz
 unsigned long last_update_time = 0;
 unsigned long current_time = 0;
 const unsigned long estop_timeout = 1000; // 1 second timeout
@@ -154,51 +154,43 @@ void loop() {
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
 
-        int aL_pos = act_left.pos_mm();
-        int aR_pos = act_right.pos_mm();
-        int aB_pos = act_bucket.pos_mm();
+        float aL_pos = act_left.pos_mm();
+        float aR_pos = act_right.pos_mm();
+        float aB_pos = act_bucket.pos_mm();
 
         // Actuator control
-        if (aB_tgt > 0) {
+        if (aB_tgt >= 0) {
             float aB_error = aB_tgt - aB_pos;
-            if (abs(aB_error) > act_threshold) {
-                aB_speed = aB_error > 0 ? act_max_vel : -act_max_vel;
-            } else {
-                aB_speed = 0;
-            }
+            aB_speed = aB_error * tgt_factor;
+            aB_speed = constrain(aB_speed, -act_max_vel, act_max_vel);
         }
         
-        if (aLR_tgt > 0 ) {
+        if (aLR_tgt >= 0 ) {
             float aL_error = aLR_tgt - aL_pos;
             float aR_error = aLR_tgt - aR_pos;
             
-            
-            if (abs(aL_error) > act_threshold) {
-                aL_speed = aL_error > 0 ? act_max_vel : -act_max_vel;
-            } else {
-                aL_speed = 0;
-            }
-            
-            if (abs(aR_error) > act_threshold) {
-                aR_speed = aR_error > 0 ? act_max_vel : -act_max_vel;
-            } else {
-                aR_speed = 0;
-            }
+            aL_speed = aL_error * tgt_factor;
+            aL_speed = constrain(aL_speed, -act_max_vel, act_max_vel);
+            aR_speed = aR_error * tgt_factor;
+            aR_speed = constrain(aR_speed, -act_max_vel, act_max_vel);
         }
 
         float aLR_error = aL_pos - aR_pos;
             
-        if (aLR_error > act_max_error) {
-            emergency_stop = true;
-        }
+        // if (aLR_error > act_max_error) {
+        //     emergency_stop = true;
+        // }
         
-        float factor = act_error_factor * aLR_error;
-        // aL_speed -= factor;
-        // aR_speed += factor;
+        float factor = async_factor * aLR_error;
+        aL_speed -= factor;
+        aR_speed += factor;
+
+        aL_speed = constrain(aL_speed, -act_max_vel, act_max_vel);
+        aR_speed = constrain(aR_speed, -act_max_vel, act_max_vel);
         
         // Send feedback
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(factor) + ">");
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(factor) + ',' + String(aLR_tgt) + ">");
 
         //Run motors
         motor_left.motor_ctrl(mL_speed);
