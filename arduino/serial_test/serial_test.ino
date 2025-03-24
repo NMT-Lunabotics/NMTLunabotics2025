@@ -1,89 +1,64 @@
+// SPDX-FileCopyrightText: 2023 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+// --------------------------------------
+// i2c_scanner
+//
+// Modified from https://playground.arduino.cc/Main/I2cScanner/
+// --------------------------------------
+
 #include <Wire.h>
 
+// Set I2C bus to use: Wire, Wire1, etc.
+#define WIRE Wire
+
 void setup() {
-    Serial.begin(115200);
-    Serial.println("Starting serial test...");
+  WIRE.begin();
+
+  Serial.begin(9600);
+  while (!Serial)
+     delay(10);
+  Serial.println("\nI2C Scanner");
 }
+
 
 void loop() {
-    if (Serial.available() > 0) {
-        if (Serial.read() == 0x02) { // Start byte
-            while (Serial.available() < 1) {} // Wait for type and length bytes
-            int length = Serial.read();
-            while (Serial.available() < length + 1) {} // Wait for the entire message
-            byte data[length];
-            Serial.readBytes(data, length);
-            while (Serial.available() < 1) {} // Wait for end byte
-            if (Serial.read() == 0x03) { // End byte
-                processMessage(data, length);
-            } else {
-                Serial.println("End byte not found");
-            }
-        }
-    }
-}
+  byte error, address;
+  int nDevices;
 
-void processMessage(byte* data, int length) {
-    char type = data[0];
-    Serial.print("Received message of type: ");
-    Serial.println(type);
-    Serial.print("Length: ");
-    Serial.println(length);
-    Serial.print("Data: ");
-    for (int i = 0; i < length; i++) {
-        Serial.print(data[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
+  Serial.println("Scanning...");
 
-    switch (type) {
-        case 'A': { // Actuator control
-            int16_t arm_pos = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
-            int16_t bucket_pos = (int16_t)((data[3] << 8) | data[4]);
-            int arm_vel = (int8_t)data[5];
-            int bucket_vel = (int8_t)data[6];
-            Serial.print("Arm Position: ");
-            Serial.println(arm_pos);
-            Serial.print("Bucket Position: ");
-            Serial.println(bucket_pos);
-            Serial.print("Arm Velocity: ");
-            Serial.println(arm_vel);
-            Serial.print("Bucket Velocity: ");
-            Serial.println(bucket_vel);
-            break;
-        }
-        case 'M': { // Motor control
-            int left_speed = (int8_t)data[1];  // Adjusted index to skip the type byte
-            int right_speed = (int8_t)data[2];
-            Serial.print("Left Speed: ");
-            Serial.println(left_speed);
-            Serial.print("Right Speed: ");
-            Serial.println(right_speed);
-            break;
-        }
-        case 'S': { // Servo control
-            bool servo_state = data[1];  // Adjusted index to skip the type byte
-            Serial.print("Servo State: ");
-            Serial.println(servo_state);
-            break;
-        }
-        case 'L': { // LED control
-            int red = data[1];  // Adjusted index to skip the type byte
-            int yellow = data[2];
-            int green = data[3];
-            int blue = data[4];
-            Serial.print("Red: ");
-            Serial.println(red);
-            Serial.print("Yellow: ");
-            Serial.println(yellow);
-            Serial.print("Green: ");
-            Serial.println(green);
-            Serial.print("Blue: ");
-            Serial.println(blue);
-            break;
-        }
-        default:
-            Serial.println("Unknown message type");
-            break;
+  nDevices = 0;
+  for(address = 1; address < 127; address++ )
+  {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+    WIRE.beginTransmission(address);
+    error = WIRE.endTransmission();
+
+    if (error == 0)
+    {
+      Serial.print("I2C device found at address 0x");
+      if (address<16)
+        Serial.print("0");
+      Serial.print(address,HEX);
+      Serial.println("  !");
+
+      nDevices++;
     }
+    else if (error==4)
+    {
+      Serial.print("Unknown error at address 0x");
+      if (address<16)
+        Serial.print("0");
+      Serial.println(address,HEX);
+    }
+  }
+  if (nDevices == 0)
+    Serial.println("No I2C devices found\n");
+  else
+    Serial.println("done\n");
+
+  delay(5000);           // wait 5 seconds for next scan
 }
