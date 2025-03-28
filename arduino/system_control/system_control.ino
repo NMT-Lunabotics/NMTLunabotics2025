@@ -3,14 +3,14 @@
 
 // Debug mode flag
 bool debug_mode = false;
-bool calibrate_actuators_flag = true;
+bool calibrate_actuators_flag = false;
 //TODO check pins
 
 //////// ACTUATORS ////////
 //Left side is L, right side is R, both is LR, bucket is B
 // I2C addresses for actuators
-#define AL_I2C_ADDRESS 0x58 // B0
-#define AR_I2C_ADDRESS 0x5A // B4
+#define AL_I2C_ADDRESS 0x5A // B0
+#define AR_I2C_ADDRESS 0x58 // B4
 #define AB_I2C_ADDRESS 0x59 // B2
 
 // I2C registers for actuators
@@ -28,15 +28,15 @@ bool calibrate_actuators_flag = true;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 49
-#define AL_POT_MAX 888
-#define AR_POT_MIN 1
-#define AR_POT_MAX 834
+#define AL_POT_MIN 53
+#define AL_POT_MAX 883
+#define AR_POT_MIN 3
+#define AR_POT_MAX 837
 #define AB_POT_MIN 30
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 50; // mm
+float act_max_error = 2; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -81,8 +81,12 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 100; //hz
+int update_rate = 1000; //hz
+int feedback_rate = 100; //hz
+int reset_int_rate = 5; //hz
 unsigned long last_update_time = 0;
+unsigned long last_feedback_time = 0;
+unsigned long last_reset_int_time = 0;
 unsigned long current_time = 0;
 const unsigned long estop_timeout = 1000; // 1 second timeout
 unsigned long last_message_time = 0;
@@ -90,9 +94,10 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-PID pidL(2.5, 0.00, 0.5, 0.2);
-PID pidR(2.5, 0.00, 0.5, 0.2);
-PID pidB(0.1, 0.0, 0.01);
+int test_tgt = 150;
+PID pidL(5, 0.005, 0.03, 3);
+PID pidR(5, 0.005, 0.03, 3);
+PID pidB(3.0, 0.001, 0.4);
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
@@ -121,9 +126,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
-    if (calibrate_actuators_flag) {
-        calibrateActuators(act_left, act_right, act_bucket);
-    }
+    // if (calibrate_actuators_flag) {
+    //     calibrateActuators(act_left, act_right, act_bucket);
+    // }
 }
 
 void loop() {
@@ -142,27 +147,26 @@ void loop() {
             }
         }
     }
-    // TODO put back
-    // if (emergency_stop || doomsday) {
-    //     act_left.vel_ctrl_ctrl(0);
-    //     act_right.vel_ctrl_ctrl(0);
-    //     act_bucket.vel_ctrl_ctrl(0);
-    //     motor_left.motor_ctrl(0);
-    //     motor_right.motor_ctrl(0);
-    //     return;
-    // }
 
     if (doomsday) {
-        // Serial.println("Doomsday");
+        Serial.println("Doomsday");
     } else if (emergency_stop) {
         Serial.println("Estopped");
     }
+
+    // if (emergency_stop || doomsday) {
+    //     act_left.stop();
+    //     act_right.stop();
+    //     // act_bucket.stop(); TODO
+    //     motor_left.motor_ctrl(0);
+    //     motor_right.motor_ctrl(0);
+    // }
 
     current_time = millis();
 
     // if (current_time - last_message_time > estop_timeout) {
     //     emergency_stop = true;
-    // }
+    // } TODO
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
@@ -170,45 +174,62 @@ void loop() {
         aL_pos = act_left.update_pos();
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
-        
-        // Send feedback
-        Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
-            + "," + String(mL_speed) + "," + String(mR_speed) + ">");
 
         if (abs(aL_pos - aR_pos) >= act_max_error) {
             doomsday = true;
+        } else {
+            doomsday = false;
         }
 
         //Run actuators
-        aLR_tgt = 50;
+        aLR_tgt = test_tgt;
         aLR_tgt = constrain(aLR_tgt, 0, ALR_STROKE);
-        if (aLR_tgt >= 0) {
-            act_left.tgt_ctrl(aLR_tgt, aR_pos);
-            act_right.tgt_ctrl(aLR_tgt, aL_pos);
-        } else {
-            act_left.vel_ctrl(aL_speed, aR_pos, update_rate);
-            act_right.vel_ctrl(aR_speed, aL_pos, update_rate);
-        }
 
-        // if (aB_tgt >= 0) {
-        //     act_bucket.tgt_ctrl(aB_tgt);
-        // } else {
-        //     act_bucket.vel_ctrl(aB_speed);
+        // if (!doomsday && !emergency_stop) {
+            if (aLR_tgt >= 0) {
+                act_left.tgt_ctrl(aLR_tgt, aR_pos);
+                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+            } else {
+                act_left.vel_ctrl(aL_speed, aR_pos, update_rate);
+                act_right.vel_ctrl(aR_speed, aL_pos, update_rate);
+            }
+
+            // if (aB_tgt >= 0) {
+            //     act_bucket.tgt_ctrl(aB_tgt);
+            // } else {
+            //     act_bucket.vel_ctrl(aB_speed);
+            // } TODO
+
+            // //Run servo
+            // //TODO implement
+
+            //Run motors
+            motor_left.motor_ctrl(mL_speed);
+            motor_right.motor_ctrl(mR_speed);
         // }
-
-        // //Run servo
-        // //TODO implement
-
-        //Run motors
-        motor_left.motor_ctrl(mL_speed);
-        motor_right.motor_ctrl(mR_speed);
 
         //Run LEDs
         ledr_pin.write(led_r);
         ledy_pin.write(led_y);
         ledg_pin.write(led_g);
         ledb_pin.write(led_b);
+    }
+
+    if (current_time - last_feedback_time >= 1000 / feedback_rate) {
+        last_feedback_time = current_time;
+
+        // Send feedback
+        Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
+            + "," + String(mL_speed) + "," + String(mR_speed) + ">");
+    }
+
+    if (current_time - last_reset_int_time >= 1000 / reset_int_rate) {
+        last_reset_int_time = current_time;
+
+        act_left.resetPIDIntegral();
+        act_right.resetPIDIntegral();
+        act_bucket.resetPIDIntegral();
     }
 }
 
@@ -288,24 +309,24 @@ void processMessage(byte* data, int length) {
     }
 }
 
-void calibrateActuators(Actuator act_left, Actuator act_right, Actuator act_bucket) {
-    act_left.set_speed(act_max_vel);
-    act_right.set_speed(act_max_vel);
-    act_bucket.set_speed(act_max_vel);
-    delay(10000);
-    act_left.calibrate_pot();
-    act_right.calibrate_pot();
-    act_bucket.calibrate_pot();
-    act_left.set_speed(-act_max_vel);
-    act_right.set_speed(-act_max_vel);
-    act_bucket.set_speed(-act_max_vel);
-    delay(10000);
-    Serial.println("Calibration complete: Biases set");
-    Serial.print("Left Actuator: ");
-    Serial.println(act_left.pos_mm());
-    Serial.print("Right Actuator: ");
-    Serial.println(act_right.pos_mm());
-    Serial.print("Bucket Actuator: ");
-    Serial.println(act_bucket.pos_mm());
-    Serial.println("Calibration Complete");
-}   
+// void calibrateActuators(Actuator act_left, Actuator act_right, Actuator act_bucket) {
+//     act_left.set_speed(act_max_vel);
+//     act_right.set_speed(act_max_vel);
+//     act_bucket.set_speed(act_max_vel);
+//     delay(10000);
+//     act_left.calibrate_pot();
+//     act_right.calibrate_pot();
+//     act_bucket.calibrate_pot();
+//     act_left.set_speed(-act_max_vel);
+//     act_right.set_speed(-act_max_vel);
+//     act_bucket.set_speed(-act_max_vel);
+//     delay(10000);
+//     Serial.println("Calibration complete: Biases set");
+//     Serial.print("Left Actuator: ");
+//     Serial.println(act_left.pos_mm());
+//     Serial.print("Right Actuator: ");
+//     Serial.println(act_right.pos_mm());
+//     Serial.print("Bucket Actuator: ");
+//     Serial.println(act_bucket.pos_mm());
+//     Serial.println("Calibration Complete");
+// }   

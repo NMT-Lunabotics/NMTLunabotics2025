@@ -112,7 +112,9 @@ public:
 
   float update_pos() {
     float unbiased_stroke = stroke - pot_bias; 
-    pos_mm = f_map(pot.read_analog_raw(), pot_min, pot_max, 0, unbiased_stroke);
+    float analog_raw = pot.read_analog_raw();
+    // Serial.println(analog_raw);
+    pos_mm = f_map(analog_raw, pot_min, pot_max, 0, unbiased_stroke);
     return pos_mm;
   }
 
@@ -138,7 +140,7 @@ public:
     // Convert speed (in mm/s) to PWM value (0-255)
     // Speed is clamped to max velocity
     speed = constrain(speed, -act_max_vel, act_max_vel);
-    int act_speed = map(abs(speed), 0, act_max_vel, 0, 255);
+    int act_speed = map(abs(speed), 0, act_max_vel, 0, 254);
     sendI2CCommand(i2c_address, speed_reg, act_speed);
     sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
   }
@@ -151,7 +153,7 @@ public:
 
   void tgt_ctrl(int tgt, int other_pos) {
     float tgt_error = tgt - pos_mm;
-    float rel_error = pos_mm - other_pos;
+    float rel_error = other_pos - pos_mm;
     float speed = pid.update(tgt_error, rel_error);
     set_speed(speed);
   }
@@ -160,14 +162,21 @@ public:
     set_speed(speed);
   }
 
-  void vel_ctrl(int speed, int other_pos, int hz) {
+  void vel_ctrl(int speed, float other_pos, int hz) {
     float rel_error = pos_mm - other_pos;
-    float vel_tgt =  pos_mm + speed / hz;
+    float vel_tgt = pos_mm + static_cast<float>(speed) / hz;
     tgt_ctrl(vel_tgt, rel_error);
   }
 
+  // void vel_ctrl(int speed, int other_pos, int hz) {
+  //   float rel_error = pos_mm - other_pos;
+  //   float vel_tgt =  pos_mm + speed / hz;
+  //   tgt_ctrl(vel_tgt, rel_error);
+  // }
+
   void stop() {
-    set_speed(0);
+    sendI2CCommand(i2c_address, speed_reg, 0);
+    sendI2CCommand(i2c_address, dir_reg, 0);
   }
 
   void resetPIDIntegral() {
