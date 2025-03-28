@@ -1,42 +1,48 @@
 #include <Wire.h>
+#include "helpers.hpp"
+#define AL_I2C_ADDRESS 0x5A // B0
+// #define AR_I2C_ADDRESS 0x58 // B4
 
-#define ADDRESS             0x58                       // Address of MD04 driver
-#define CMDBYTE             0x00                       // Command byte
-#define SPEEDBYTE           0x02                       // Byte to write to speed register
+// I2C registers for actuators
+#define SPEED_REG 0x02
+#define DIR_REG 0x00
 
-#define POTPIN             A0                         // Potentiometer pin
+// Actuator potentiometer read pins
+#define POTL_PIN A1
+// #define POTR_PIN A0
 
-void setup(){
-  Serial.begin(9600);                             
-  delay(100);
+// Actuator stroke in mm
+#define ALR_STROKE 191
 
-  pinMode(POTPIN, INPUT);                              // Set potentiometer pin as input
-  
-  Wire.begin();                                        // Start I2C connection
+// Actuator Calibration
+#define AL_POT_MIN 49
+#define AL_POT_MAX 888
+// #define AR_POT_MIN 1
+// #define AR_POT_MAX 834
 
-  sendData(SPEEDBYTE, 255);
-  sendData(CMDBYTE, 1);
-  delay(8000);
+float act_max_vel = 25; //mm/s
 
+float aLR_tgt = 100;
 
-  Serial.print("max:");
-  Serial.println(analogRead(POTPIN));                 // Print potentiometer value
+float aL_pos = 0;
 
-  sendData(SPEEDBYTE, 255);
-  sendData(CMDBYTE, 2);
-  delay(8000);
+// Set up PID controllers
+PID pidL(2.5, 0.00, 0.5, 0.2);
+// PID pidR(2.5, 0.00, 0.5, 0.2);
 
-  Serial.print("min:");
-  Serial.println(analogRead(POTPIN));                 // Print potentiometer value
+Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
+// Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+                    // ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
 }
 
-void loop(){
- 
-}
-
-void sendData(byte commandRegister, byte value){       // Send data through I2C communication
-  Wire.beginTransmission(ADDRESS);                     // Start transmission of data to MD04 motor driver address
-    Wire.write(commandRegister);                       // Select used register
-    Wire.write(value);                                 // Send data to register 
-  Wire.endTransmission();   
+void loop () {
+  act_left.vel_ctrl(-act_max_vel);
+  aL_pos = act_left.update_pos();
+  Serial.println(aL_pos);
+  delay(10);
 }

@@ -18,8 +18,8 @@ bool debug_mode = false;
 #define DIR_REG 0x00
 
 // Actuator potentiometer read pins
-#define POTL_PIN A0
-#define POTR_PIN A1
+#define POTL_PIN A1
+#define POTR_PIN A0
 #define POTB_PIN A2
 
 // Actuator info
@@ -28,11 +28,11 @@ bool debug_mode = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 55
-#define AL_POT_MAX 890
-#define AR_POT_MIN 55
-#define AR_POT_MAX 890
-#define AB_POT_MIN 40
+#define AL_POT_MIN 49
+#define AL_POT_MAX 888
+#define AR_POT_MIN 1
+#define AR_POT_MAX 834
+#define AB_POT_MIN 30
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
@@ -164,20 +164,21 @@ void loop() {
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
 
-        float aL_pos = act_left.update_pos();
-        float aR_pos = act_right.update_pos();
-        float aB_pos = act_bucket.update_pos();
+        aL_pos = act_left.update_pos();
+        aR_pos = act_right.update_pos();
+        aB_pos = act_bucket.update_pos();
         
         // Send feedback
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt) + ">");
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
+            + "," + String(mL_speed) + "," + String(mR_speed) + ">");
 
         if (abs(aL_pos - aR_pos) >= act_max_error) {
             doomsday = true;
         }
 
         //Run actuators
-        aLR_tgt = 0;
+        aLR_tgt = 50;
         aLR_tgt = constrain(aLR_tgt, 0, ALR_STROKE);
         if (aLR_tgt >= 0) {
             act_left.tgt_ctrl(aLR_tgt, aR_pos);

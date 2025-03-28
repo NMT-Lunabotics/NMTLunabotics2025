@@ -1,15 +1,31 @@
-void setup() {
-  Serial.begin(9600); // Start the serial communication
+#include <Wire.h>
+
+void scanI2C() {
+  Serial.println("Scanning for I2C devices...");
+  for (byte address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    byte error = Wire.endTransmission();
+
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address < 16) Serial.print("0");
+      Serial.println(address, HEX);
+    } else if (error == 4) {
+      Serial.print("Unknown error at address 0x");
+      if (address < 16) Serial.print("0");
+      Serial.println(address, HEX);
+    }
+  }
+  Serial.println("Scan complete.");
+}
+
+void setup(){
+  Serial.begin(115200);
+  Wire.begin();
 }
 
 void loop() {
-  int sensorValueA0 = analogRead(A0); // Read the value from analog pin A0
-  int sensorValueA1 = analogRead(A1); // Read the value from analog pin A1
-
-  Serial.print("A0: ");
-  Serial.println(sensorValueA0); // Print the value of A0
-  // Serial.print(" A1: ");
-  // Serial.println(sensorValueA1); // Print the value of A1
+  scanI2C(); // Call the I2C scanning function
 
   delay(1000); // Wait for a second before reading again
 }
