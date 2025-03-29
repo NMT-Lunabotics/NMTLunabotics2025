@@ -88,8 +88,8 @@ unsigned long last_update_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
 unsigned long current_time = 0;
-const unsigned long estop_timeout = 1000; // 1 second timeout
-unsigned long last_message_time = 0;
+//const unsigned long estop_timeout = 1000; // 1 second timeout
+//unsigned long last_message_time = 0;
 bool emergency_stop = false;
 bool doomsday = false;
 
@@ -160,9 +160,9 @@ void loop() {
 
     current_time = millis();
 
-    if (current_time - last_message_time > estop_timeout) {
-        emergency_stop = true;
-    }
+    //if (current_time - last_message_time > estop_timeout) {
+    //    emergency_stop = true;
+    //}
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
