@@ -36,7 +36,7 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 2; // mm
+float act_max_error = 3; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -94,10 +94,12 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-int test_tgt = 150;
-PID pidL(2.3, 0.0022, 0.29, 1.7);
-PID pidR(1.8, 0.0018, 0.29, 1.7);
+// int test_tgt = 50;
+int test_vel = -25;
+PID pidL(2.2, 0.0022, 0.34, 2.0);
+PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
+float vel_gain = 2.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
@@ -176,16 +178,18 @@ void loop() {
         }
 
         //Run actuators
-        aLR_tgt = test_tgt;
-        aLR_tgt = constrain(aLR_tgt, 0, ALR_STROKE);
+        aL_speed = test_vel;
+        aR_speed = test_vel;
+        aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
         // if (!doomsday && !emergency_stop) {
             if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
             } else {
-                act_left.vel_ctrl(aL_speed, aR_pos, update_rate);
-                act_right.vel_ctrl(aR_speed, aL_pos, update_rate);
+                float factor = (aL_pos - aR_pos) * vel_gain;
+                act_left.vel_ctrl(aL_speed - factor);
+                act_right.vel_ctrl(aR_speed + factor);
             }
 
             // if (aB_tgt >= 0) {
@@ -218,14 +222,14 @@ void loop() {
         } else if (emergency_stop) {
             Serial.println("Estopped");
         }
-        // Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-        //     + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
-        //     + "," + String(mL_speed) + "," + String(mR_speed) + ">");
-        Serial.print("aL_pos:");
-        Serial.print(aL_pos);
-        Serial.print(",");
-        Serial.print("aR_pos:");
-        Serial.println(aR_pos);
+        Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
+            + "," + String(mL_speed) + "," + String(mR_speed) + ">");
+        // Serial.print("aL_pos:");
+        // Serial.print(aL_pos);
+        // Serial.print(",");
+        // Serial.print("aR_pos:");
+        // Serial.println(aR_pos);
     }
 
     if (current_time - last_reset_int_time >= 1000 / reset_int_rate) {

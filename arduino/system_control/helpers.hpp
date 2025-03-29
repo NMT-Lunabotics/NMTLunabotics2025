@@ -163,8 +163,9 @@ public:
   }
 
   void vel_ctrl(int speed, float other_pos, int hz) {
-    float rel_error = pos_mm - other_pos;
-    float vel_tgt = pos_mm + static_cast<float>(speed) / hz;
+    float time_step = 1.0f / hz;
+    float vel_tgt = pos_mm + speed * time_step;
+    float rel_error = other_pos - pos_mm;
     tgt_ctrl(vel_tgt, rel_error);
   }
 
