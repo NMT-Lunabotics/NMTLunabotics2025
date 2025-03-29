@@ -88,8 +88,8 @@ unsigned long last_update_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
 unsigned long current_time = 0;
-//const unsigned long estop_timeout = 1000; // 1 second timeout
-//unsigned long last_message_time = 0;
+const unsigned long estop_timeout = 1000; // 1 second timeout
+unsigned long last_message_time = 0;
 bool emergency_stop = false;
 bool doomsday = false;
 
@@ -126,9 +126,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
-    // if (calibrate_actuators_flag) {
-    //     calibrateActuators(act_left, act_right, act_bucket);
-    // }
+     if (calibrate_actuators_flag) {
+         calibrateActuators(act_left, act_right, act_bucket);
+     }
 }
 
 void loop() {
@@ -142,7 +142,7 @@ void loop() {
             while (Serial.available() < 1) {} // Wait for end byte
             if (Serial.read() == 0x03) { // End byte
                 emergency_stop = false;
-                //last_message_time = millis();
+                last_message_time = millis();
                 processMessage(data, length);
             } else {
                 Serial.println("End byte not found");
