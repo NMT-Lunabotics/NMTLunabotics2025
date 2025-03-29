@@ -1,12 +1,14 @@
 # Use multi-architecture support
 ARG BASE_IMAGE_AMD=osrf/ros:humble-desktop-full
-ARG BASE_IMAGE_ARM=osrf/ros:humble-desktop-full-arm64
+ARG BASE_IMAGE_ARM=arm64v8/ros:humble-ros-base
 
-# Automatically select the base image based on the architecture
+# Define initial stages
+FROM ${BASE_IMAGE_AMD} AS base_amd64
+FROM ${BASE_IMAGE_ARM} AS base_arm64
+
+# Select the appropriate base
 ARG TARGETARCH
-FROM ${BASE_IMAGE_ARM} AS base_arm
-FROM ${BASE_IMAGE_AMD} AS base_amd
-FROM base_${TARGETARCH} AS base
+FROM base_${TARGETARCH}
 
 ENV DISPLAY=0
 
@@ -24,27 +26,26 @@ WORKDIR /home/$USER
 
 # Install system packages
 USER root
-RUN apt-get install -y python3
-RUN apt-get install -y python3-pip
+RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Install python packages
 RUN pip3 install pyserial
 
-# Install ros packages
-RUN apt-get -y install ros-humble-teleop-twist-joy
-RUN apt-get -y install ros-humble-joy
-RUN apt-get -y install ros-humble-navigation2
-RUN apt-get -y install ros-humble-nav2-bringup
-RUN apt-get -y install ros-humble-realsense2-*
-RUN apt-get -y install ros-humble-rviz2
-RUN apt-get -y install ros-humble-rtabmap-ros
-RUN apt-get -y install ros-humble-rmw-cyclonedds-cpp
-RUN apt-get -y install ros-humble-usb-cam
-RUN apt-get -y install ros-humble-image-view
-RUN apt-get -y install ros-humble-image-transport-plugins
-RUN apt-get -y install python3-pydantic
-RUN apt-get -y install v4l-utils
-RUN apt-get -y install ros-humble-rosidl-generator-py
+# Add error handling for packages that might not be available on ARM
+RUN apt-get update && \
+    apt-get -y install ros-humble-teleop-twist-joy || echo "Package not available" && \
+    apt-get -y install ros-humble-joy || echo "Package not available" && \
+    apt-get -y install ros-humble-navigation2 || echo "Package not available" && \
+    apt-get -y install ros-humble-nav2-bringup || echo "Package not available" && \
+    apt-get -y install ros-humble-realsense2-camera || echo "Package not available" && \
+    apt-get -y install ros-humble-rviz2 || echo "Package not available" && \
+    apt-get -y install ros-humble-rtabmap-ros || echo "Package not available" && \
+    apt-get -y install ros-humble-rmw-cyclonedds-cpp || echo "Package not available" && \
+    apt-get -y install ros-humble-usb-cam || echo "Package not available" && \
+    apt-get -y install ros-humble-image-view || echo "Package not available" && \
+    apt-get -y install ros-humble-image-transport-plugins || echo "Package not available" && \
+    apt-get -y install python3-pydantic v4l-utils || echo "Package not available" && \
+    apt-get -y install ros-humble-rosidl-generator-py || echo "Package not available"
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
