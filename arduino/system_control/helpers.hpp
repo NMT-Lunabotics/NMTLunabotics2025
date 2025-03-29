@@ -191,12 +191,17 @@ class Motor {
 
     int motor_max_vel; //rpm
 
+    bool reverse = false;
+
 public:
-    Motor(OutPin dac1, OutPin dac2, int motor_max_vel) : dac1(dac1), dac2(dac2), motor_max_vel(motor_max_vel) {}
+    Motor(OutPin dac1, OutPin dac2, int motor_max_vel, bool reverse) : dac1(dac1), dac2(dac2), motor_max_vel(motor_max_vel), reverse(reverse) {}
 
     void motor_ctrl(int signed_speed) {
         // Convert motor speeds (in rpm) to PWM values (0-255)
         // Constrain speeds to max velocity first
+        if (reverse) {
+            signed_speed = -signed_speed;
+        }
         signed_speed = constrain(signed_speed, -motor_max_vel, motor_max_vel);
 
         // Map the absolute speed values to PWM range
