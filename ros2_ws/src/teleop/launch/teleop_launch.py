@@ -26,7 +26,9 @@ def generate_launch_description():
             # Adjust the joystick device if necessary
             parameters=[{
                 'device_id': device_id,
-                'deadzone': 0.2
+                'deadzone': 0.2,
+                'autorepeat_rate': 10.0,  # Set the publish rate in Hz
+                'coalesce_interval_ms': 100
             }]
         ),
 
