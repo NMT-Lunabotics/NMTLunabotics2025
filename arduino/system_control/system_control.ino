@@ -126,9 +126,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
-    // if (calibrate_actuators_flag) {
-    //     calibrateActuators(act_left, act_right, act_bucket);
-    // }
+     if (calibrate_actuators_flag) {
+         calibrateActuators(act_left, act_right, act_bucket);
+     }
 }
 
 void loop() {
@@ -160,9 +160,9 @@ void loop() {
 
     current_time = millis();
 
-    if (current_time - last_message_time > estop_timeout) {
-        emergency_stop = true;
-    }
+    //if (current_time - last_message_time > estop_timeout) {
+    //    emergency_stop = true;
+    //}
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
