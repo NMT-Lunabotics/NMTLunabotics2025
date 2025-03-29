@@ -94,8 +94,6 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-// int test_tgt = 50;
-int test_vel = -25;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
@@ -143,6 +141,8 @@ void loop() {
             Serial.readBytes(data, length);
             while (Serial.available() < 1) {} // Wait for end byte
             if (Serial.read() == 0x03) { // End byte
+                emergency_stop = false;
+                last_message_time = millis();
                 processMessage(data, length);
             } else {
                 Serial.println("End byte not found");
@@ -150,19 +150,19 @@ void loop() {
         }
     }
 
-    // if (emergency_stop || doomsday) {
-    //     act_left.stop();
-    //     act_right.stop();
+    if (emergency_stop || doomsday) {
+        act_left.stop();
+        act_right.stop();
     //     // act_bucket.stop(); TODO
-    //     motor_left.motor_ctrl(0);
-    //     motor_right.motor_ctrl(0);
-    // }
+        motor_left.motor_ctrl(0);
+        motor_right.motor_ctrl(0);
+    }
 
     current_time = millis();
 
-    // if (current_time - last_message_time > estop_timeout) {
-    //     emergency_stop = true;
-    // } TODO
+    if (current_time - last_message_time > estop_timeout) {
+        emergency_stop = true;
+    }
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
@@ -178,11 +178,9 @@ void loop() {
         }
 
         //Run actuators
-        aL_speed = test_vel;
-        aR_speed = test_vel;
         aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
-        // if (!doomsday && !emergency_stop) {
+        if (!doomsday && !emergency_stop) {
             if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
@@ -204,7 +202,7 @@ void loop() {
             //Run motors
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
-        // }
+        }
 
         //Run LEDs
         ledr_pin.write(led_r);
