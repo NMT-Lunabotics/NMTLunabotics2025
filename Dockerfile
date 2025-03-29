@@ -1,4 +1,13 @@
-FROM osrf/ros:humble-desktop-full
+# Use multi-architecture support
+ARG BASE_IMAGE_AMD=osrf/ros:humble-desktop-full
+ARG BASE_IMAGE_ARM=osrf/ros:humble-desktop-full-arm64
+
+# Automatically select the base image based on the architecture
+ARG TARGETARCH
+FROM ${BASE_IMAGE_ARM} AS base_arm
+FROM ${BASE_IMAGE_AMD} AS base_amd
+FROM base_${TARGETARCH} AS base
+
 ENV DISPLAY=0
 
 RUN apt-get update && apt-get install -y sudo
@@ -37,7 +46,6 @@ RUN apt-get -y install python3-pydantic
 RUN apt-get -y install v4l-utils
 RUN apt-get -y install ros-humble-rosidl-generator-py
 
-
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
 COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
@@ -47,7 +55,6 @@ USER $USER
 WORKDIR /home/$USER/ros2_ws
 # RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
 RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
-
 
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc

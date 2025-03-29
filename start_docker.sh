@@ -183,16 +183,19 @@ fi
 if [[ "$BUILD_CONTAINER" = true ]]; then
     echo "Building the Docker container for the current architecture..."
     ARCH=$(uname -m)
+    TARGET_ARCH=""
     if [[ "$ARCH" == "x86_64" ]]; then
         echo "Detected architecture: AMD64"
-        docker build -t $IMAGE_NAME --build-arg ARCH=amd64 .
+        TARGET_ARCH="amd64"
     elif [[ "$ARCH" == "aarch64" ]]; then
         echo "Detected architecture: ARM64"
-        docker build -t $IMAGE_NAME --build-arg ARCH=arm64 .
+        TARGET_ARCH="arm64"
     else
         echo "Error: Unsupported architecture: $ARCH"
         exit 1
     fi
+
+    docker build -t $IMAGE_NAME --build-arg TARGET_ARCH=$TARGET_ARCH .
 fi
 
 # Start the container if it is not already running
