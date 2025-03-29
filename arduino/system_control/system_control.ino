@@ -142,7 +142,7 @@ void loop() {
             while (Serial.available() < 1) {} // Wait for end byte
             if (Serial.read() == 0x03) { // End byte
                 emergency_stop = false;
-                last_message_time = millis();
+                //last_message_time = millis();
                 processMessage(data, length);
             } else {
                 Serial.println("End byte not found");
