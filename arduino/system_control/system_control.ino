@@ -81,9 +81,9 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 1000; //hz
-int feedback_rate = 100; //hz
-int reset_int_rate = 5; //hz
+int update_rate = 150; //hz
+int feedback_rate = 10; //hz
+int reset_int_rate = 2; //hz
 unsigned long last_update_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
@@ -95,8 +95,8 @@ bool doomsday = false;
 
 // Set up PID controllers
 int test_tgt = 150;
-PID pidL(5, 0.005, 0.03, 3);
-PID pidR(5, 0.005, 0.03, 3);
+PID pidL(2.3, 0.0022, 0.29, 1.7);
+PID pidR(1.8, 0.0018, 0.29, 1.7);
 PID pidB(3.0, 0.001, 0.4);
 
 // Set up actuators
@@ -146,12 +146,6 @@ void loop() {
                 Serial.println("End byte not found");
             }
         }
-    }
-
-    if (doomsday) {
-        Serial.println("Doomsday");
-    } else if (emergency_stop) {
-        Serial.println("Estopped");
     }
 
     // if (emergency_stop || doomsday) {
@@ -219,9 +213,19 @@ void loop() {
         last_feedback_time = current_time;
 
         // Send feedback
-        Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
-            + "," + String(mL_speed) + "," + String(mR_speed) + ">");
+        if (doomsday) {
+            Serial.println("Doomsday");
+        } else if (emergency_stop) {
+            Serial.println("Estopped");
+        }
+        // Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
+        //     + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
+        //     + "," + String(mL_speed) + "," + String(mR_speed) + ">");
+        Serial.print("aL_pos:");
+        Serial.print(aL_pos);
+        Serial.print(",");
+        Serial.print("aR_pos:");
+        Serial.println(aR_pos);
     }
 
     if (current_time - last_reset_int_time >= 1000 / reset_int_rate) {
@@ -329,4 +333,4 @@ void processMessage(byte* data, int length) {
 //     Serial.print("Bucket Actuator: ");
 //     Serial.println(act_bucket.pos_mm());
 //     Serial.println("Calibration Complete");
-// }   
+// }
