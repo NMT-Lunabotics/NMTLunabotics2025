@@ -126,9 +126,9 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
-     if (calibrate_actuators_flag) {
-         calibrateActuators(act_left, act_right, act_bucket);
-     }
+    //  if (calibrate_actuators_flag) {
+        //  calibrateActuators(act_left, act_right, act_bucket);
+    //  }
 }
 
 void loop() {
