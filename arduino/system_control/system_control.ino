@@ -160,9 +160,9 @@ void loop() {
 
     current_time = millis();
 
-    //if (current_time - last_message_time > estop_timeout) {
-    //    emergency_stop = true;
-    //}
+    if (current_time - last_message_time > estop_timeout) {
+        emergency_stop = true;
+    }
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
