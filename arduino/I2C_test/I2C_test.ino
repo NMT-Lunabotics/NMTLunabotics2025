@@ -1,23 +1,21 @@
-void setup() {
-  // Initialize serial communication at 9600 baud
-  Serial.begin(9600);
+#include <Servo.h>
 
-  // Configure A0 and A1 as input
-  pinMode(A0, INPUT);
-  pinMode(A1, INPUT);
+Servo myServo;  // Create a servo object
+
+void setup() {
+  myServo.attach(12);  // Attach the servo to pin 9
+  Serial.begin(9600); // Start serial communication
+  Serial.println("Servo Test Initialized");
 }
 
 void loop() {
-  // Read analog values from A0 and A1
-  int valueA0 = analogRead(A0);
-  int valueA1 = analogRead(A1);
+  for (int pos = 0; pos <= 180; pos += 1) { // Sweep from 0 to 180 degrees
+    myServo.write(pos);                    // Move the servo to the position
+    delay(15);                             // Wait for the servo to reach the position
+  }
 
-  // Print the values to the Serial Monitor
-  Serial.print("A0: ");
-  Serial.print(valueA0);
-  Serial.print(" | A1: ");
-  Serial.println(valueA1);
-
-  // Wait for 500 milliseconds before the next reading
-  delay(500);
+  for (int pos = 180; pos >= 0; pos -= 1) { // Sweep back from 180 to 0 degrees
+    myServo.write(pos);                     // Move the servo to the position
+    delay(15);                              // Wait for the servo to reach the position
+  }
 }
