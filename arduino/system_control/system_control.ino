@@ -10,8 +10,8 @@ bool calibrate_actuators_flag = false;
 //Left side is L, right side is R, both is LR, bucket is B
 // I2C addresses for actuators
 #define AL_I2C_ADDRESS 0x5A // B0
-#define AR_I2C_ADDRESS 0x58 // B4
-#define AB_I2C_ADDRESS 0x59 // B2
+#define AR_I2C_ADDRESS 0x59 // B4
+#define AB_I2C_ADDRESS 0x58 // B2
 
 // I2C registers for actuators
 #define SPEED_REG 0x02
@@ -151,8 +151,8 @@ void loop() {
     }
 
     if (emergency_stop || doomsday) {
-        act_left.stop();
-        act_right.stop();
+        // act_left.stop();
+        // act_right.stop();
     //     // act_bucket.stop(); TODO
         motor_left.motor_ctrl(0);
         motor_right.motor_ctrl(0);
@@ -182,12 +182,12 @@ void loop() {
 
         if (!doomsday && !emergency_stop) {
             if (aLR_tgt >= 0) {
-                act_left.tgt_ctrl(aLR_tgt, aR_pos);
-                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+                // act_left.tgt_ctrl(aLR_tgt, aR_pos);
+                // act_right.tgt_ctrl(aLR_tgt, aL_pos);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                // act_left.vel_ctrl(aL_speed - factor);
+                // act_right.vel_ctrl(aR_speed + factor);
             }
 
             // if (aB_tgt >= 0) {
