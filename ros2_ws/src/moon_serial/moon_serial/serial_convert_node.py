@@ -8,10 +8,6 @@ class SerialConvertNode(Node):
     def __init__(self):
         super().__init__('serial_convert_node')
         
-        self.last_act_serial_msg = b''
-        self.last_motor_serial_msg = b''
-        self.last_servo_serial_msg = b''
-        
         self.serial_write_publisher = self.create_publisher(Bytes, '/serial_write', 10)
         
         self.create_subscription(Actuators, '/actuator_control', self.actuator_control_subscriber, 10)
@@ -21,26 +17,18 @@ class SerialConvertNode(Node):
     
     def actuator_control_subscriber(self, msg):
         data = struct.pack('>Bhhbb', ord('A'), msg.arm_pos, msg.bucket_pos, msg.arm_vel, msg.bucket_vel)
-        #if data != self.last_act_serial_msg:
-        self.last_act_serial_msg = data
         self.send_serial_data(data)
     
     def motor_control_subscriber(self, msg):
         data = struct.pack('>Bbb', ord('M'), msg.left, msg.right)
-        #if data != self.last_motor_serial_msg:
-        self.last_motor_serial_msg = data
         self.send_serial_data(data)
     
     def servo_control_subscriber(self, msg):
         data = struct.pack('>BB', ord('S'), 1 if msg.data else 0)
-        #if data != self.last_servo_serial_msg:
-        self.last_servo_serial_msg = data
         self.send_serial_data(data)
     
     def led_control_subscriber(self, msg):
         data = struct.pack('>BBBBB', ord('L'), int(msg.red), int(msg.yellow), int(msg.green), int(msg.blue))
-        #if data != self.last_led_serial_msg:
-        self.last_led_serial_msg = data
         self.send_serial_data(data)
     
     def send_serial_data(self, data):
