@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include "helpers.hpp"
+#include <Servo.h>
 
 // Debug mode flag
 bool debug_mode = false;
@@ -119,6 +120,7 @@ OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
 OutPin servo_pin(SERVO_PIN);
+Servo servo;
 
 void processMessage(byte* data, int length);
 
@@ -129,6 +131,8 @@ void setup(){
     //  if (calibrate_actuators_flag) {
         //  calibrateActuators(act_left, act_right, act_bucket);
     //  }
+    servo.attach(SERVO_PIN);
+    servo.write(0);
 }
 
 void loop() {
@@ -198,7 +202,11 @@ void loop() {
 
             // //Run servo
             // //TODO implement
-
+            if (servo_state) {
+                servo.write(0);
+            } else {
+                servo.write(90);
+            }
             //Run motors
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
