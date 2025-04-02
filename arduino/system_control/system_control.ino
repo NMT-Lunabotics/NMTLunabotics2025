@@ -109,7 +109,7 @@ Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false,
                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
 
 // Set up motors
-Motor motor_left(DACL1_PIN, DACL2_PIN, motor_max_vel, true);
+Motor motor_left(DACL1_PIN, DACL2_PIN, motor_max_vel, false);
 Motor motor_right(DACR1_PIN, DACR2_PIN, motor_max_vel, true);
 
 // Set up LEDs
