@@ -140,7 +140,7 @@ public:
     // Convert speed (in mm/s) to PWM value (0-255)
     // Speed is clamped to max velocity
     speed = constrain(speed, -act_max_vel, act_max_vel);
-    int act_speed = map(abs(speed), 0, act_max_vel, 0, 254);
+    int act_speed = map(abs(speed), 0, act_max_vel, 0, 250);
     sendI2CCommand(i2c_address, speed_reg, act_speed);
     sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
   }
