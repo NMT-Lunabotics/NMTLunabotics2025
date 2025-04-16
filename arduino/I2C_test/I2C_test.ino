@@ -9,13 +9,8 @@ void setup() {
 }
 
 void loop() {
-  for (int pos = 0; pos <= 180; pos += 1) { // Sweep from 0 to 180 degrees
-    myServo.write(pos);                    // Move the servo to the position
-    delay(15);                             // Wait for the servo to reach the position
-  }
-
-  for (int pos = 180; pos >= 0; pos -= 1) { // Sweep back from 180 to 0 degrees
-    myServo.write(pos);                     // Move the servo to the position
-    delay(15);                              // Wait for the servo to reach the position
-  }
+  myServo.write(90);  // Move servo to 90 degrees
+  delay(1000);        // Wait for 1 second
+  myServo.write(0);   // Move servo to 0 degrees
+  delay(1000);        // Wait for 1 second
 }
