@@ -1,5 +1,3 @@
-#include "helpers.hpp"
-
 // Debug mode flag
 bool debug_mode = false;
 bool calibrate_actuators_flag = true;
@@ -7,6 +5,13 @@ bool calibrate_actuators_flag = true;
 
 //////// MOTORS ////////
 const float rpm_to_pwm_constant = 2.5;
+const int motor1_pwm_pin = 3;  // Motor 1 speed (PWM)
+const int motor1_dir_pin1 = 4;  // Motor 1 direction pin 1
+const int motor1_dir_pin2 = 5;  // Motor 1 direction pin 2
+
+const int motor2_pwm_pin = 6;  // Motor 2 speed (PWM)
+const int motor2_dir_pin1 = 7;  // Motor 2 direction pin 1
+const int motor2_dir_pin2 = 8;  // Motor 2 direction pin 2
 
 // Motor speeds
 int mL_speed = 0;
@@ -28,13 +33,13 @@ void processMessage(byte* data, int length);
 void setup(){
     Serial.begin(115200);
     Serial.flush();
-    OutPin motor1_pwm_pin(3); // Motor 1 speed (PWM)
-    OutPin motor1_dir_pin1(4); // Motor 1 direction pin 1
-    OutPin motor1_dir_pin2(5); // Motor 1 direction pin 2
-    
-    OutPin motor2_pwm_pin(6); // Motor 2 speed (PWM)
-    OutPin motor2_dir_pin1(7); // Motor 2 direction pin 1
-    OutPin motor2_dir_pin2(8); // Motor 2 direction pin 2
+    pinMode(motor1_pwm_pin, OUTPUT);
+    pinMode(motor1_dir_pin1, OUTPUT);
+    pinMode(motor1_dir_pin2, OUTPUT);
+  
+    pinMode(motor2_pwm_pin, OUTPUT);
+    pinMode(motor2_dir_pin1, OUTPUT);
+    pinMode(motor2_dir_pin2, OUTPUT);
 }
 
 void loop() {
@@ -60,11 +65,11 @@ void loop() {
         last_update_time = current_time;
 
           // Convert RPM to PWM using the constant
-          pwm_motor1 = constrain(abs(rpm_motor1) * rpm_to_pwm_constant, 0, 255);
-          pwm_motor2 = constrain(abs(rpm_motor2) * rpm_to_pwm_constant, 0, 255);
+          pwm_motor1 = constrain(abs(mL_speed) * rpm_to_pwm_constant, 0, 255);
+          pwm_motor2 = constrain(abs(mR_speed) * rpm_to_pwm_constant, 0, 255);
 
           // Set motor 1 direction
-          if (rpm_motor1 >= 0) {
+          if (mL_speed >= 0) {
             digitalWrite(motor1_dir_pin1, HIGH);
             digitalWrite(motor1_dir_pin2, LOW);
           } else {
@@ -76,7 +81,7 @@ void loop() {
           analogWrite(motor1_pwm_pin, pwm_motor1);
 
           // Set motor 2 direction
-          if (rpm_motor2 >= 0) {
+          if (mR_speed >= 0) {
             digitalWrite(motor2_dir_pin1, HIGH);
             digitalWrite(motor2_dir_pin2, LOW);
           } else {
@@ -106,21 +111,21 @@ void processMessage(byte* data, int length) {
 
     switch (type) {
         case 'A': { // Actuator control
-            aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
-            aB_tgt = (int16_t)((data[3] << 8) | data[4]);
-            aL_speed = (int8_t)data[5];
-            aR_speed = aL_speed;
-            aB_speed = (int8_t)data[6];
-            if (debug_mode) {
-                Serial.print("Arm Position: ");
-                Serial.println(aLR_tgt);
-                Serial.print("Bucket Position: ");
-                Serial.println(aB_tgt);
-                Serial.print("Arm Velocity: ");
-                Serial.println(aL_speed);
-                Serial.print("Bucket Velocity: ");
-                Serial.println(aB_speed);
-            }
+            // aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
+            // aB_tgt = (int16_t)((data[3] << 8) | data[4]);
+            // aL_speed = (int8_t)data[5];
+            // aR_speed = aL_speed;
+            // aB_speed = (int8_t)data[6];
+            // if (debug_mode) {
+            //     Serial.print("Arm Position: ");
+            //     Serial.println(aLR_tgt);
+            //     Serial.print("Bucket Position: ");
+            //     Serial.println(aB_tgt);
+            //     Serial.print("Arm Velocity: ");
+            //     Serial.println(aL_speed);
+            //     Serial.print("Bucket Velocity: ");
+            //     Serial.println(aB_speed);
+            // }
             break;
         }
         case 'M': { // Motor control
@@ -135,28 +140,28 @@ void processMessage(byte* data, int length) {
             break;
         }
         case 'S': { // Servo control
-            servo_state = data[1];  // Adjusted index to skip the type byte
-            if (debug_mode) {
-                Serial.print("Servo State: ");
-                Serial.println(servo_state);
-            }
+            // servo_state = data[1];  // Adjusted index to skip the type byte
+            // if (debug_mode) {
+            //     Serial.print("Servo State: ");
+            //     Serial.println(servo_state);
+            // }
             break;
         }
         case 'L': { // LED control
-            led_r = data[1];  // Adjusted index to skip the type byte
-            led_y = data[2];
-            led_g = data[3];
-            led_b = data[4];
-            if (debug_mode) {
-                Serial.print("Red: ");
-                Serial.println(led_r);
-                Serial.print("Yellow: ");
-                Serial.println(led_y);
-                Serial.print("Green: ");
-                Serial.println(led_g);
-                Serial.print("Blue: ");
-                Serial.println(led_b);
-            }
+            // led_r = data[1];  // Adjusted index to skip the type byte
+            // led_y = data[2];
+            // led_g = data[3];
+            // led_b = data[4];
+            // if (debug_mode) {
+            //     Serial.print("Red: ");
+            //     Serial.println(led_r);
+            //     Serial.print("Yellow: ");
+            //     Serial.println(led_y);
+            //     Serial.print("Green: ");
+            //     Serial.println(led_g);
+            //     Serial.print("Blue: ");
+            //     Serial.println(led_b);
+            // }
             break;
         }
         default:
