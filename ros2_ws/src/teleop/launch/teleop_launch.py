@@ -42,9 +42,9 @@ def generate_launch_description():
                 'require_enable_button': True,
                 'enable_button': 4,
                 'axis_linear.x': 1,
-                'scale_linear.x': 0.25,
+                'scale_linear.x': 0.5,
                 'axis_angular.yaw': 0,
-                'scale_angular.yaw': 0.25,
+                'scale_angular.yaw': 1.6,
                 'inverted_reverse': False
             }]
         ),

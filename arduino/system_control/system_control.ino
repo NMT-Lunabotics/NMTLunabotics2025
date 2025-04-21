@@ -154,13 +154,14 @@ void loop() {
         }
     }
 
-    if (emergency_stop || doomsday) {
+    // if (emergency_stop || doomsday) {
         // act_left.stop();
         // act_right.stop();
     //     // act_bucket.stop(); TODO
-        motor_left.motor_ctrl(0);
-        motor_right.motor_ctrl(0);
-    }
+        // motor_left.motor_ctrl(0);
+        // motor_right.motor_ctrl(0);
+    // }
+    // TODO put back
 
     current_time = millis();
 
@@ -184,7 +185,7 @@ void loop() {
         //Run actuators
         aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
-        if (!doomsday && !emergency_stop) {
+        if (!emergency_stop) { //TODO if not doomsday
             if (aLR_tgt >= 0) {
                 // act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 // act_right.tgt_ctrl(aLR_tgt, aL_pos);

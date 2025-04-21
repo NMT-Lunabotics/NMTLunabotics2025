@@ -17,10 +17,10 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {'cmd_vel_topic': 'cmd_vel'},
-                {'wheel_base': 0.5},
-                {'wheel_diameter': 0.1},
-                {'max_rpm': 100},
-                {'min_rpm': 10},
+                {'wheel_base': 0.6},
+                {'wheel_diameter': 0.3},
+                {'max_rpm': 30},
+                {'min_rpm': 2},
                 {'arduino_serial_device': '/dev/ttyACM0'}
             ]
         ),

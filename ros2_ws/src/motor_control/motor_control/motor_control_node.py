@@ -13,9 +13,9 @@ class MotorControlNode(Node):
         self.declare_parameter('wheel_base', 0.5)  # Default in meters
         self.declare_parameter('wheel_diameter', 0.1)  # Default in meters
         # Maximum RPM value for motor control
-        self.declare_parameter('max_rpm', 100)
+        self.declare_parameter('max_rpm', 30)
         # Minimum RPM value for motor control
-        self.declare_parameter('min_rpm', 10)
+        self.declare_parameter('min_rpm', 1)
         self.declare_parameter('arduino_serial_device', '/dev/ttyACM0')
 
         self.cmd_vel_topic = self.get_parameter(
@@ -45,7 +45,7 @@ class MotorControlNode(Node):
         omega = msg.angular.z  # Angular velocity in rad/s
 
         # Calculate left and right wheel velocities (m/s)
-        v_left = 0.9*(v - omega) #(omega * self.wheel_base / 2.0)
+        v_left = v - omega #(omega * self.wheel_base / 2.0)
         v_right = v + omega # (omega * self.wheel_base / 2.0)
 
         # Convert to RPM
