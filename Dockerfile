@@ -47,6 +47,20 @@ RUN apt-get update && \
     apt-get -y install python3-pydantic v4l-utils || echo "Package not available" && \
     apt-get -y install ros-humble-rosidl-generator-py || echo "Package not available"
 
+# Install micro-ROS dependencies
+RUN apt-get update && apt-get install -y \
+    ros-humble-micro-ros-agent \
+    ros-humble-micro-ros-msgs \
+    ros-humble-micro-ros-setup
+
+# Set up micro-ROS workspace
+USER $USER
+WORKDIR /home/$USER/micro_ros_ws
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
+    ros2 run micro_ros_setup create_firmware_ws.sh && \
+    ros2 run micro_ros_setup configure_firmware.sh generic_linux && \
+    ros2 run micro_ros_setup build_firmware.sh"
+
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
 COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
