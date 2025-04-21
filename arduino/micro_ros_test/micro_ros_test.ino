@@ -35,22 +35,20 @@ int num_subscribers = 0;
 void motors_callback(const void * msgin)
 {
     const moon_messages__msg__Motors * msg = (const moon_messages__msg__Motors *)msgin;
-    Serial.println("Motors Control Command received");
-    // Process the motors message fields here
+    Serial.println("Motor left: " + String(msg->left) + ", right: " + String(msg->right));
 }
 
 void actuators_callback(const void * msgin)
 {
     const moon_messages__msg__Actuators * msg = (const moon_messages__msg__Actuators *)msgin;
-    Serial.println("Actuators Control Command received");
-    // Process the actuators message fields here
+    Serial.println("Actuators arm pos: " + String(msg->arm_pos) + ", vel: " + String(msg->arm_vel) +
+                   ", bucket pos: " + String(msg->bucket_pos) + ", vel: " + String(msg->bucket_vel));
 }
 
 void leds_callback(const void * msgin)
 {
     const moon_messages__msg__Leds * msg = (const moon_messages__msg__Leds *)msgin;
-    Serial.println("LEDs Control Command received");
-    // Process the LEDs message fields here
+    Serial.println("LED red: " + String(msg->red) ", yellow: " + String(msg->yellow) + ", green: " + String(msg->green) + ", blue: " + String(msg->blue));
 }
 
 // Error handling function
@@ -93,7 +91,7 @@ bool add_subscriber(const char* topic_name, const rosidl_message_type_support_t*
 
 void setup() {
     Serial.begin(115200);
-    delay(2000);
+    delay(200);
     Serial.println("Starting micro-ROS test...");
 
     // Set microros transport
@@ -110,14 +108,14 @@ void setup() {
     
     // Add subscribers with custom message types
     add_subscriber(
-        "/motors_control", 
+        "/motor_control", 
         ROSIDL_GET_MSG_TYPE_SUPPORT(moon_messages, msg, Motors), 
         &motors_msg, 
         &motors_callback
     );
     
     add_subscriber(
-        "/actuators_control", 
+        "/actuator_control", 
         ROSIDL_GET_MSG_TYPE_SUPPORT(moon_messages, msg, Actuators), 
         &actuators_msg, 
         &actuators_callback

@@ -19,11 +19,16 @@ QUIET_MODE=false
 ROS_DOMAIN_ID=42
 OPEN_BASH=false
 RUN_RVIZ=false
+ARDUINO_SKETCH=""
+ARDUINO_PORT="/dev/ttyUSB0"
+ARDUINO_BOARD="arduino:avr:uno"  # Default board (change as needed)
+RUN_ARDUINO=false
 
 usage() {
     echo "Usage: $0 [--start (-s) | --motor_ctrl (-m) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |"
     echo "           --command (-c) <command> | --build (-b) | --stop (-x) |"
     echo "           --restart (-r)] [--display (-d)] [--quiet (-q)] [--help (-h)]"
+    echo "           [--arduino (-a) <sketch_path>] [--port (-p) <port>] [--board (-b) <board>]"
     echo "This script is used to start and manage a Docker container for ROS2"
     echo "If no action is specified, the script will open an interactive bash terminal in the container."
     echo "Actions (pick ONE):"
@@ -40,6 +45,9 @@ usage() {
     echo "  --restart (-r)              Restart the Docker container if it is running"
     echo "  --quiet (-q)                Suppress output"
     echo "  --help (-h)                 Show this help message"
+    echo "  --arduino (-a) <sketch_path>  Compile and upload an Arduino sketch"
+    echo "  --port (-p) <port>            Specify the serial port for Arduino (default: /dev/ttyUSB0)"
+    echo "  --board (-b) <board>          Specify the Arduino board (default: arduino:avr:uno)"
     exit 1
 }
 
@@ -58,6 +66,9 @@ while [[ "$#" -gt 0 ]]; do
         --restart|-r) RESTART_CONTAINER=true; shift ;;
         --quiet|-q) QUIET_MODE=true; shift ;;
         --help|-h) usage; shift ;;
+        --arduino|-a) RUN_ARDUINO=true; ARDUINO_SKETCH="$2"; shift 2 ;;
+        --port|-p) ARDUINO_PORT="$2"; shift 2 ;;
+        --board|-b) ARDUINO_BOARD="$2"; shift 2 ;;
         *) usage; shift ;;
     esac
 done
@@ -70,6 +81,7 @@ if [ "$RUN_TELEOP_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_USB_CAM_NODE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ -n "$COMMAND_TO_RUN" ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_ARDUINO" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 
 if [ "$ACTION_COUNT" -gt 1 ]; then
     echo "Error: Multiple actions specified. You get ONE."
@@ -221,6 +233,19 @@ if [ "$QUIET_MODE" = true ]; then
     DOCKER_EXEC_FLAGS="-dt"
 else
     DOCKER_EXEC_FLAGS="-it"
+fi
+
+# Compile and upload Arduino sketch
+if [ "$RUN_ARDUINO" = true ]; then
+    if [ -z "$ARDUINO_SKETCH" ]; then
+        echo "Error: No Arduino sketch specified."
+        exit 1
+    fi
+
+    echo "Compiling and uploading Arduino sketch: $ARDUINO_SKETCH"
+    docker exec $DOCKER_EXEC_FLAGS $CONTAINER_ID arduino-cli compile --fqbn $ARDUINO_BOARD $ARDUINO_SKETCH
+    docker exec $DOCKER_EXEC_FLAGS $CONTAINER_ID arduino-cli upload --fqbn $ARDUINO_BOARD --port $ARDUINO_PORT $ARDUINO_SKETCH
+    exit 0
 fi
 
 # Execute the specified option
