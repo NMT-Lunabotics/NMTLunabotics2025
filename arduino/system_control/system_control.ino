@@ -109,8 +109,12 @@ Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false,
                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
 
 // Set up motors
-Motor motor_left(DACL1_PIN, DACL2_PIN, motor_max_vel, true);
-Motor motor_right(DACR1_PIN, DACR2_PIN, motor_max_vel, false);
+OutPin motor_left_dac1(DACL1_PIN);
+OutPin motor_left_dac2(DACL2_PIN);
+OutPin motor_right_dac1(DACR1_PIN);
+OutPin motor_right_dac2(DACR2_PIN);
+Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, true);
+Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, false);
 
 // Set up LEDs
 OutPin ledr_pin(LEDR_PIN);

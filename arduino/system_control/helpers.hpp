@@ -206,7 +206,7 @@ public:
 
         // Map the absolute speed values to PWM range
         int motor_speed = map(abs(signed_speed), 0, motor_max_vel, 0, 255);
-        if (signed_speed < 0) {
+        if (signed_speed > 0) {
             dac1.write_pwm_raw(motor_speed);
             dac2.write_pwm_raw(0);
         } else {
