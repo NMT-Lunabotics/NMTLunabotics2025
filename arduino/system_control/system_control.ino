@@ -52,10 +52,10 @@ int aLR_tgt = -1;
 int aB_tgt = -1;
 
 //////// MOTORS ////////
-#define DACL1_PIN 3
-#define DACL2_PIN 5
-#define DACR1_PIN 6
-#define DACR2_PIN 9
+#define DACL1_PIN 6
+#define DACL2_PIN 9
+#define DACR1_PIN 3
+#define DACR2_PIN 5
 
 int motor_max_vel = 21; //rpm
 
@@ -113,7 +113,7 @@ OutPin motor_left_dac1(DACL1_PIN);
 OutPin motor_left_dac2(DACL2_PIN);
 OutPin motor_right_dac1(DACR1_PIN);
 OutPin motor_right_dac2(DACR2_PIN);
-Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, false);
+Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, true);
 Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, false);
 
 // Set up LEDs
