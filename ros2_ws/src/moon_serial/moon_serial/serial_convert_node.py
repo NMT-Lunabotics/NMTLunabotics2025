@@ -32,10 +32,10 @@ class SerialConvertNode(Node):
         self.send_serial_data(data)
     
     def send_serial_data(self, data):
-        # start_byte = b'\x02'
-        # end_byte = b'\x03'
-        # length_byte = struct.pack('>B', len(data))
-        # message = start_byte + length_byte + data + end_byte
+        start_byte = b'\x02'
+        end_byte = b'\x03'
+        length_byte = struct.pack('>B', len(data))
+        message = start_byte + length_byte + data + end_byte
         self.serial_write_publisher.publish(Bytes(data=data))
 
 def main(args=None):

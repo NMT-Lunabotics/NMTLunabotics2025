@@ -88,19 +88,19 @@ class SerialBridgeNode(Node):
             return
         
         try:
-            # Define start and end bytes
-            START_BYTE = b'\x02'
-            END_BYTE = b'\x03'
+            # # Define start and end bytes
+            # START_BYTE = b'\x02'
+            # END_BYTE = b'\x03'
 
-            # Calculate message length and checksum
-            message_length = len(msg.data).to_bytes(2, byteorder='big')
-            checksum = (sum(msg.data) + sum(message_length)) & 0xFF
+            # # Calculate message length and checksum
+            # message_length = len(msg.data).to_bytes(2, byteorder='big')
+            # checksum = (sum(msg.data) + sum(message_length)) & 0xFF
 
-            # Construct the full message
-            full_message = START_BYTE + message_length + msg.data + checksum.to_bytes(1, byteorder='big') + END_BYTE
+            # # Construct the full message
+            # full_message = START_BYTE + message_length + msg.data + checksum.to_bytes(1, byteorder='big') + END_BYTE
 
-            # Write the full message to the serial connection
-            self.serial_conn.write(full_message)
+            # # Write the full message to the serial connection
+            # self.serial_conn.write(full_message)
             self.serial_conn.write(msg.data)
             self.serial_conn.flush()  # Ensure data is written
         except serial.SerialException as e:
