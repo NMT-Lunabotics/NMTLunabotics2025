@@ -122,7 +122,6 @@ OutPin ledg_pin(LEDG_PIN);
 OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
-OutPin servo_pin(SERVO_PIN);
 Servo servo;
 
 void processMessage(byte* data, int length);
