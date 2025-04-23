@@ -7,8 +7,8 @@
 // B0: 58
 // B2: 59
 // B4: 5A
-#define AL_I2C_ADDRESS 0x59 // B2
-#define AR_I2C_ADDRESS 0x5A // B4
+#define AL_I2C_ADDRESS 0x5A // B4
+#define AR_I2C_ADDRESS 0x59 // B2
 #define AB_I2C_ADDRESS 0x58 // B0
 
 // I2C registers for actuators
@@ -161,12 +161,6 @@ void loop() {
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
         }
-
-        //Run LEDs
-        ledr_pin.write(led_r);
-        ledy_pin.write(led_y);
-        ledg_pin.write(led_g);
-        ledb_pin.write(led_b);
     }
 
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
