@@ -39,7 +39,7 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 10; // mm
+float act_max_error = 5; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -100,7 +100,7 @@ bool doomsday = false;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 1.0;
+float vel_gain = 2.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
