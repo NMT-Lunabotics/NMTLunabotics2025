@@ -36,7 +36,7 @@ class SerialConvertNode(Node):
         end_byte = b'\x03'
         length_byte = struct.pack('>B', len(data))
         message = start_byte + length_byte + data + end_byte
-        self.serial_write_publisher.publish(Bytes(data=data))
+        self.serial_write_publisher.publish(Bytes(data=message))
 
 def main(args=None):
     rclpy.init(args=args)
