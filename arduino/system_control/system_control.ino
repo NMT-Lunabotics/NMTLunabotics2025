@@ -94,18 +94,18 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-PID pidL(2.2, 0.0022, 0.34, 2.0);
-PID pidR(1.85, 0.0018, 0.31, 1.7);
-PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 2.0;
+// PID pidL(2.2, 0.0022, 0.34, 2.0);
+// PID pidR(1.85, 0.0018, 0.31, 1.7);
+// PID pidB(3.0, 0.001, 0.4);
+// float vel_gain = 2.0;
 
 // Set up actuators
-Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
-                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
-Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
-                    ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
-Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
+// Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+//                     ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
+// Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+//                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
+// Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
+//                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
@@ -116,14 +116,14 @@ Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, false);
 Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, true);
 
 // Set up LEDs
-OutPin ledr_pin(LEDR_PIN);
-OutPin ledy_pin(LEDY_PIN);
-OutPin ledg_pin(LEDG_PIN);
-OutPin ledb_pin(LEDB_PIN);
+// OutPin ledr_pin(LEDR_PIN);
+// OutPin ledy_pin(LEDY_PIN);
+// OutPin ledg_pin(LEDG_PIN);
+// OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
-OutPin servo_pin(SERVO_PIN);
-Servo servo;
+// OutPin servo_pin(SERVO_PIN);
+// Servo servo;
 
 void processMessage(byte* data, int length);
 
@@ -246,72 +246,72 @@ void loop() {
 
 void processMessage(byte* data, int length) {
     char type = data[0];
-    // if (debug_mode) {
-    //     Serial.print("Received message of type: ");
-    //     Serial.println(type);
-    //     Serial.print("Length: ");
-    //     Serial.println(length);
-    //     Serial.print("Data: ");
-    //     for (int i = 0; i < length; i++) {
-    //         Serial.print(data[i], HEX);
-    //         Serial.print(" ");
-    //     }
-    //     Serial.println();
-    // }
+    if (debug_mode) {
+        Serial.print("Received message of type: ");
+        Serial.println(type);
+        Serial.print("Length: ");
+        Serial.println(length);
+        Serial.print("Data: ");
+        for (int i = 0; i < length; i++) {
+            Serial.print(data[i], HEX);
+            Serial.print(" ");
+        }
+        Serial.println();
+    }
 
     switch (type) {
         case 'A': { // Actuator control
-            // aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
-            // aB_tgt = (int16_t)((data[3] << 8) | data[4]);
-            // aL_speed = (int8_t)data[5];
-            // aR_speed = aL_speed;
-            // aB_speed = (int8_t)data[6];
-            // if (debug_mode) {
-            //     Serial.print("Arm Position: ");
-            //     Serial.println(aLR_tgt);
-            //     Serial.print("Bucket Position: ");
-            //     Serial.println(aB_tgt);
-            //     Serial.print("Arm Velocity: ");
-            //     Serial.println(aL_speed);
-            //     Serial.print("Bucket Velocity: ");
-            //     Serial.println(aB_speed);
-            // }
+            aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
+            aB_tgt = (int16_t)((data[3] << 8) | data[4]);
+            aL_speed = (int8_t)data[5];
+            aR_speed = aL_speed;
+            aB_speed = (int8_t)data[6];
+            if (debug_mode) {
+                Serial.print("Arm Position: ");
+                Serial.println(aLR_tgt);
+                Serial.print("Bucket Position: ");
+                Serial.println(aB_tgt);
+                Serial.print("Arm Velocity: ");
+                Serial.println(aL_speed);
+                Serial.print("Bucket Velocity: ");
+                Serial.println(aB_speed);
+            }
             break;
         }
         case 'M': { // Motor control
             mL_speed = (int8_t)data[1];  // Adjusted index to skip the type byte
             mR_speed = (int8_t)data[2];
-            // if (debug_mode) {
-            //     Serial.print("Left Speed: ");
-            //     Serial.println(mL_speed);
-            //     Serial.print("Right Speed: ");
-            //     Serial.println(mR_speed);
-            // }
+            if (debug_mode) {
+                Serial.print("Left Speed: ");
+                Serial.println(mL_speed);
+                Serial.print("Right Speed: ");
+                Serial.println(mR_speed);
+            }
             break;
         }
         case 'S': { // Servo control
-            // servo_state = data[1];  // Adjusted index to skip the type byte
-            // if (debug_mode) {
-            //     Serial.print("Servo State: ");
-            //     Serial.println(servo_state);
-            // }
+            servo_state = data[1];  // Adjusted index to skip the type byte
+            if (debug_mode) {
+                Serial.print("Servo State: ");
+                Serial.println(servo_state);
+            }
             break;
         }
         case 'L': { // LED control
-            // led_r = data[1];  // Adjusted index to skip the type byte
-            // led_y = data[2];
-            // led_g = data[3];
-            // led_b = data[4];
-            // if (debug_mode) {
-            //     Serial.print("Red: ");
-            //     Serial.println(led_r);
-            //     Serial.print("Yellow: ");
-            //     Serial.println(led_y);
-            //     Serial.print("Green: ");
-            //     Serial.println(led_g);
-            //     Serial.print("Blue: ");
-            //     Serial.println(led_b);
-            // }
+            led_r = data[1];  // Adjusted index to skip the type byte
+            led_y = data[2];
+            led_g = data[3];
+            led_b = data[4];
+            if (debug_mode) {
+                Serial.print("Red: ");
+                Serial.println(led_r);
+                Serial.print("Yellow: ");
+                Serial.println(led_y);
+                Serial.print("Green: ");
+                Serial.println(led_g);
+                Serial.print("Blue: ");
+                Serial.println(led_b);
+            }
             break;
         }
         default:
