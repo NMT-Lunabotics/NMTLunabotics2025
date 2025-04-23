@@ -86,15 +86,14 @@ void setup(){
 }
 
 void loop() {
-    // Get and print the position of each actuator
-    float left_pos = act_left.update_pos();
-    float right_pos = act_right.update_pos();
+    int potL_value = analogRead(POTL_PIN);
+    int potR_value = analogRead(POTR_PIN);
 
-    Serial.print("Left Actuator Position: ");
-    Serial.println(left_pos);
-    Serial.print("Right Actuator Position: ");
-    Serial.println(right_pos);
+    Serial.print("POTL_PIN (A1): ");
+    Serial.println(potL_value);
+    Serial.print("POTR_PIN (A0): ");
+    Serial.println(potR_value);
 
-    act_left.vel_ctrl(-25);
-    act_right.vel_ctrl(-25);
+    act_left.vel_ctrl(25);
+    act_right.vel_ctrl(25);
 }
