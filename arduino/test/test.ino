@@ -87,7 +87,7 @@ void loop() {
         if (emergency_stop) {
             Serial.println("Estopped");
         }
-        Serial.println("<F," + "," + String(mL_speed) + "," + String(mR_speed) + ">");
+        Serial.println("<F," + String(mL_speed) + "," + String(mR_speed) + ">");
     }
 
 }
@@ -99,12 +99,6 @@ void processMessage(byte* data, int length) {
         case 'M': { // Motor control
             mL_speed = (int8_t)data[1];  // Adjusted index to skip the type byte
             mR_speed = (int8_t)data[2];
-            if (debug_mode) {
-                Serial.print("Left Speed: ");
-                Serial.println(mL_speed);
-                Serial.print("Right Speed: ");
-                Serial.println(mR_speed);
-            }
             break;
         }
         default:
