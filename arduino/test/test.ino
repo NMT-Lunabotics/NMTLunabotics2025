@@ -111,8 +111,8 @@ void loop() {
             doomsday = false;
         }
 
-        act_left.vel_ctrl(0);
-        act_right.vel_ctrl(0);
+        act_left.vel_ctrl(-25);
+        act_right.vel_ctrl(-25);
         // if (!emergency_stop) { //TODO if not doomsday
         // aLR_tgt = 100;
         //     if (aLR_tgt >= 0) {
