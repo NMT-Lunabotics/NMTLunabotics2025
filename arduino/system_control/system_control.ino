@@ -130,7 +130,7 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     // Wire.begin();
-    servo.attach(SERVO_PIN);
+    // servo.attach(SERVO_PIN); //THIS LINE BREAKS THE MOTORS
     // servo.write(0);
 }
 
