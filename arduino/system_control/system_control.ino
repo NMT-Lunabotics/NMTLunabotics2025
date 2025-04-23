@@ -214,6 +214,7 @@ void loop() {
             }
             //Run motors
             motor_left.motor_ctrl(mL_speed);
+            Serial.println(mL_speed);
             motor_right.motor_ctrl(mR_speed);
         }
 
