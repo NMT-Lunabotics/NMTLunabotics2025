@@ -1,6 +1,8 @@
 #include <Wire.h>
 #include "helpers.hpp"
 
+bool debug_mode = false;
+
 //////// ACTUATORS ////////
 //Left side is L, right side is R, both is LR, bucket is B
 // I2C addresses for actuators
