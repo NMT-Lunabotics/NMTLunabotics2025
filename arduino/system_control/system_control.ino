@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include "helpers.hpp"
-#include <Servo.h>
+// #include <Servo.h>
 
 // Debug mode flag
 bool debug_mode = false;
@@ -12,8 +12,8 @@ bool calibrate_actuators_flag = false;
 // B0: 58
 // B2: 59
 // B4: 5A
-#define AL_I2C_ADDRESS 0x59 // B2
-#define AR_I2C_ADDRESS 0x5A // B4
+#define AL_I2C_ADDRESS 0x5A // B4
+#define AR_I2C_ADDRESS 0x59 // B2
 #define AB_I2C_ADDRESS 0x58 // B0
 
 // I2C registers for actuators
@@ -100,7 +100,7 @@ bool doomsday = false;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 2.0;
+float vel_gain = 1.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
