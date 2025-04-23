@@ -25,6 +25,8 @@ class ActuatorControlNode(Node):
         self.bucket_axis = self.get_parameter('bucket_axis').get_parameter_value().integer_value
         self.arm_axis = self.get_parameter('arm_axis').get_parameter_value().integer_value
         self.servo_btn = self.get_parameter('servo_btn').get_parameter_value().integer_value
+
+        self.actuator_min_vel = 5.0
         
         # Subscribe to the joy topic
         self.subscription = self.create_subscription(
@@ -39,17 +41,9 @@ class ActuatorControlNode(Node):
         self.act_pub = self.create_publisher(Actuators, '/actuator_control', 10)
         self.servo_pub = self.create_publisher(Bool, '/servo_control', 10)
 
-    def velocity_deadzone(self, axis_value):
-        if axis_value < -0.5:
-            return -self.actuator_max_vel
-        elif axis_value > 0.5:
-            return self.actuator_max_vel
-        else:
-            return 0
-
     def joy_callback(self, msg):
-        bucket_value = msg.axes[self.bucket_axis]
-        arm_value = msg.axes[self.arm_axis]
+        bucket_value = msg.axes[self.bucket_axis] * self.actuator_max_vel
+        arm_value = msg.axes[self.arm_axis] * self.actuator_max_vel
 
         servo_msg = Bool()
         if msg.buttons[self.get_parameter('servo_btn').get_parameter_value().integer_value] == 1:
@@ -58,8 +52,10 @@ class ActuatorControlNode(Node):
             servo_msg.data = False
         self.servo_pub.publish(servo_msg)
 
-        bucket_value = self.velocity_deadzone(bucket_value)
-        arm_value = self.velocity_deadzone(arm_value)
+        if abs(bucket_value) < self.actuator_min_vel:
+            bucket_value = 0.0
+        if abs(arm_value) < self.actuator_min_vel:
+            arm_value = 0.0
         
         actuators_msg = Actuators()
         
@@ -68,8 +64,8 @@ class ActuatorControlNode(Node):
         actuators_msg.bucket_pos = -1
         ##
         
-        actuators_msg.bucket_vel = bucket_value
-        actuators_msg.arm_vel = arm_value
+        actuators_msg.bucket_vel = int(bucket_value)
+        actuators_msg.arm_vel = int(arm_value)
         
         self.act_pub.publish(actuators_msg)
         
