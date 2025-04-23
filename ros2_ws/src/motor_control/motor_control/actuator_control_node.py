@@ -48,8 +48,8 @@ class ActuatorControlNode(Node):
             return 0
 
     def joy_callback(self, msg):
-        bucket_value = msg.axes[self.bucket_axis] * self.actuator_max_vel
-        arm_value = msg.axes[self.arm_axis] * self.actuator_max_vel
+        bucket_value = msg.axes[self.bucket_axis]
+        arm_value = msg.axes[self.arm_axis]
 
         servo_msg = Bool()
         if msg.buttons[self.get_parameter('servo_btn').get_parameter_value().integer_value] == 1:
@@ -70,8 +70,7 @@ class ActuatorControlNode(Node):
         
         actuators_msg.bucket_vel = bucket_value
         actuators_msg.arm_vel = arm_value
-        print(arm_value)
-
+        
         self.act_pub.publish(actuators_msg)
         
 
