@@ -36,7 +36,7 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 10; // mm
+float act_max_error = 100; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -47,7 +47,7 @@ float aL_pos = 0;
 float aR_pos = 0;
 float aB_pos = 0;
 
-int aLR_tgt = -1;
+int aLR_tgt = 50;
 int aB_tgt = -1;
 
 //////// MOTORS ////////
