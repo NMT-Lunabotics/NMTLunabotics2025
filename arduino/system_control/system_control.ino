@@ -84,7 +84,7 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 10; //hz
+int update_rate = 150; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 2; //hz
 unsigned long last_update_time = 0;
