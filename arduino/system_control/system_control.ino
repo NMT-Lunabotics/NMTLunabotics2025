@@ -213,7 +213,7 @@ void loop() {
                 servo.write(90);
             }
             //Run motors
-            motor_left.motor_ctrl(mL_speed);
+            motor_left.motor_ctrl(-10);
             motor_right.motor_ctrl(mR_speed);
         }
 
