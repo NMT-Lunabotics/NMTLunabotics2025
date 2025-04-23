@@ -103,9 +103,9 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.0;
 
 // Set up actuators
-Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, true, 
                     ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
-Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, true, 
                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
