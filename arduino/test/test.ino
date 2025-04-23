@@ -134,14 +134,15 @@ void loop() {
         //Run actuators
         // aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
-        if (!emergency_stop) { //TODO if not doomsday
+        // if (!emergency_stop) { //TODO if not doomsday
+        aLR_tgt = 100;
             if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                act_left.vel_ctrl(aL_speed + factor);
+                act_right.vel_ctrl(aR_speed - factor);
             }
 
             if (aB_tgt >= 0) {
@@ -150,7 +151,7 @@ void loop() {
                 act_bucket.vel_ctrl(aB_speed);
             }
 
-        }
+        // }
     }
 
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
