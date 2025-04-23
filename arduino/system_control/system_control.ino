@@ -171,15 +171,15 @@ void loop() {
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
 
-        // aL_pos = act_left.update_pos();
-        // aR_pos = act_right.update_pos();
-        // aB_pos = act_bucket.update_pos();
+        aL_pos = act_left.update_pos();
+        aR_pos = act_right.update_pos();
+        aB_pos = act_bucket.update_pos();
 
-        // if (abs(aL_pos - aR_pos) >= act_max_error) {
-        //     doomsday = true;
-        // } else {
-        //     doomsday = false;
-        // }
+        if (abs(aL_pos - aR_pos) >= act_max_error) {
+            doomsday = true;
+        } else {
+            doomsday = false;
+        }
 
         //Run actuators
         // aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
@@ -235,13 +235,13 @@ void loop() {
             + "," + String(mL_speed) + "," + String(mR_speed) + ">");
     }
 
-    // if (current_time - last_reset_int_time >= 1000 / reset_int_rate) {
-    //     last_reset_int_time = current_time;
+    if (current_time - last_reset_int_time >= 1000 / reset_int_rate) {
+        last_reset_int_time = current_time;
 
-    //     act_left.resetPIDIntegral();
-    //     act_right.resetPIDIntegral();
-    //     act_bucket.resetPIDIntegral();
-    // }
+        act_left.resetPIDIntegral();
+        act_right.resetPIDIntegral();
+        act_bucket.resetPIDIntegral();
+    }
 }
 
 void processMessage(byte* data, int length) {
