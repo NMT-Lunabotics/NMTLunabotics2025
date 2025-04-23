@@ -104,12 +104,10 @@ void loop() {
         }
     }
 
-    if (emergency_stop || doomsday) { 
+    if (doomsday) { 
         act_left.stop();
         act_right.stop();
         act_bucket.stop();
-        motor_left.motor_ctrl(0);
-        motor_right.motor_ctrl(0);
     }
 
     current_time = millis();
