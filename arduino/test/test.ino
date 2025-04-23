@@ -112,20 +112,20 @@ void loop() {
         }
 
         if (!emergency_stop && !doomsday) {
-            if (aLR_tgt >= 0) {
+            // if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
-            } else {
-                float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
-            }
+            // } else {
+            //     float factor = (aL_pos - aR_pos) * vel_gain;
+            //     act_left.vel_ctrl(aL_speed - factor);
+            //     act_right.vel_ctrl(aR_speed + factor);
+            // }
 
-            if (aB_tgt >= 0) {
-                act_bucket.tgt_ctrl(aB_tgt);
-            } else {
-                act_bucket.vel_ctrl(aB_speed);
-            }
+            // if (aB_tgt >= 0) {
+            //     act_bucket.tgt_ctrl(aB_tgt);
+            // } else {
+            //     act_bucket.vel_ctrl(aB_speed);
+            // }
         }
     }
 
