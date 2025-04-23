@@ -2,6 +2,7 @@
 #define HELPERS_H
 
 #include "arduino_lib.hpp"
+#include <Wire.h>
 
 #define MEDIAN_SIZE 15 // Median filter window size for potentionmeter smoothing
 
