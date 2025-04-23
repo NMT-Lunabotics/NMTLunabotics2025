@@ -36,7 +36,7 @@
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 1000; // mm
+float act_max_error = 10; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -51,9 +51,9 @@ int aLR_tgt = -1;
 int aB_tgt = -1;
 
 // Timing
-int update_rate = 10; //hz
+int update_rate = 150; //hz
 int feedback_rate = 10; //hz
-int reset_int_rate = 2; //hz
+int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
@@ -111,26 +111,22 @@ void loop() {
             doomsday = false;
         }
 
-        act_left.vel_ctrl(-25);
-        act_right.vel_ctrl(-25);
-        // if (!emergency_stop) { //TODO if not doomsday
-        // aLR_tgt = 100;
-        //     if (aLR_tgt >= 0) {
-        //         act_left.tgt_ctrl(aLR_tgt, aR_pos);
-        //         act_right.tgt_ctrl(aLR_tgt, aL_pos);
-        //     } else {
-        //         float factor = (aL_pos - aR_pos) * vel_gain;
-        //         act_left.vel_ctrl(aL_speed - factor);
-        //         act_right.vel_ctrl(aR_speed + factor);
-        //     }
+        if (!emergency_stop && !doomsday) {
+            if (aLR_tgt >= 0) {
+                act_left.tgt_ctrl(aLR_tgt, aR_pos);
+                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+            } else {
+                float factor = (aL_pos - aR_pos) * vel_gain;
+                act_left.vel_ctrl(aL_speed - factor);
+                act_right.vel_ctrl(aR_speed + factor);
+            }
 
-        //     if (aB_tgt >= 0) {
-        //         act_bucket.tgt_ctrl(aB_tgt);
-        //     } else {
-        //         act_bucket.vel_ctrl(aB_speed);
-        //     }
-
-        // }
+            if (aB_tgt >= 0) {
+                act_bucket.tgt_ctrl(aB_tgt);
+            } else {
+                act_bucket.vel_ctrl(aB_speed);
+            }
+        }
     }
 
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
