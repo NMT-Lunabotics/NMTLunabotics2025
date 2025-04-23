@@ -66,7 +66,7 @@ int mL_speed = 0;
 int mR_speed = 0;
 
 //TODO implement servo logic
-#define SERVO_PIN 12
+// #define SERVO_PIN 12
 
 // Servo
 bool servo_state = false;
@@ -125,7 +125,7 @@ OutPin ledg_pin(LEDG_PIN);
 OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
-Servo servo;
+// Servo servo;
 
 void processMessage(byte* data, int length);
 
