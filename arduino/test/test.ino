@@ -39,8 +39,8 @@ float act_max_vel = 25; //mm/s
 float act_max_error = 10; // mm
 
 // Actuator targets
-int aL_speed = 0;
-int aR_speed = 0;
+int aL_speed = -25;
+int aR_speed = -25;
 int aB_speed = 0;
 
 float aL_pos = 0;
@@ -67,7 +67,7 @@ bool doomsday = false;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 1.0;
+float vel_gain = 2.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, true, 
@@ -94,6 +94,15 @@ void loop() {
     Serial.print("POTR_PIN (A0): ");
     Serial.println(potR_value);
 
-    act_left.vel_ctrl(25);
-    act_right.vel_ctrl(25);
+    aL_pos = act_left.update_pos();
+    aR_pos = act_right.update_pos();
+
+    if (aLR_tgt >= 0) {
+        act_left.tgt_ctrl(aLR_tgt, aR_pos);
+        act_right.tgt_ctrl(aLR_tgt, aL_pos);
+    } else {
+        float factor = (aL_pos - aR_pos) * vel_gain;
+        act_left.vel_ctrl(aL_speed - factor);
+        act_right.vel_ctrl(aR_speed + factor);
+    }
 }
