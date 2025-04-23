@@ -113,7 +113,7 @@ OutPin motor_left_dac1(DACL1_PIN);
 OutPin motor_left_dac2(DACL2_PIN);
 OutPin motor_right_dac1(DACR1_PIN);
 OutPin motor_right_dac2(DACR2_PIN);
-Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, false);
+Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, true);
 Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, true);
 
 // Set up LEDs
@@ -213,7 +213,7 @@ void loop() {
                 servo.write(90);
             }
             //Run motors
-            motor_left.motor_ctrl(-10);
+            motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
         }
 
