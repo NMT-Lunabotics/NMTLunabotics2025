@@ -9,9 +9,12 @@ bool calibrate_actuators_flag = false;
 //////// ACTUATORS ////////
 //Left side is L, right side is R, both is LR, bucket is B
 // I2C addresses for actuators
-#define AL_I2C_ADDRESS 0x5A // B0
-#define AR_I2C_ADDRESS 0x58 // B2
-#define AB_I2C_ADDRESS 0x59 // B4
+// B0: 58
+// B2: 59
+// B4: 5A
+#define AL_I2C_ADDRESS 0x59 // B2
+#define AR_I2C_ADDRESS 0x5A // B4
+#define AB_I2C_ADDRESS 0x58 // B0
 
 // I2C registers for actuators
 #define SPEED_REG 0x02
