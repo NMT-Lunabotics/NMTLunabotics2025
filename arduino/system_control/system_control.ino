@@ -82,7 +82,7 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 150; //hz
+int update_rate = 10; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 2; //hz
 unsigned long last_update_time = 0;
@@ -213,8 +213,8 @@ void loop() {
                 servo.write(90);
             }
             //Run motors
-            motor_right.motor_ctrl(mL_speed);
-            motor_left.motor_ctrl(mR_speed);
+            motor_left.motor_ctrl(mL_speed);
+            motor_right.motor_ctrl(mR_speed);
         }
 
         //Run LEDs
