@@ -12,10 +12,10 @@ void setup() {
 void loop() {
     for (int i = -max_vel; i <= max_vel; i++) {
         test.motor_ctrl(i);
-        delay(10);
+        delay(100);
     }
     for (int i = max_vel; i >= -max_vel; i--) {
         test.motor_ctrl(i);
-        delay(10);
+        delay(100);
     }
 }
