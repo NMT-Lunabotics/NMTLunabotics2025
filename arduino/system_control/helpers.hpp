@@ -203,9 +203,12 @@ public:
             signed_speed = -signed_speed;
         }
         signed_speed = constrain(signed_speed, -motor_max_vel, motor_max_vel);
-
+        Serial.print("signed_speed: ");
+        Serial.println(signed_speed);
         // Map the absolute speed values to PWM range
         int motor_speed = map(abs(signed_speed), 0, motor_max_vel, 0, 255);
+        Serial.print("motor_speed: ");
+        Serial.println(motor_speed);
         if (signed_speed > 0) {
             dac1.write_pwm_raw(motor_speed);
             dac2.write_pwm_raw(0);
