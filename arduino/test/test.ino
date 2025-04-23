@@ -39,15 +39,15 @@ float act_max_vel = 25; //mm/s
 float act_max_error = 10; // mm
 
 // Actuator targets
-int aL_speed = 0;
-int aR_speed = 0;
+int aL_speed = 25;
+int aR_speed = 25;
 int aB_speed = 0;
 
 float aL_pos = 0;
 float aR_pos = 0;
 float aB_pos = 0;
 
-int aLR_tgt = 10;
+int aLR_tgt = -1;
 int aB_tgt = -1;
 
 // Timing
@@ -113,12 +113,12 @@ void loop() {
 
         // if (!emergency_stop && !doomsday) {
             // if (aLR_tgt >= 0) {
-                act_left.tgt_ctrl(aLR_tgt, aR_pos);
-                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+                // act_left.tgt_ctrl(aLR_tgt, aR_pos);
+                // act_right.tgt_ctrl(aLR_tgt, aL_pos);
             // } else {
-            //     float factor = (aL_pos - aR_pos) * vel_gain;
-            //     act_left.vel_ctrl(aL_speed - factor);
-            //     act_right.vel_ctrl(aR_speed + factor);
+                float factor = (aL_pos - aR_pos) * vel_gain;
+                act_left.vel_ctrl(aL_speed - factor);
+                act_right.vel_ctrl(aR_speed + factor);
             // }
 
             // if (aB_tgt >= 0) {
