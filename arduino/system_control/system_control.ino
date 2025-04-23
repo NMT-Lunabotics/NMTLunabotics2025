@@ -63,7 +63,7 @@ int mL_speed = 0;
 int mR_speed = 0;
 
 //TODO implement servo logic
-#define SERVO_PIN 12
+#define SERVO_PIN 10
 
 // Servo
 bool servo_state = false;
@@ -130,7 +130,7 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     // Wire.begin();
-    // servo.attach(SERVO_PIN);
+    servo.attach(SERVO_PIN);
     // servo.write(0);
 }
 
