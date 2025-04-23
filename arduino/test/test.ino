@@ -111,7 +111,7 @@ void loop() {
             doomsday = false;
         }
 
-        if (!emergency_stop && !doomsday) {
+        // if (!emergency_stop && !doomsday) {
             // if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
@@ -126,7 +126,7 @@ void loop() {
             // } else {
             //     act_bucket.vel_ctrl(aB_speed);
             // }
-        }
+        // }
     }
 
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
