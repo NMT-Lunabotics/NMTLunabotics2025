@@ -21,7 +21,6 @@ def generate_launch_description():
                 {'wheel_diameter': 0.3},
                 {'max_rpm': 30},
                 {'min_rpm': 2},
-                {'arduino_serial_device': '/dev/ttyACM0'}
             ]
         ),
         Node(
@@ -33,7 +32,7 @@ def generate_launch_description():
                 {'joy_topic': '/joy'},
                 {'actuator_max_vel': 25},
                 {'bucket_axis': 3},
-                {'arm_axis': 2}
+                {'arm_axis': 4}
             ]
         ),
         IncludeLaunchDescription(

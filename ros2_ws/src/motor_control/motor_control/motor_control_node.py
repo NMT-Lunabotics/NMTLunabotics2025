@@ -16,7 +16,6 @@ class MotorControlNode(Node):
         self.declare_parameter('max_rpm', 30)
         # Minimum RPM value for motor control
         self.declare_parameter('min_rpm', 1)
-        self.declare_parameter('arduino_serial_device', '/dev/ttyACM0')
 
         self.cmd_vel_topic = self.get_parameter(
             'cmd_vel_topic').get_parameter_value().string_value
@@ -28,8 +27,6 @@ class MotorControlNode(Node):
             'max_rpm').get_parameter_value().integer_value
         self.min_rpm = self.get_parameter(
             'min_rpm').get_parameter_value().integer_value
-        self.arduino_serial_device = self.get_parameter(
-            'arduino_serial_device').get_parameter_value().string_value
 
         self.wheel_radius = self.wheel_diameter / 2.0
 
