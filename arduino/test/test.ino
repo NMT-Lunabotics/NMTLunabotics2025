@@ -67,7 +67,7 @@ bool doomsday = false;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 2.0;
+float vel_gain = 1.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
@@ -202,7 +202,7 @@ void processMessage(byte* data, int length) {
             aL_speed = (int8_t)data[5];
             aR_speed = aL_speed;
             aB_speed = (int8_t)data[6];
-            if (debug_mode) {
+            // if (debug_mode) {
                 Serial.print("Arm Position: ");
                 Serial.println(aLR_tgt);
                 Serial.print("Bucket Position: ");
@@ -211,7 +211,7 @@ void processMessage(byte* data, int length) {
                 Serial.println(aL_speed);
                 Serial.print("Bucket Velocity: ");
                 Serial.println(aB_speed);
-            }
+            // }
             break;
         }
         case 'M': { // Motor control
