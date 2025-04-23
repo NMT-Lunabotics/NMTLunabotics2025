@@ -94,18 +94,18 @@ bool emergency_stop = false;
 bool doomsday = false;
 
 // Set up PID controllers
-// PID pidL(2.2, 0.0022, 0.34, 2.0);
-// PID pidR(1.85, 0.0018, 0.31, 1.7);
-// PID pidB(3.0, 0.001, 0.4);
-// float vel_gain = 2.0;
+PID pidL(2.2, 0.0022, 0.34, 2.0);
+PID pidR(1.85, 0.0018, 0.31, 1.7);
+PID pidB(3.0, 0.001, 0.4);
+float vel_gain = 2.0;
 
 // Set up actuators
-// Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
-//                     ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
-// Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
-//                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
-// Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-//                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
+Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
+Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+                    ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
+Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
@@ -116,10 +116,10 @@ Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, false);
 Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, true);
 
 // Set up LEDs
-// OutPin ledr_pin(LEDR_PIN);
-// OutPin ledy_pin(LEDY_PIN);
-// OutPin ledg_pin(LEDG_PIN);
-// OutPin ledb_pin(LEDB_PIN);
+OutPin ledr_pin(LEDR_PIN);
+OutPin ledy_pin(LEDY_PIN);
+OutPin ledg_pin(LEDG_PIN);
+OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
 // OutPin servo_pin(SERVO_PIN);
@@ -213,10 +213,10 @@ void loop() {
         }
 
         //Run LEDs
-        // ledr_pin.write(led_r);
-        // ledy_pin.write(led_y);
-        // ledg_pin.write(led_g);
-        // ledb_pin.write(led_b);
+        ledr_pin.write(led_r);
+        ledy_pin.write(led_y);
+        ledg_pin.write(led_g);
+        ledb_pin.write(led_b);
     }
 
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
