@@ -94,18 +94,6 @@ void loop() {
 
 void processMessage(byte* data, int length) {
     char type = data[0];
-    if (debug_mode) {
-        Serial.print("Received message of type: ");
-        Serial.println(type);
-        Serial.print("Length: ");
-        Serial.println(length);
-        Serial.print("Data: ");
-        for (int i = 0; i < length; i++) {
-            Serial.print(data[i], HEX);
-            Serial.print(" ");
-        }
-        Serial.println();
-    }
 
     switch (type) {
         case 'M': { // Motor control
