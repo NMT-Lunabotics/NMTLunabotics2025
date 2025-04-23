@@ -50,7 +50,7 @@ float aL_pos = 0;
 float aR_pos = 0;
 float aB_pos = 0;
 
-int aLR_tgt = 50;
+int aLR_tgt = -1;
 int aB_tgt = -1;
 
 //////// MOTORS ////////
@@ -103,9 +103,9 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.0;
 
 // Set up actuators
-Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, true, 
+Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
                     ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
-Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, true, 
+Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
                     AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB);
