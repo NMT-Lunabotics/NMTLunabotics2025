@@ -70,6 +70,7 @@ class ActuatorControlNode(Node):
         
         actuators_msg.bucket_vel = bucket_value
         actuators_msg.arm_vel = arm_value
+        print(arm_value)
 
         self.act_pub.publish(actuators_msg)
         

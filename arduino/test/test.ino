@@ -202,7 +202,7 @@ void processMessage(byte* data, int length) {
             aL_speed = (int8_t)data[5];
             aR_speed = aL_speed;
             aB_speed = (int8_t)data[6];
-            // if (debug_mode) {
+            if (debug_mode) {
                 Serial.print("Arm Position: ");
                 Serial.println(aLR_tgt);
                 Serial.print("Bucket Position: ");
@@ -211,7 +211,7 @@ void processMessage(byte* data, int length) {
                 Serial.println(aL_speed);
                 Serial.print("Bucket Velocity: ");
                 Serial.println(aB_speed);
-            // }
+            }
             break;
         }
         case 'M': { // Motor control
