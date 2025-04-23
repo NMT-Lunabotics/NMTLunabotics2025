@@ -63,7 +63,7 @@ int mL_speed = 0;
 int mR_speed = 0;
 
 //TODO implement servo logic
-#define SERVO_PIN 10
+#define SERVO_PIN 12
 
 // Servo
 bool servo_state = false;
