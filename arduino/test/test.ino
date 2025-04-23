@@ -39,8 +39,8 @@ float act_max_vel = 25; //mm/s
 float act_max_error = 10; // mm
 
 // Actuator targets
-int aL_speed = -25;
-int aR_speed = -25;
+int aL_speed = 0;
+int aR_speed = 0;
 int aB_speed = 0;
 
 float aL_pos = 0;
