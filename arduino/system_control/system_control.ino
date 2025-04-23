@@ -10,8 +10,8 @@ bool calibrate_actuators_flag = false;
 //Left side is L, right side is R, both is LR, bucket is B
 // I2C addresses for actuators
 #define AL_I2C_ADDRESS 0x5A // B0
-#define AR_I2C_ADDRESS 0x59 // B4
-#define AB_I2C_ADDRESS 0x58 // B2
+#define AR_I2C_ADDRESS 0x58 // B2
+#define AB_I2C_ADDRESS 0x59 // B4
 
 // I2C registers for actuators
 #define SPEED_REG 0x02
@@ -129,7 +129,7 @@ void processMessage(byte* data, int length);
 void setup(){
     Serial.begin(115200);
     Serial.flush();
-    // Wire.begin();
+    Wire.begin();
     // servo.attach(SERVO_PIN); //THIS LINE BREAKS THE MOTORS
     // servo.write(0);
 }
@@ -153,10 +153,10 @@ void loop() {
         }
     }
 
-    if (emergency_stop) { //TODO or doomsday
-        // act_left.stop();
-        // act_right.stop();
-    //     // act_bucket.stop(); TODO
+    if (emergency_stop || doomsday) { 
+        act_left.stop();
+        act_right.stop();
+        act_bucket.stop();
         motor_left.motor_ctrl(0);
         motor_right.motor_ctrl(0);
     }
@@ -184,20 +184,20 @@ void loop() {
         // aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
         if (!emergency_stop) { //TODO if not doomsday
-            // if (aLR_tgt >= 0) {
-                // act_left.tgt_ctrl(aLR_tgt, aR_pos);
-                // act_right.tgt_ctrl(aLR_tgt, aL_pos);
-            // } else {
-                // float factor = (aL_pos - aR_pos) * vel_gain;
-                // act_left.vel_ctrl(aL_speed - factor);
-                // act_right.vel_ctrl(aR_speed + factor);
-            // }
+            if (aLR_tgt >= 0) {
+                act_left.tgt_ctrl(aLR_tgt, aR_pos);
+                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+            } else {
+                float factor = (aL_pos - aR_pos) * vel_gain;
+                act_left.vel_ctrl(aL_speed - factor);
+                act_right.vel_ctrl(aR_speed + factor);
+            }
 
-            // if (aB_tgt >= 0) {
-            //     act_bucket.tgt_ctrl(aB_tgt);
-            // } else {
-            //     act_bucket.vel_ctrl(aB_speed);
-            // } TODO
+            if (aB_tgt >= 0) {
+                act_bucket.tgt_ctrl(aB_tgt);
+            } else {
+                act_bucket.vel_ctrl(aB_speed);
+            }
 
             // //Run servo
             // //TODO implement
