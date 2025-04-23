@@ -57,7 +57,7 @@ int aB_tgt = -1;
 #define DACR1_PIN 3
 #define DACR2_PIN 5
 
-int motor_max_vel = 21; //rpm
+int motor_max_vel = 30; //rpm
 
 // Motor speeds
 int mL_speed = 0;
