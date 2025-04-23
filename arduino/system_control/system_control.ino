@@ -52,10 +52,10 @@ int aLR_tgt = -1;
 int aB_tgt = -1;
 
 //////// MOTORS ////////
-#define DACL1_PIN 6
-#define DACL2_PIN 9
-#define DACR1_PIN 3
-#define DACR2_PIN 5
+const int DACL1_PIN = 6;
+const int DACL2_PIN = 9;
+const int DACR1_PIN = 3;
+const int DACR2_PIN = 5;
 
 int motor_max_vel = 30; //rpm
 
