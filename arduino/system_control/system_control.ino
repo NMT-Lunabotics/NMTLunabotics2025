@@ -31,15 +31,15 @@ bool calibrate_actuators_flag = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 53
-#define AL_POT_MAX 883
+#define AL_POT_MIN 45
+#define AL_POT_MAX 875
 #define AR_POT_MIN 3
 #define AR_POT_MAX 837
 #define AB_POT_MIN 30
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 5; // mm
+float act_max_error = 10; // mm
 
 // Actuator targets
 int aL_speed = 0;
