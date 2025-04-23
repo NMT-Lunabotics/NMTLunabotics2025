@@ -122,8 +122,8 @@ OutPin ledg_pin(LEDG_PIN);
 OutPin ledb_pin(LEDB_PIN);
 
 // Set up servo
-// OutPin servo_pin(SERVO_PIN);
-// Servo servo;
+OutPin servo_pin(SERVO_PIN);
+Servo servo;
 
 void processMessage(byte* data, int length);
 
@@ -131,7 +131,7 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     // Wire.begin();
-    // servo.attach(SERVO_PIN);
+    servo.attach(SERVO_PIN);
     // servo.write(0);
 }
 
