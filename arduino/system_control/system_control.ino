@@ -246,72 +246,72 @@ void loop() {
 
 void processMessage(byte* data, int length) {
     char type = data[0];
-    if (debug_mode) {
-        Serial.print("Received message of type: ");
-        Serial.println(type);
-        Serial.print("Length: ");
-        Serial.println(length);
-        Serial.print("Data: ");
-        for (int i = 0; i < length; i++) {
-            Serial.print(data[i], HEX);
-            Serial.print(" ");
-        }
-        Serial.println();
-    }
+    // if (debug_mode) {
+    //     Serial.print("Received message of type: ");
+    //     Serial.println(type);
+    //     Serial.print("Length: ");
+    //     Serial.println(length);
+    //     Serial.print("Data: ");
+    //     for (int i = 0; i < length; i++) {
+    //         Serial.print(data[i], HEX);
+    //         Serial.print(" ");
+    //     }
+    //     Serial.println();
+    // }
 
     switch (type) {
         case 'A': { // Actuator control
-            aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
-            aB_tgt = (int16_t)((data[3] << 8) | data[4]);
-            aL_speed = (int8_t)data[5];
-            aR_speed = aL_speed;
-            aB_speed = (int8_t)data[6];
-            if (debug_mode) {
-                Serial.print("Arm Position: ");
-                Serial.println(aLR_tgt);
-                Serial.print("Bucket Position: ");
-                Serial.println(aB_tgt);
-                Serial.print("Arm Velocity: ");
-                Serial.println(aL_speed);
-                Serial.print("Bucket Velocity: ");
-                Serial.println(aB_speed);
-            }
+            // aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
+            // aB_tgt = (int16_t)((data[3] << 8) | data[4]);
+            // aL_speed = (int8_t)data[5];
+            // aR_speed = aL_speed;
+            // aB_speed = (int8_t)data[6];
+            // if (debug_mode) {
+            //     Serial.print("Arm Position: ");
+            //     Serial.println(aLR_tgt);
+            //     Serial.print("Bucket Position: ");
+            //     Serial.println(aB_tgt);
+            //     Serial.print("Arm Velocity: ");
+            //     Serial.println(aL_speed);
+            //     Serial.print("Bucket Velocity: ");
+            //     Serial.println(aB_speed);
+            // }
             break;
         }
         case 'M': { // Motor control
             mL_speed = (int8_t)data[1];  // Adjusted index to skip the type byte
             mR_speed = (int8_t)data[2];
-            if (debug_mode) {
-                Serial.print("Left Speed: ");
-                Serial.println(mL_speed);
-                Serial.print("Right Speed: ");
-                Serial.println(mR_speed);
-            }
+            // if (debug_mode) {
+            //     Serial.print("Left Speed: ");
+            //     Serial.println(mL_speed);
+            //     Serial.print("Right Speed: ");
+            //     Serial.println(mR_speed);
+            // }
             break;
         }
         case 'S': { // Servo control
-            servo_state = data[1];  // Adjusted index to skip the type byte
-            if (debug_mode) {
-                Serial.print("Servo State: ");
-                Serial.println(servo_state);
-            }
+            // servo_state = data[1];  // Adjusted index to skip the type byte
+            // if (debug_mode) {
+            //     Serial.print("Servo State: ");
+            //     Serial.println(servo_state);
+            // }
             break;
         }
         case 'L': { // LED control
-            led_r = data[1];  // Adjusted index to skip the type byte
-            led_y = data[2];
-            led_g = data[3];
-            led_b = data[4];
-            if (debug_mode) {
-                Serial.print("Red: ");
-                Serial.println(led_r);
-                Serial.print("Yellow: ");
-                Serial.println(led_y);
-                Serial.print("Green: ");
-                Serial.println(led_g);
-                Serial.print("Blue: ");
-                Serial.println(led_b);
-            }
+            // led_r = data[1];  // Adjusted index to skip the type byte
+            // led_y = data[2];
+            // led_g = data[3];
+            // led_b = data[4];
+            // if (debug_mode) {
+            //     Serial.print("Red: ");
+            //     Serial.println(led_r);
+            //     Serial.print("Yellow: ");
+            //     Serial.println(led_y);
+            //     Serial.print("Green: ");
+            //     Serial.println(led_g);
+            //     Serial.print("Blue: ");
+            //     Serial.println(led_b);
+            // }
             break;
         }
         default:
