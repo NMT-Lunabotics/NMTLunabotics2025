@@ -47,7 +47,7 @@ float aL_pos = 0;
 float aR_pos = 0;
 float aB_pos = 0;
 
-int aLR_tgt = 100;
+int aLR_tgt = 180;
 int aB_tgt = -1;
 
 // Timing
