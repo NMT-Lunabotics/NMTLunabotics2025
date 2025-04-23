@@ -39,7 +39,7 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 100; // mm
+float act_max_error = 5; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -186,7 +186,7 @@ void loop() {
         //Run actuators
         // aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
 
-        if (!emergency_stop) { //TODO if not doomsday
+        if (!emergency_stop && !doomsday) { //TODO if not doomsday
             if (aLR_tgt >= 0) {
                 act_left.tgt_ctrl(aLR_tgt, aR_pos);
                 act_right.tgt_ctrl(aLR_tgt, aL_pos);
