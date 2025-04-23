@@ -39,8 +39,8 @@ float act_max_vel = 25; //mm/s
 float act_max_error = 10; // mm
 
 // Actuator targets
-int aL_speed = 0;
-int aR_speed = 0;
+int aL_speed = -25;
+int aR_speed = -25;
 int aB_speed = 0;
 
 float aL_pos = 0;
@@ -86,6 +86,15 @@ void setup(){
 }
 
 void loop() {
+    // Get and print the position of each actuator
+    float left_pos = act_left.update_pos();
+    float right_pos = act_right.update_pos();
+
+    Serial.print("Left Actuator Position: ");
+    Serial.println(left_pos);
+    Serial.print("Right Actuator Position: ");
+    Serial.println(right_pos);
+
     act_left.vel_ctrl(-25);
     act_right.vel_ctrl(-25);
 }
