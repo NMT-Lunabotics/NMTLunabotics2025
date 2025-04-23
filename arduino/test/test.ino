@@ -29,9 +29,9 @@
 
 // Actuator Calibration
 #define AL_POT_MIN 53
-#define AL_POT_MAX 883
+#define AL_POT_MAX 893
 #define AR_POT_MIN 3
-#define AR_POT_MAX 837
+#define AR_POT_MAX 840
 #define AB_POT_MIN 30
 #define AB_POT_MAX 782
 

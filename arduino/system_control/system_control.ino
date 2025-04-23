@@ -31,10 +31,10 @@ bool calibrate_actuators_flag = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 45
-#define AL_POT_MAX 875
-#define AR_POT_MIN 3
-#define AR_POT_MAX 837
+#define AL_POT_MIN 48
+#define AL_POT_MAX 893
+#define AR_POT_MIN 0
+#define AR_POT_MAX 840
 #define AB_POT_MIN 30
 #define AB_POT_MAX 782
 

@@ -3,7 +3,7 @@
 
 #include "arduino_lib.hpp"
 
-#define MEDIAN_SIZE 15 // Median filter window size for potentionmeter smoothing
+#define MEDIAN_SIZE 8 // Median filter window size for potentionmeter smoothing
 
 class PID {
 private:
