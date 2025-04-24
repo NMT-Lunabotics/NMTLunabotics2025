@@ -190,7 +190,7 @@ void loop() {
         while (abs(aL_pos - aR_pos) >= act_max_error) {
             float factor = (aL_pos - aR_pos) * vel_gain;
             act_left.vel_ctrl(factor);
-            act_right.vel_ctrl(+factor);
+            act_right.vel_ctrl(-factor);
             oopsie = true;
             Serial.println("Fixing actuators");
         }
