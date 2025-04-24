@@ -89,6 +89,8 @@ class Actuator {
   float act_max_vel;
   float pos_mm;
   float pot_bias = 0;
+  float min_pos;
+  float max_pos;
   PID pid;
 
   SmoothedInput<MEDIAN_SIZE> pot;
@@ -101,9 +103,13 @@ class Actuator {
 
 public:
   Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, float stroke, float pot_min, 
-       float pot_max, float act_max_vel, PID pid)
+       float pot_max, float act_max_vel, PID pid, float min_pos=0, float max_pos=0)
     : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
-      pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {}
+      pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {
+        if (max_pos == 0) {
+          max_pos = stroke;
+        }
+      }
     
   void calibrate_pot() {
     Serial.println("Calibrating potentiometer... ENSURE MINIMUM POSITION");
@@ -138,8 +144,11 @@ public:
   }
   
   int set_speed(int speed) {
-    // Convert speed (in mm/s) to PWM value (0-255)
-    // Speed is clamped to max velocity
+    if (speed < 0 && pos_mm <= min_pos) {
+      speed = 0;
+    } else if (speed > 0 && pos_mm >= max_pos) {
+      speed = 0;
+    }
     speed = constrain(speed, -act_max_vel, act_max_vel);
     int act_speed = map(abs(speed), 0, act_max_vel, 0, 250);
     int e1 = sendI2CCommand(i2c_address, speed_reg, act_speed);
