@@ -144,11 +144,11 @@ public:
   }
   
   int set_speed(int speed) {
+    Serial.println(String(speed) + " " + String(pos_mm) + " " + String(min_pos) + " " + String(max_pos));
     speed = constrain(speed, -act_max_vel, act_max_vel);
     if (speed < 0 && pos_mm <= min_pos) {
       speed = 0;
     } else if (speed > 0 && pos_mm >= max_pos) {
-      Serial.println("Max pos reached");
       speed = 0;
     }
     int act_speed = map(abs(speed), 0, act_max_vel, 0, 250);
