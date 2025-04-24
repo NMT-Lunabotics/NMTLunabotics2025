@@ -12,8 +12,8 @@ bool calibrate_actuators_flag = false;
 // B0: 58
 // B2: 59
 // B4: 5A
-#define AL_I2C_ADDRESS 0x5A // B4
-#define AR_I2C_ADDRESS 0x59 // B2
+#define AL_I2C_ADDRESS 0x59 // B4
+#define AR_I2C_ADDRESS 0x5A // B2
 #define AB_I2C_ADDRESS 0x58 // B0
 
 // I2C registers for actuators
@@ -21,8 +21,8 @@ bool calibrate_actuators_flag = false;
 #define DIR_REG 0x00
 
 // Actuator potentiometer read pins
-#define POTL_PIN A0
-#define POTR_PIN A1
+#define POTL_PIN A1
+#define POTR_PIN A0
 #define POTB_PIN A2
 
 // Actuator info
