@@ -12,8 +12,8 @@ bool calibrate_actuators_flag = false;
 // B0: 58
 // B2: 59
 // B4: 5A
-#define AL_I2C_ADDRESS 0x59 // B4
-#define AR_I2C_ADDRESS 0x5A // B2
+#define AL_I2C_ADDRESS 0x5A // B4
+#define AR_I2C_ADDRESS 0x59 // B2
 #define AB_I2C_ADDRESS 0x58 // B0
 
 // I2C registers for actuators
@@ -191,6 +191,8 @@ void loop() {
             float factor = (aL_pos - aR_pos) * vel_gain;
             act_left.vel_ctrl(-factor);
             act_right.vel_ctrl(factor);
+            aL_pos = act_left.update_pos();
+            aR_pos = act_right.update_pos();
             oopsie = true;
             Serial.println("Fixing actuators");
         }
