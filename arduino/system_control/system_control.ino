@@ -156,12 +156,16 @@ void loop() {
         }
     }
 
-    if (emergency_stop || doomsday) { 
+    if (emergency_stop) { 
         act_left.stop();
         act_right.stop();
         act_bucket.stop();
         motor_left.motor_ctrl(0);
         motor_right.motor_ctrl(0);
+    }
+
+    if (doomsday) {
+
     }
 
     current_time = millis();
@@ -177,8 +181,17 @@ void loop() {
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
 
-        if (abs(aL_pos - aR_pos) >= act_max_error) {
+        if (abs(aL_pos - aR_pos)  >= act_max_error) {
             doomsday = true;
+            float avg_pos = (aL_pos + aR_pos) / 2.0;
+            act_left.tgt_ctrl(avg_pos);
+            act_right.tgt_ctrl(avg_pos);
+
+            while (abs(aL_pos - aR_pos) > act_max_error) {
+                aL_pos = act_left.update_pos();
+                aR_pos = act_right.update_pos();
+                delay(10);
+            }
         } else {
             doomsday = false;
         }
