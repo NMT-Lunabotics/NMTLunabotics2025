@@ -192,6 +192,7 @@ void loop() {
             act_left.vel_ctrl(-factor);
             act_right.vel_ctrl(factor);
             oopsie = true;
+            Serial.println("Fixing actuators");
         }
         if (oopsie) {
             act_left.stop();
