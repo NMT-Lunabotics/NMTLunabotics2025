@@ -105,10 +105,7 @@ public:
   Actuator(char i2c_address, char speed_reg, char dir_reg, InPin pot, bool invert_direction, float stroke, float pot_min, 
        float pot_max, float act_max_vel, PID pid, float min_pos=0, float max_pos=0)
     : i2c_address(i2c_address),  speed_reg(speed_reg), dir_reg(dir_reg), pot(pot), stroke(stroke), pot_min(pot_min), 
-      pot_max(pot_max), act_max_vel(act_max_vel), pid(pid) {
-        if (max_pos == 0) {
-          max_pos = stroke;
-        }
+      pot_max(pot_max), act_max_vel(act_max_vel), pid(pid), min_pos(min_pos), max_pos(max_pos == 0 ? stroke : max_pos) {
       }
     
   void calibrate_pot() {
