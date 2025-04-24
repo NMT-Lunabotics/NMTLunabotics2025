@@ -186,17 +186,16 @@ void loop() {
         // } else {
         //     doomsday = false;
         // }
-        bool oopsie = false;
-        while (abs(aL_pos - aR_pos) >= act_max_error) {
-            float factor = (aL_pos - aR_pos) * vel_gain;
-            act_left.vel_ctrl(-factor);
-            act_right.vel_ctrl(factor);
-            aL_pos = act_left.update_pos();
-            aR_pos = act_right.update_pos();
-            oopsie = true;
-            Serial.println("Fixing actuators");
-        }
-        if (oopsie) {
+        if (abs(aL_pos - aR_pos) >= act_max_error) {
+            while (abs(aL_pos - aR_pos) >= 0.5*act_max_error) {
+                float factor = (aL_pos - aR_pos) * vel_gain;
+                act_left.vel_ctrl(-factor);
+                act_right.vel_ctrl(factor);
+                delay(10);
+                aL_pos = act_left.update_pos();
+                aR_pos = act_right.update_pos();
+                Serial.println("Fixing actuators");
+            }
             act_left.stop();
             act_right.stop();
         }
