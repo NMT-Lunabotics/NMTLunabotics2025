@@ -84,9 +84,9 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 150; //hz
+int update_rate = 20; //hz
 int feedback_rate = 10; //hz
-int reset_int_rate = 2; //hz
+int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
@@ -181,19 +181,21 @@ void loop() {
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
 
-        if (abs(aL_pos - aR_pos)  >= act_max_error) {
-            doomsday = true;
-            float avg_pos = (aL_pos + aR_pos) / 2.0;
-            act_left.tgt_ctrl(avg_pos);
-            act_right.tgt_ctrl(avg_pos);
-
-            while (abs(aL_pos - aR_pos) > act_max_error) {
-                aL_pos = act_left.update_pos();
-                aR_pos = act_right.update_pos();
-                delay(10);
-            }
-        } else {
-            doomsday = false;
+        // if (abs(aL_pos - aR_pos)  >= act_max_error) {
+        //     doomsday = true;
+        // } else {
+        //     doomsday = false;
+        // }
+        bool oopsie = false;
+        while (abs(aL_pos - aR_pos) >= act_max_error) {
+            float factor = (aL_pos - aR_pos) * vel_gain;
+            act_left.vel_ctrl(-factor);
+            act_right.vel_ctrl(factor);
+            oopsie = true;
+        }
+        if (oopsie) {
+            act_left.stop();
+            act_right.stop();
         }
 
         //Run actuators
