@@ -242,6 +242,10 @@ void loop() {
 
 void safe_actuator_vel_control(Actuator& actuator, int vel) {
     int code = actuator.vel_ctrl(vel);
+    if (code == 2) {
+        Serial.println("Retrying actuator velocity control...");
+        code = actuator.vel_ctrl(vel);
+    }
     if (code != 0) {
         Serial.print("Error in actuator velocity control: ");
         Serial.println(code);
@@ -259,6 +263,10 @@ void safe_actuator_vel_control(Actuator& actuator, int vel) {
 
 void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
     int code = actuator.tgt_ctrl(tgt);
+    if (code == 2) {
+        Serial.println("Retrying actuator target control...");
+        code = actuator.tgt_ctrl(tgt);
+    }
     if (code != 0) {
         Serial.print("Error in actuator target control: ");
         Serial.println(code);
