@@ -100,7 +100,7 @@ bool doomsday = false;
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 3;
+float vel_gain = 4.0;
 
 // Set up actuators
 Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
