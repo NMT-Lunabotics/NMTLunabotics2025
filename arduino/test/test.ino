@@ -83,26 +83,11 @@ void setup(){
     Serial.begin(115200);
     Serial.flush();
     Wire.begin();
+    act_bucket.vel_ctrl(25);
+    delay(500);
+    act_bucket.vel_ctrl(0);
 }
 
 void loop() {
-    int potL_value = analogRead(POTL_PIN);
-    int potR_value = analogRead(POTR_PIN);
 
-    Serial.print("POTL_PIN (A1): ");
-    Serial.println(potL_value);
-    Serial.print("POTR_PIN (A0): ");
-    Serial.println(potR_value);
-
-    aL_pos = act_left.update_pos();
-    aR_pos = act_right.update_pos();
-
-    if (aLR_tgt >= 0) {
-        act_left.tgt_ctrl(aLR_tgt, aR_pos);
-        act_right.tgt_ctrl(aLR_tgt, aL_pos);
-    } else {
-        float factor = (aL_pos - aR_pos) * vel_gain;
-        act_left.vel_ctrl(aL_speed - factor);
-        act_right.vel_ctrl(aR_speed + factor);
-    }
 }
