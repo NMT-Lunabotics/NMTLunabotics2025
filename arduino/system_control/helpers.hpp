@@ -144,12 +144,12 @@ public:
   }
   
   int set_speed(int speed) {
-    if (speed < 0 && pos_mm <= min_pos) {
-      speed = 0;
-    } else if (speed > 0 && pos_mm >= max_pos) {
-      speed = 0;
-    }
     speed = constrain(speed, -act_max_vel, act_max_vel);
+    // if (speed < 0 && pos_mm <= min_pos) {
+    //   speed = 0;
+    // } else if (speed > 0 && pos_mm >= max_pos) {
+    //   speed = 0;
+    // }
     int act_speed = map(abs(speed), 0, act_max_vel, 0, 250);
     int e1 = sendI2CCommand(i2c_address, speed_reg, act_speed);
     int e2 = sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
