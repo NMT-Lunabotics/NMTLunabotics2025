@@ -122,7 +122,7 @@ public:
     return pos_mm;
   }
   
-  void sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
+  int sendI2CCommand(byte address, byte operationRegister, byte value){      // send command using I2C pin protocol for (MDO4 motor driver)
     Wire.beginTransmission(address);    // begin transmission with our selected driver
     Wire.write(operationRegister);      // enter the desired register
     Wire.write(value);                  // send the data to the register 
@@ -134,39 +134,41 @@ public:
       Wire.endTransmission(true); // End transmission and release the I2C bus
       Wire.begin(); // Restart the I2C bus
     }
+    return error;
   }
   
-  void set_speed(int speed) {
+  int set_speed(int speed) {
     // Convert speed (in mm/s) to PWM value (0-255)
     // Speed is clamped to max velocity
     speed = constrain(speed, -act_max_vel, act_max_vel);
     int act_speed = map(abs(speed), 0, act_max_vel, 0, 250);
-    sendI2CCommand(i2c_address, speed_reg, act_speed);
-    sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
+    int e1 = sendI2CCommand(i2c_address, speed_reg, act_speed);
+    int e2 = sendI2CCommand(i2c_address, dir_reg, speed > 0 ? 1 : 2);
+    return (e1 == 0 && e2 == 0) ? 0 : (e1 != 0 ? e1 : e2);
   }
 
-  void tgt_ctrl(int tgt) {
+  int tgt_ctrl(int tgt) {
     float tgt_error = tgt - pos_mm;
     float speed = pid.update(tgt_error);
-    set_speed(speed);
+    return set_speed(speed);
   }
 
-  void tgt_ctrl(int tgt, int other_pos) {
+  int tgt_ctrl(int tgt, int other_pos) {
     float tgt_error = tgt - pos_mm;
     float rel_error = other_pos - pos_mm;
     float speed = pid.update(tgt_error, rel_error);
-    set_speed(speed);
+    return set_speed(speed);
   }
 
-  void vel_ctrl(int speed) {
-    set_speed(speed);
+  int vel_ctrl(int speed) {
+    return set_speed(speed);
   }
 
-  void vel_ctrl(int speed, float other_pos, int hz) {
+  int vel_ctrl(int speed, float other_pos, int hz) {
     float time_step = 1.0f / hz;
     float vel_tgt = pos_mm + speed * time_step;
     float rel_error = other_pos - pos_mm;
-    tgt_ctrl(vel_tgt, rel_error);
+    return tgt_ctrl(vel_tgt, rel_error);
   }
 
   // void vel_ctrl(int speed, int other_pos, int hz) {

@@ -164,10 +164,6 @@ void loop() {
         motor_right.motor_ctrl(0);
     }
 
-    if (doomsday) {
-
-    }
-
     current_time = millis();
 
     if (current_time - last_message_time > estop_timeout) {
@@ -181,16 +177,11 @@ void loop() {
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
 
-        // if (abs(aL_pos - aR_pos)  >= act_max_error) {
-        //     doomsday = true;
-        // } else {
-        //     doomsday = false;
-        // }
         if (abs(aL_pos - aR_pos) >= act_max_error) {
             while (abs(aL_pos - aR_pos) >= 0.5*act_max_error) {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(-factor);
-                act_right.vel_ctrl(factor);
+                safe_actuator_vel_control(act_left, -factor);
+                safe_actuator_vel_control(act_right, factor);
                 delay(10);
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
@@ -200,38 +191,26 @@ void loop() {
             act_right.stop();
         }
 
-        //Run actuators
-        // aLR_tgt = constrain(aLR_tgt, -1, ALR_STROKE);
-
-        if (!emergency_stop && !doomsday) { //TODO if not doomsday
+        if (!emergency_stop && !doomsday) {
             if (aLR_tgt >= 0) {
-                act_left.tgt_ctrl(aLR_tgt, aR_pos);
-                act_right.tgt_ctrl(aLR_tgt, aL_pos);
+                safe_actuator_tgt_control(act_left, aLR_tgt);
+                safe_actuator_tgt_control(act_right, aLR_tgt);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                safe_actuator_vel_control(act_left, aL_speed - factor);
+                safe_actuator_vel_control(act_right, aR_speed + factor);
             }
 
             if (aB_tgt >= 0) {
-                act_bucket.tgt_ctrl(aB_tgt);
+                safe_actuator_tgt_control(act_bucket, aB_tgt);
             } else {
-                act_bucket.vel_ctrl(aB_speed);
+                safe_actuator_vel_control(act_bucket, aB_speed);
             }
 
-            // //Run servo
-            // //TODO implement
-            // if (servo_state) {
-            //     servo.write(0);
-            // } else {
-            //     servo.write(90);
-            // }
-            //Run motors
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
         }
 
-        //Run LEDs
         ledr_pin.write(led_r);
         ledy_pin.write(led_y);
         ledg_pin.write(led_g);
@@ -241,14 +220,12 @@ void loop() {
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
         last_feedback_time = current_time;
 
-        // Send feedback
         if (doomsday) {
             Serial.println("Doomsday");
         }
         if (emergency_stop) {
             Serial.println("Estopped");
         }
-        // Serial.println("<F," + String(mL_speed) + "," + String(mR_speed) + ">");
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
             + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
             + "," + String(mL_speed) + "," + String(mR_speed) + ">");
@@ -260,6 +237,40 @@ void loop() {
         act_left.resetPIDIntegral();
         act_right.resetPIDIntegral();
         act_bucket.resetPIDIntegral();
+    }
+}
+
+void safe_actuator_vel_control(Actuator& actuator, int vel) {
+    int code = actuator.vel_ctrl(vel);
+    if (code != 0) {
+        Serial.print("Error in actuator velocity control: ");
+        Serial.println(code);
+        while (1) {
+            Serial.println("I2C Error. Stopping.");
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
+            delay(10);
+        }
+    }
+}
+
+void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
+    int code = actuator.tgt_ctrl(tgt);
+    if (code != 0) {
+        Serial.print("Error in actuator target control: ");
+        Serial.println(code);
+        while (1) {
+            Serial.println("I2C Error. Stopping.");
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
+            delay(10);
+        }
     }
 }
 
