@@ -141,7 +141,6 @@ public:
   }
   
   int set_speed(int speed) {
-    // Serial.println(String(speed) + " " + String(pos_mm) + " " + String(min_pos) + " " + String(max_pos));
     speed = constrain(speed, -act_max_vel, act_max_vel);
     if (speed < 0 && pos_mm <= min_pos) {
       speed = 0;
