@@ -108,7 +108,7 @@ Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false,
 Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 100); // 11, 115
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 115); // 11, 115
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
