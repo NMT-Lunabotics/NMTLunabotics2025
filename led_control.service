@@ -1,0 +1,13 @@
+[Unit]
+Description=LED Control Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/luna/NMTLunabotics2025/arduino/led_control.py
+WorkingDirectory=/home/luna/NMTLunabotics2025/arduino
+Restart=always
+User=luna
+Group=luna
+
+[Install]
+WantedBy=multi-user.target

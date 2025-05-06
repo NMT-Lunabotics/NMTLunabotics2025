@@ -108,7 +108,7 @@ Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false,
 Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 105); // 11, 115
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 115); // 11, 115
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
@@ -150,8 +150,11 @@ void loop() {
                 emergency_stop = false;
                 last_message_time = millis();
                 processMessage(data, length);
+                ledr_pin.write(0);
             } else {
                 Serial.println("End byte not found");
+                emergency_stop = true;
+                ledr_pin.write(1);
             }
         }
     }
@@ -162,6 +165,9 @@ void loop() {
         act_bucket.stop();
         motor_left.motor_ctrl(0);
         motor_right.motor_ctrl(0);
+        ledr_pin.write(1);
+    } else {
+        ledr_pin.write(0);
     }
 
     current_time = millis();
@@ -186,12 +192,16 @@ void loop() {
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
                 Serial.println("Fixing actuators");
+                ledr_pin.write(1);
             }
             act_left.stop();
             act_right.stop();
+        } else {
+            ledr_pin.write(0);
         }
 
         if (!emergency_stop && !doomsday) {
+            ledr_pin.write(0);
             if (aLR_tgt >= 0) {
                 safe_actuator_tgt_control(act_left, aLR_tgt);
                 safe_actuator_tgt_control(act_right, aLR_tgt);
@@ -209,6 +219,8 @@ void loop() {
 
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
+        } else {
+            ledr_pin.write(1);
         }
 
         ledr_pin.write(led_r);
@@ -256,6 +268,7 @@ void safe_actuator_vel_control(Actuator& actuator, int vel) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
+            ledr_pin.write(1);
             delay(10);
         }
     }
@@ -277,6 +290,7 @@ void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
+            ledr_pin.write(1);
             delay(10);
         }
     }
