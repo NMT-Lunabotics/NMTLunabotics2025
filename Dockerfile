@@ -66,8 +66,8 @@ COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 # Compile the ros workspace
 USER $USER
 WORKDIR /home/$USER/ros2_ws
-# RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
-RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
+RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
+# RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
 
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
