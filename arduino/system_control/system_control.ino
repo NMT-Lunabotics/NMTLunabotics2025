@@ -315,9 +315,9 @@ void processMessage(byte* data, int length) {
         case 'A': { // Actuator control
             aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
             aB_tgt = (int16_t)((data[3] << 8) | data[4]);
-            aL_speed = (int8_t)data[5];
+            aL_speed = -(int8_t)data[5];
             aR_speed = aL_speed;
-            aB_speed = (int8_t)data[6];
+            aB_speed = -(int8_t)data[6];
             if (debug_mode) {
                 Serial.print("Arm Position: ");
                 Serial.println(aLR_tgt);
