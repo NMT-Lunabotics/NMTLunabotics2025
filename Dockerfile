@@ -54,8 +54,7 @@ RUN apt-get -y install \
     ros-humble-rplidar-ros \
     ros-humble-imu-filter-madgwick \
     ros-humble-tf2-ros \
-    ros-humble-message-filters \
-
+    ros-humble-message-filters
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
