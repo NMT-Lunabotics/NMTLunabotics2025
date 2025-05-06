@@ -47,6 +47,16 @@ RUN apt-get update && \
     apt-get -y install python3-pydantic v4l-utils || echo "Package not available" && \
     apt-get -y install ros-humble-rosidl-generator-py || echo "Package not available"
 
+RUN apt-get -y install \
+    ros-humble-robot-state-publisher \
+    ros-humble-rviz2 \
+    ros-humble-rtabmap-viz \
+    ros-humble-rplidar-ros \
+    ros-humble-imu-filter-madgwick \
+    ros-humble-tf2-ros \
+    ros-humble-message-filters \
+
+
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
 COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
