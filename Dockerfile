@@ -35,11 +35,11 @@ RUN pip3 install pyserial
 RUN apt-get update && \
     apt-get -y install ros-humble-teleop-twist-joy || echo "Package not available" && \
     apt-get -y install ros-humble-joy || echo "Package not available" && \
-    apt-get -y install ros-humble-navigation2 || echo "Package not available" && \
-    apt-get -y install ros-humble-nav2-bringup || echo "Package not available" && \
-    apt-get -y install ros-humble-realsense2-camera || echo "Package not available" && \
-    apt-get -y install ros-humble-rviz2 || echo "Package not available" && \
-    apt-get -y install ros-humble-rtabmap-ros || echo "Package not available" && \
+    # apt-get -y install ros-humble-navigation2 || echo "Package not available" && \
+    # apt-get -y install ros-humble-nav2-bringup || echo "Package not available" && \
+    # apt-get -y install ros-humble-realsense2-camera || echo "Package not available" && \
+    # apt-get -y install ros-humble-rviz2 || echo "Package not available" && \
+    # apt-get -y install ros-humble-rtabmap-ros || echo "Package not available" && \
     apt-get -y install ros-humble-rmw-cyclonedds-cpp || echo "Package not available" && \
     apt-get -y install ros-humble-usb-cam || echo "Package not available" && \
     apt-get -y install ros-humble-image-view || echo "Package not available" && \
@@ -47,14 +47,14 @@ RUN apt-get update && \
     apt-get -y install python3-pydantic v4l-utils || echo "Package not available" && \
     apt-get -y install ros-humble-rosidl-generator-py || echo "Package not available"
 
-RUN apt-get -y install \
-    ros-humble-robot-state-publisher \
-    ros-humble-rviz2 \
-    ros-humble-rtabmap-viz \
-    ros-humble-rplidar-ros \
-    ros-humble-imu-filter-madgwick \
-    ros-humble-tf2-ros \
-    ros-humble-message-filters
+# RUN apt-get -y install \
+    # ros-humble-robot-state-publisher \
+    # ros-humble-rviz2 \
+    # ros-humble-rtabmap-viz \
+    # ros-humble-rplidar-ros \
+    # ros-humble-imu-filter-madgwick \
+    # ros-humble-tf2-ros \
+    # ros-humble-message-filters
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
