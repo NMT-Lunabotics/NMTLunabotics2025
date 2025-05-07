@@ -27,6 +27,8 @@ WORKDIR /home/$USER
 # Install system packages
 USER root
 RUN apt-get update && apt-get install -y python3 python3-pip
+RUN rosdep init && rosdep update
+
 
 # Install python packages
 RUN pip3 install pyserial
@@ -48,16 +50,17 @@ RUN apt-get update && apt-get -y install \
     ros-humble-rplidar-ros \
     ros-humble-imu-filter-madgwick \
     ros-humble-tf2-ros \
+    ros-humble-slam-toolbox \
     ros-humble-message-filters || echo "Some packages might not be available"
 
 # RUN apt-get -y install \
-    # ros-humble-robot-state-publisher \
-    # ros-humble-rviz2 \
-    # ros-humble-rtabmap-viz \
-    # ros-humble-rplidar-ros \
-    # ros-humble-imu-filter-madgwick \
-    # ros-humble-tf2-ros \
-    # ros-humble-message-filters
+#     ros-humble-robot-state-publisher \
+#     ros-humble-rviz2 \
+#     ros-humble-rtabmap-viz \
+#     ros-humble-rplidar-ros \
+#     ros-humble-imu-filter-madgwick \
+#     ros-humble-tf2-ros \
+#     ros-humble-message-filters
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
@@ -66,8 +69,8 @@ COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 # Compile the ros workspace
 USER $USER
 WORKDIR /home/$USER/ros2_ws
-RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
-# RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
+# RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
+RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
 
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
