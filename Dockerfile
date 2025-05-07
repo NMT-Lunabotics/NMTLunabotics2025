@@ -50,14 +50,14 @@ RUN apt-get update && apt-get -y install \
     ros-humble-tf2-ros \
     ros-humble-message-filters || echo "Some packages might not be available"
 
-# RUN apt-get -y install \
-    # ros-humble-robot-state-publisher \
-    # ros-humble-rviz2 \
-    # ros-humble-rtabmap-viz \
-    # ros-humble-rplidar-ros \
-    # ros-humble-imu-filter-madgwick \
-    # ros-humble-tf2-ros \
-    # ros-humble-message-filters
+ RUN apt-get -y install \
+     ros-humble-robot-state-publisher \
+     ros-humble-rviz2 \
+     ros-humble-rtabmap-viz \
+     ros-humble-rplidar-ros \
+     ros-humble-imu-filter-madgwick \
+     ros-humble-tf2-ros \
+     ros-humble-message-filters
 
 # Copy in the ros workspace
 COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
