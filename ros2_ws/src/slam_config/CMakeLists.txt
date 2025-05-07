@@ -7,7 +7,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(slam_toolbox REQUIRED)
+find_package(rtabmap_ros REQUIRED)
 find_package(realsense2_camera REQUIRED)
 
 if(BUILD_TESTING)

@@ -27,31 +27,36 @@ WORKDIR /home/$USER
 # Install system packages
 USER root
 RUN apt-get update && apt-get install -y python3 python3-pip
-RUN rosdep init && rosdep update
-
 
 # Install python packages
 RUN pip3 install pyserial
 
 # Add error handling for packages that might not be available on ARM
-RUN apt-get update && apt-get -y install \
+RUN apt-get update && apt-get install -y \
+    python3-pydantic \
+    v4l-utils \
+    ros-humble-librealsense2* \
+    ros-humble-realsense2-* \
+    ros-humble-realsense2-description \
     ros-humble-teleop-twist-joy \
     ros-humble-joy \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-usb-cam \
     ros-humble-image-view \
     ros-humble-image-transport-plugins \
-    python3-pydantic \
-    v4l-utils \
     ros-humble-rosidl-generator-py \
     ros-humble-robot-state-publisher \
     ros-humble-rviz2 \
+    ros-humble-rtabmap-ros \
     ros-humble-rtabmap-viz \
     ros-humble-rplidar-ros \
     ros-humble-imu-filter-madgwick \
     ros-humble-tf2-ros \
-    ros-humble-slam-toolbox \
-    ros-humble-message-filters || echo "Some packages might not be available"
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    ros-humble-realsense2-description \
+    ros-humble-ros2-control \
+    ros-humble-message-filters 
 
 # RUN apt-get -y install \
 #     ros-humble-robot-state-publisher \
@@ -70,7 +75,8 @@ COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 USER $USER
 WORKDIR /home/$USER/ros2_ws
 # RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config navigation'
-RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'
+# RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip slam_config'
+RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build --packages-skip'
 
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
