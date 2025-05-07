@@ -39,7 +39,8 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 3; // mm
+float act_fix_err = 2.0; // mm
+float act_max_err = 4.0; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -108,7 +109,7 @@ Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false,
 Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
                     ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
 Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
-                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 115); // 11, 115
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 110); // 11, 115
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
@@ -135,6 +136,10 @@ void setup(){
     Wire.begin();
     // servo.attach(SERVO_PIN); //THIS LINE BREAKS THE MOTORS
     // servo.write(0);
+    ledr_pin.write(1);
+    ledy_pin.write(1);
+    ledg_pin.write(0);
+    ledb_pin.write(0);
 }
 
 void loop() {
@@ -150,11 +155,9 @@ void loop() {
                 emergency_stop = false;
                 last_message_time = millis();
                 processMessage(data, length);
-                ledr_pin.write(0);
             } else {
                 Serial.println("End byte not found");
                 emergency_stop = true;
-                ledr_pin.write(1);
             }
         }
     }
@@ -165,9 +168,6 @@ void loop() {
         act_bucket.stop();
         motor_left.motor_ctrl(0);
         motor_right.motor_ctrl(0);
-        ledr_pin.write(1);
-    } else {
-        ledr_pin.write(0);
     }
 
     current_time = millis();
@@ -183,8 +183,9 @@ void loop() {
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
 
-        if (abs(aL_pos - aR_pos) >= act_max_error) {
-            while (abs(aL_pos - aR_pos) >= 0.5*act_max_error) {
+        float lr_err = abs(aL_pos - aR_pos);
+        if (lr_err >= act_fix_err && lr_err < act_max_err) {
+            while (lr_err >= 0.5*act_fix_err) {
                 float factor = (aL_pos - aR_pos) * vel_gain;
                 safe_actuator_vel_control(act_left, -factor);
                 safe_actuator_vel_control(act_right, factor);
@@ -192,16 +193,21 @@ void loop() {
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
                 Serial.println("Fixing actuators");
-                ledr_pin.write(1);
+                ledy_pin.write(1);
             }
             act_left.stop();
             act_right.stop();
+            ledy_pin.write(0);
+        } else if (lr_err >= act_max_err) {
+            doomsday = true;
         } else {
-            ledr_pin.write(0);
+            doomsday = false;
         }
 
         if (!emergency_stop && !doomsday) {
-            ledr_pin.write(0);
+            led_r = false;
+            led_g = true;
+
             if (aLR_tgt >= 0) {
                 safe_actuator_tgt_control(act_left, aLR_tgt);
                 safe_actuator_tgt_control(act_right, aLR_tgt);
@@ -220,7 +226,8 @@ void loop() {
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
         } else {
-            ledr_pin.write(1);
+            led_r = true;
+            led_g = false;
         }
 
         ledr_pin.write(led_r);
@@ -268,7 +275,7 @@ void safe_actuator_vel_control(Actuator& actuator, int vel) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
-            ledr_pin.write(1);
+            
             delay(10);
         }
     }
@@ -290,7 +297,7 @@ void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
-            ledr_pin.write(1);
+            
             delay(10);
         }
     }

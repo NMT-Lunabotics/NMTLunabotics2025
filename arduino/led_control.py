@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
 import serial
+import struct
+import time
 
 # Configure the serial connection
 serial_device = '/dev/ttyACM0'  # Replace with your serial port
@@ -13,5 +16,7 @@ command = start_byte + length_byte + payload + end_byte
 
 # Send the command
 with serial.Serial(serial_device, baud_rate, timeout=1) as ser:
-    ser.write(command)
-    print("Command sent:", command)
+    for i in range(10):
+        ser.write(command)
+        print("Command sent:", command)
+        time.sleep(0.1)

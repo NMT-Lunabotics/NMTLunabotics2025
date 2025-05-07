@@ -1,8 +1,27 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import TimerAction, ExecuteProcess
+from launch.actions import TimerAction, ExecuteProcess, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 
 def generate_launch_description():
+    # Define the LED-off command
+    led_off_command = ExecuteProcess(
+        cmd=[
+            'ros2', 'topic', 'pub', '--once', '/led_control', 'moon_messages/Leds', 
+            '{red: true, yellow: false, green: false, blue: false}'
+        ],
+        output='screen'
+    )
+
+    led_on_command = ExecuteProcess(
+        cmd=[
+            'ros2', 'topic', 'pub', '--once', '/led_control', 'moon_messages/Leds', 
+            '{red: false, yellow: false, green: true}'
+        ],
+        output='screen'
+    )
+
     return LaunchDescription([
         Node(
             package='moon_serial',
@@ -19,15 +38,28 @@ def generate_launch_description():
             name='serial_convert_node'
         ),
         TimerAction(
-            period=2.0,  # Wait 5 seconds after nodes start
-            actions=[
-                ExecuteProcess(
-                    cmd=[
-                        'ros2', 'topic', 'pub', '/led_control', 'moon_messages/Leds', 
-                        '{green: true}'
-                    ],
-                    output='screen'
-                )
-            ]
+            period=2.0,  # Wait 2 seconds after nodes start
+            actions=[led_on_command],
+        ),
+        # Turn off the LED when either node exits
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=Node(
+                    package='moon_serial',
+                    executable='serial_bridge_node',
+                    name='serial_bridge_node'
+                ),
+                on_exit=[led_off_command]
+            )
+        ),
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=Node(
+                    package='moon_serial',
+                    executable='serial_convert_node',
+                    name='serial_convert_node'
+                ),
+                on_exit=[led_off_command]
+            )
         )
     ])
