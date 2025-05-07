@@ -36,7 +36,7 @@
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_max_error = 10; // mm
+float act_fix_err = 10; // mm
 
 // Actuator targets
 int aL_speed = -25;

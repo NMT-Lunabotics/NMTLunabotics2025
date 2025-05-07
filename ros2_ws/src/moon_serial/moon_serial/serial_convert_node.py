@@ -37,6 +37,16 @@ class SerialConvertNode(Node):
         length_byte = struct.pack('>B', len(data))
         message = start_byte + length_byte + data + end_byte
         self.serial_write_publisher.publish(Bytes(data=message))
+    
+    def destroy_node(self):
+        """Clean up resources when the node is shutting down."""
+        self.get_logger().info('Shutting down serial_convert_node...')
+        
+        # Publish a message to turn off the LED
+        led_off_msg = Leds(red=True, yellow=False, green=False, blue=False)
+        self.serial_write_publisher.publish(led_off_msg)
+        
+        super().destroy_node()
 
 def main(args=None):
     rclpy.init(args=args)
