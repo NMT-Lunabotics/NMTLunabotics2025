@@ -9,28 +9,8 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
-
-    lifecycle_manager = Node(
-        package='nav2_lifecycle_manager',
-        executable='lifecycle_manager',
-        name='lifecycle_manager_navigation',
-        output='screen',
-        parameters=[{
-            'use_sim_time': False,
-            'autostart': True,
-            'node_names': [
-            'map_server',
-            'amcl',
-            'planner_server',
-            'controller_server',
-            'recoveries_server',
-            'bt_navigator'
-            ]
-        }]
-    )
     
     return LaunchDescription([
-        lifecycle_manager,
         
         DeclareLaunchArgument(
             'use_sim_time',
