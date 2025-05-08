@@ -12,7 +12,7 @@ def generate_launch_description():
                 'video_device': '/dev/video0',
                 'image_width': 320,  # Lower resolution
                 'image_height': 240,
-                'pixel_format': 'mjpeg',  # Compressed format
+                'pixel_format': 'raw_mjpeg',  # Change from 'mjpeg' to 'yuyv'
                 'framerate': 10.0,  # Lower frame rate
                 'camera_frame_id': 'usb_cam'
             }]
