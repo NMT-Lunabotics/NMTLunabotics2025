@@ -39,8 +39,8 @@ bool calibrate_actuators_flag = false;
 #define AB_POT_MAX 782
 
 float act_max_vel = 25; //mm/s
-float act_fix_err = 2.0; // mm
-float act_max_err = 4.0; // mm
+float act_fix_err = 3.0; // mm
+float act_max_err = 5.0; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -162,14 +162,6 @@ void loop() {
         }
     }
 
-    if (emergency_stop) { 
-        act_left.stop();
-        act_right.stop();
-        act_bucket.stop();
-        motor_left.motor_ctrl(0);
-        motor_right.motor_ctrl(0);
-    }
-
     current_time = millis();
 
     if (current_time - last_message_time > estop_timeout) {
@@ -228,6 +220,11 @@ void loop() {
         } else {
             led_r = true;
             led_g = false;
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
         }
 
         ledr_pin.write(led_r);
