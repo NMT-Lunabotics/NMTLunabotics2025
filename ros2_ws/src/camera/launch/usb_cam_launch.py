@@ -3,7 +3,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     cameras = [
-        {'name': 'camera1', 'video_device': '/dev/video0'},
+        {'name': 'usb_cam_0', 'video_device': '/dev/video0'},
         # Add more cameras as needed
     ]
 
@@ -13,18 +13,10 @@ def generate_launch_description():
             Node(
                 package='usb_cam',
                 executable='usb_cam_node_exe',
-                name=camera['name'],
+                namespace=camera['name'],  # Set the namespace for the node
                 output='screen',
-                parameters=[{
-                    'video_device': camera['video_device'],
-                    'image_width': 320,  # Lower resolution
-                    'image_height': 240,
-                    'pixel_format': 'raw_mjpeg',  # Change from 'mjpeg' to 'yuyv'
-                    'framerate': 10.0,  # Lower frame rate
-                    'camera_frame_id': camera['name']
-                }],
                 remappings=[
-                    ('/image_raw', f'/{camera["name"]}/image')
+                    ('/image_raw', f'/{camera["name"]}/image')  # Remap the image topic
                 ]
             )
         )
