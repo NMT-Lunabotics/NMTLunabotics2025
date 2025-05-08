@@ -10,10 +10,10 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'video_device': '/dev/video0',
-                'image_width': 640,
-                'image_height': 480,
-                'pixel_format': 'mjpeg',
-                'framerate': 30.0,
+                'image_width': 320,  # Lower resolution
+                'image_height': 240,
+                'pixel_format': 'mjpeg',  # Compressed format
+                'framerate': 10.0,  # Lower frame rate
                 'camera_frame_id': 'usb_cam'
             }]
         )

@@ -273,7 +273,8 @@ void safe_actuator_vel_control(Actuator& actuator, int vel) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
-            
+            ledr_pin.write(1);
+            ledg_pin.write(0);
             delay(10);
         }
     }
@@ -295,7 +296,8 @@ void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
             act_bucket.stop();
             motor_left.motor_ctrl(0);
             motor_right.motor_ctrl(0);
-            
+            ledr_pin.write(1);
+            ledg_pin.write(0);
             delay(10);
         }
     }
