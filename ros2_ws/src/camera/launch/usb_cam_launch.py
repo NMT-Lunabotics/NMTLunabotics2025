@@ -14,10 +14,7 @@ def generate_launch_description():
                 package='usb_cam',
                 executable='usb_cam_node_exe',
                 namespace=camera['name'],  # Set the namespace for the node
-                output='screen',
-                remappings=[
-                    ('/image_raw', f'/{camera["name"]}/image')  # Remap the image topic
-                ]
+                output='screen'
             )
         )
 
