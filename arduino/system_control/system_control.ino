@@ -184,7 +184,8 @@ void loop() {
                 delay(10);
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
-                Serial.println("Fixing actuators: " + String(factor));
+                lr_err = abs(aL_pos - aR_pos);
+                Serial.println("Fixing actuators: ");
                 ledy_pin.write(1);
             }
             act_left.stop();
