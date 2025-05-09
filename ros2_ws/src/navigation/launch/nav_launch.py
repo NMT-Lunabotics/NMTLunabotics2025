@@ -25,6 +25,7 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
     # Get the launch directory
+
     bringup_dir = get_package_share_directory('nav2_bringup')
     # Get the navigation package directory
     nav_dir = os.path.join(get_package_share_directory('navigation'))
