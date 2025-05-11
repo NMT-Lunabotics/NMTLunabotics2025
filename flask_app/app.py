@@ -1,0 +1,39 @@
+from flask import Flask, Response, render_template
+import cv2
+
+app = Flask(__name__)
+
+# --- Camera stream generator ---
+def gen_frames(camera_index):
+    cap = cv2.VideoCapture(camera_index)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+    cap.set(cv2.CAP_PROP_FPS, 10)
+
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        ret, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 15])
+        if not ret:
+            continue
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+# --- Route to render index.html ---
+@app.route('/')
+def index():
+    # Customize this list based on available /dev/video* devices
+    camera_ids = [0]  # Add 1, 2, etc., as needed
+    cameras = [{'id': cam_id} for cam_id in camera_ids]
+    return render_template('index.html', cameras=cameras)
+
+# --- Route to serve video feed ---
+@app.route('/video/<int:camera_id>')
+def video_feed(camera_id):
+    return Response(gen_frames(camera_id),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, threaded=True)

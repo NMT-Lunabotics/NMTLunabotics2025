@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGULUS Control Panel</title>
+</head>
+<body>
+    <h1>Camera Streams</h1>
+    {% for camera in cameras %}
+        <div>
+            <h2>{{ camera.id }}</h2>
+            <img src="{{ url_for('video_feed', camera_id=camera.id) }}" width="640" height="480">
+        </div>
+    {% endfor %}
+</body>
+</html>
