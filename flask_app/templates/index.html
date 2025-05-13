@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGULUS Control Panel</title>
+    <style>
+        .camera-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px; /* Optional: Adds spacing between streams */
+        }
+        .camera {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Streams</h1>
+    <div class="camera-container">
+        {% for camera in cameras %}
+            <div class="camera">
+                <h2>{{ camera.id }}</h2>
+                <img src="{{ url_for('video_feed', camera_id=camera.id) }}" width="640" height="480">
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
