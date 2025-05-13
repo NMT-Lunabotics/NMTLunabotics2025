@@ -40,7 +40,7 @@ bool calibrate_actuators_flag = false;
 
 float act_max_vel = 25; //mm/s
 float act_fix_err = 3.0; // mm
-float act_max_err = 20.0; // mm
+float act_max_err = 5.0; // mm
 
 // Actuator targets
 int aL_speed = 0;
