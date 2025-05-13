@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask, Response, render_template
 import cv2
 
