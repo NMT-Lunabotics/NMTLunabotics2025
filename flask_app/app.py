@@ -11,16 +11,22 @@ def gen_frames(camera_index):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
     cap.set(cv2.CAP_PROP_FPS, 10)
 
+    # Define the codec and create a VideoWriter object for H.264
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
+
     while True:
         success, frame = cap.read()
         if not success:
             break
-        ret, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 15])
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+
+        # Encode the frame using H.264
+        ret, buffer = cv2.imencode('.mp4', frame, [cv2.IMWRITE_JPEG_QUALITY, 15])
         if not ret:
             continue
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+               b'Content-Type: video/mp4\r\n\r\n' + frame + b'\r\n')
 
 # --- Route to render index.html ---
 @app.route('/')
