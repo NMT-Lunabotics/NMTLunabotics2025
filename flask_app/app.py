@@ -7,8 +7,8 @@ app = Flask(__name__)
 # --- Camera stream generator ---
 def gen_frames(camera_index):
     cap = cv2.VideoCapture(camera_index)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     cap.set(cv2.CAP_PROP_FPS, 5)
 
     # Define the codec and create a VideoWriter object for H.264
