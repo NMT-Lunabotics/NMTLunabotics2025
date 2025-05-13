@@ -7,9 +7,9 @@ app = Flask(__name__)
 # --- Camera stream generator ---
 def gen_frames(camera_index):
     cap = cv2.VideoCapture(camera_index)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
-    cap.set(cv2.CAP_PROP_FPS, 10)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
+    cap.set(cv2.CAP_PROP_FPS, 5)
 
     # Define the codec and create a VideoWriter object for H.264
     # Removed unused fourcc variable
@@ -21,7 +21,7 @@ def gen_frames(camera_index):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
 
         # Encode the frame using JPEG
-        ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 15])
+        ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 10])
         if not ret:
             continue
         frame = buffer.tobytes()
