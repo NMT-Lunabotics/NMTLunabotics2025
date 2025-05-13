@@ -8,7 +8,7 @@ app = Flask(__name__)
 CAMERA_CONFIG = {
     0: {
         'resolution': (288, 160),
-        'fps': 5
+        'fps': 10
     },
     4: {
         'resolution': (320, 240),
