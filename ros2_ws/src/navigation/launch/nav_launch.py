@@ -38,9 +38,14 @@ def generate_launch_description():
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',
+                       'smoother_server',
                        'bt_navigator',
                        'waypoint_follower',
-                       'amcl']
+                       'amcl',
+                       'behavior_server',
+                       'velocity_smoother',
+                       'collision_monitor',
+    ]
 
     remappings = [('/tf', 'tf'),
                   ('/tf_static', 'tf_static')]
@@ -96,6 +101,14 @@ def generate_launch_description():
             output='screen',
             parameters=[configured_params],
             remappings=remappings),
+        
+        Node(
+            package='nav2_smoother',
+            executable='smoother_server',
+            name='smoother_server',
+            output='screen',
+            parameters=[configured_params],
+            remappings=remappings),
 
         Node(
             package='nav2_planner',
@@ -125,6 +138,30 @@ def generate_launch_description():
             package='nav2_waypoint_follower',
             executable='waypoint_follower',
             name='waypoint_follower',
+            output='screen',
+            parameters=[configured_params],
+            remappings=remappings),
+
+        Node(
+            package='nav2_behaviors',
+            executable='behavior_server',
+            name='behavior_server',
+            output='screen',
+            parameters=[configured_params],
+            remappings=remappings),
+
+        Node(
+            package='nav2_velocity_smoother',
+            executable='velocity_smoother',
+            name='velocity_smoother',
+            output='screen',
+            parameters=[configured_params],
+            remappings=remappings),
+        
+        Node(
+            package='nav2_collision_monitor',
+            executable='collision_monitor',
+            name='collision_monitor',
             output='screen',
             parameters=[configured_params],
             remappings=remappings),
