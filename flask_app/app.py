@@ -26,7 +26,7 @@ def gen_frames(camera_index):
 @app.route('/')
 def index():
     # List of cameras: /dev/video0
-    camera_ids = [0]
+    camera_ids = [0, 4]
     cameras = [{'id': cam_id} for cam_id in camera_ids]
     return render_template('index.html', cameras=cameras)
 
