@@ -4,26 +4,23 @@
 
 // Debug mode flag
 bool debug_mode = false;
+bool calibrate_actuators_flag = false;
 
 //////// ACTUATORS ////////
-// Driver 1 pins
-#define DRV11_PWM_PIN 6
-#define DRV11_DIR1_PIN 34
-#define DRV11_DIR2_PIN 36
-#define DRV12_PWM_PIN 7
-#define DRV12_DIR1_PIN 38
-#define DRV12_DIR2_PIN 40
+//Left side is L, right side is R, both is LR, bucket is B
+// I2C addresses for actuators
+// B0: 58
+// B2: 59
+// B4: 5A
+#define AL_I2C_ADDRESS 0x5A // B4
+#define AR_I2C_ADDRESS 0x59 // B2
+#define AB_I2C_ADDRESS 0x58 // B0
 
-// Driver 2 pins
-#define DRV21_PWM_PIN 9
-#define DRV21_DIR1_PIN 44
-#define DRV21_DIR2_PIN 42
-#define DRV22_PWM_PIN 8
-#define DRV22_DIR1_PIN 46
-#define DRV22_DIR2_PIN 48
+// I2C registers for actuators
+#define SPEED_REG 0x02
+#define DIR_REG 0x00
 
 // Actuator potentiometer read pins
-// TODO verify
 #define POTL_PIN A1
 #define POTR_PIN A0
 #define POTB_PIN A2
@@ -58,11 +55,10 @@ int aLR_tgt = -1;
 int aB_tgt = -1;
 
 //////// MOTORS ////////
-const int DACL1_PIN = 2;
-const int DACL2_PIN = 3;
-const int DACR1_PIN = 4;
+const int DACL1_PIN = 6;
+const int DACL2_PIN = 9;
+const int DACR1_PIN = 3;
 const int DACR2_PIN = 5;
-const int EN_PIN = 32; // Common for both motors
 
 int motor_max_vel = 30; //rpm
 
@@ -71,17 +67,17 @@ int mL_speed = 0;
 int mR_speed = 0;
 
 //TODO implement servo logic
-// #define SERVO_PIN 22
+// #define SERVO_PIN 12
 
 // Servo
 bool servo_state = false;
 
 // LED's
 // TODO implement
-#define LEDR_PIN 24
-#define LEDY_PIN 26
-#define LEDG_PIN 28
-#define LEDB_PIN 30
+#define LEDR_PIN 2
+#define LEDY_PIN 4
+#define LEDG_PIN 7
+#define LEDB_PIN 8
 
 bool led_r = false;
 bool led_y = false;
@@ -108,23 +104,20 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.5;
 
 // Set up actuators
-PWM_Driver left_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, invert=false);
-Actuator act_left(left_driver, pidL, POTL_PIN, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
-
-PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, invert=false);
-Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
-
-PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, invert=false);
-Actuator act_bucket(bucket_driver, pidB, POTB_PIN, AB_POT_MIN, AB_POT_MAX, AB_STROKE, act_max_vel, 30, 110);
+Actuator act_left(AL_I2C_ADDRESS, SPEED_REG, DIR_REG, POTL_PIN, false, 
+                    ALR_STROKE, AL_POT_MIN, AL_POT_MAX, act_max_vel, pidL);
+Actuator act_right(AR_I2C_ADDRESS, SPEED_REG, DIR_REG, POTR_PIN, false, 
+                    ALR_STROKE, AR_POT_MIN, AR_POT_MAX, act_max_vel, pidR);
+Actuator act_bucket(AB_I2C_ADDRESS, SPEED_REG, DIR_REG, POTB_PIN, false, 
+                    AB_STROKE, AB_POT_MIN, AB_POT_MAX, act_max_vel, pidB, 30, 110); // 11, 115
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
 OutPin motor_left_dac2(DACL2_PIN);
 OutPin motor_right_dac1(DACR1_PIN);
 OutPin motor_right_dac2(DACR2_PIN);
-OutPin motor_enable(EN_PIN);
-Motor motor_left(motor_left_dac1, motor_left_dac2, motor_enable, motor_max_vel, false);
-Motor motor_right(motor_right_dac1, motor_right_dac2, motor_enable, motor_max_vel, true);
+Motor motor_left(motor_left_dac1, motor_left_dac2, motor_max_vel, false);
+Motor motor_right(motor_right_dac1, motor_right_dac2, motor_max_vel, true);
 
 // Set up LEDs
 OutPin ledr_pin(LEDR_PIN);
@@ -136,8 +129,6 @@ OutPin ledb_pin(LEDB_PIN);
 // Servo servo;
 
 void processMessage(byte* data, int length);
-void stop_all();
-void fault();
 
 void setup(){
     Serial.begin(115200);
@@ -185,24 +176,15 @@ void loop() {
         aB_pos = act_bucket.update_pos();
 
         float lr_err = abs(aL_pos - aR_pos);
-        float prev_err = lr_err;
         if (lr_err >= act_fix_err && lr_err < act_max_err) {
-            stop_all();
-            while (lr_err >= 0.5 * act_fix_err) {
+            while (lr_err >= 0.5*act_fix_err) {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                safe_actuator_vel_control(act_left, -factor);
+                safe_actuator_vel_control(act_right, factor);
                 delay(10);
-
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
-
-                prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
-                if (lr_err > prev_err) {
-                    fault("Actuator positions are diverging.");
-                }
                 Serial.println("Fixing actuators: ");
                 ledy_pin.write(1);
             }
@@ -210,26 +192,28 @@ void loop() {
             act_right.stop();
             ledy_pin.write(0);
         } else if (lr_err >= act_max_err) {
-            fault("Actuator relative error too large.");
+            doomsday = true;
+        } else {
+            doomsday = false;
         }
 
-        if (!emergency_stop) {
+        if (!emergency_stop && !doomsday) {
             led_r = false;
             led_g = true;
 
             if (aLR_tgt >= 0) {
-                act_left.tgt_ctrl(aLR_tgt);
-                act_right.tgt_ctrl(aLR_tgt);
+                safe_actuator_tgt_control(act_left, aLR_tgt);
+                safe_actuator_tgt_control(act_right, aLR_tgt);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                safe_actuator_vel_control(act_left, aL_speed - factor);
+                safe_actuator_vel_control(act_right, aR_speed + factor);
             }
 
             if (aB_tgt >= 0) {
-                act_bucket.tgt_ctrl(aB_tgt);
+                safe_actuator_tgt_control(act_bucket, aB_tgt);
             } else {
-                act_bucket.vel_ctrl(aB_speed);
+                safe_actuator_vel_control(act_bucket, aB_speed);
             }
 
             motor_left.motor_ctrl(mL_speed);
@@ -237,7 +221,11 @@ void loop() {
         } else {
             led_r = true;
             led_g = false;
-            stop_all();
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
         }
 
         ledr_pin.write(led_r);
@@ -249,6 +237,9 @@ void loop() {
     if (current_time - last_feedback_time >= 1000 / feedback_rate) {
         last_feedback_time = current_time;
 
+        if (doomsday) {
+            Serial.println("Doomsday");
+        }
         if (emergency_stop) {
             Serial.println("Estopped");
         }
@@ -263,6 +254,52 @@ void loop() {
         act_left.resetPIDIntegral();
         act_right.resetPIDIntegral();
         act_bucket.resetPIDIntegral();
+    }
+}
+
+void safe_actuator_vel_control(Actuator& actuator, int vel) {
+    int code = actuator.vel_ctrl(vel);
+    if (code == 2) {
+        Serial.println("Retrying actuator velocity control...");
+        code = actuator.vel_ctrl(vel);
+    }
+    if (code != 0) {
+        Serial.print("Error in actuator velocity control: ");
+        Serial.println(code);
+        while (1) {
+            Serial.println("I2C Error. Stopping.");
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
+            ledr_pin.write(1);
+            ledg_pin.write(0);
+            delay(10);
+        }
+    }
+}
+
+void safe_actuator_tgt_control(Actuator& actuator, int tgt) {
+    int code = actuator.tgt_ctrl(tgt);
+    if (code == 2) {
+        Serial.println("Retrying actuator target control...");
+        code = actuator.tgt_ctrl(tgt);
+    }
+    if (code != 0) {
+        Serial.print("Error in actuator target control: ");
+        Serial.println(code);
+        while (1) {
+            Serial.println("I2C Error. Stopping.");
+            act_left.stop();
+            act_right.stop();
+            act_bucket.stop();
+            motor_left.motor_ctrl(0);
+            motor_right.motor_ctrl(0);
+            ledr_pin.write(1);
+            ledg_pin.write(0);
+            delay(10);
+        }
     }
 }
 
@@ -339,24 +376,5 @@ void processMessage(byte* data, int length) {
         default:
             Serial.println("Unknown message type");
             break;
-    }
-}
-
-void stop_all() {
-    act_left.stop();
-    act_right.stop();
-    act_bucket.stop();
-    motor_left.stop();
-    motor_right.stop();
-}
-
-void fault(String msg) {
-    while (true) {
-        stop_all();
-        ledr_pin.write(1);
-        delay(500);
-        ledr_pin.write(0);
-        delay(500);
-        Serial.println("Critical Error: " + msg + " - Reset arduino to continue.");
     }
 }
