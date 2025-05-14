@@ -209,7 +209,7 @@ void loop() {
             act_right.stop();
             ledy_pin.write(0);
         } else if (lr_err >= act_max_err) {
-            fault("Actuator relative error too large: " + string(lr_err));
+            fault("Actuator relative error too large: " + String(lr_err));
         }
 
         if (!emergency_stop) {
