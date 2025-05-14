@@ -43,7 +43,7 @@ bool debug_mode = false;
 float act_max_vel = 25; //mm/s
 // float act_fix_err = 3.0; // mm
 float act_max_err = 5.0; // mm
-float act_err_threshold = 0.5; // mm
+float act_err_threshold = 1; // mm
 
 // Actuator targets
 int aL_speed = 0;
