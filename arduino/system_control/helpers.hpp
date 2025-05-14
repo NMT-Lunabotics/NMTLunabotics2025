@@ -162,6 +162,8 @@ public:
     if ((pos_mm <= min_pos && speed < 0) || (pos_mm >= max_pos && speed > 0)) {
       speed = 0;
     }
+    speed = constrain(speed, -act_max_vel, act_max_vel);
+    pwm_speed = speed / act_max_vel * 255;
     pwm_driver.set_speed(speed);
   }
 
