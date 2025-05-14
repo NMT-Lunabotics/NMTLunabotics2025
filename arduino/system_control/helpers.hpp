@@ -163,7 +163,7 @@ public:
       speed = 0;
     }
     speed = constrain(speed, -act_max_vel, act_max_vel);
-    pwm_speed = speed / act_max_vel * 255;
+    speed = speed / act_max_vel * 255;
     pwm_driver.set_speed(speed);
   }
 
