@@ -194,7 +194,7 @@ public:
             stop();
             return;
         }
-        enable.write(0);
+        enable.write(1);
         
         if (reverse) {
             signed_speed = -signed_speed;
@@ -213,7 +213,7 @@ public:
     }
 
     void stop() {
-      enable.write(1);
+      enable.write(0);
       dac1.write_pwm_raw(0);
       dac2.write_pwm_raw(0);
     }
