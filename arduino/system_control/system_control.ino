@@ -107,10 +107,10 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.5;
 
 // Set up actuators
-PWM_Driver left_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, true);
+PWM_Driver left_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, false);
 Actuator act_left(left_driver, pidL, POTL_PIN, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, true);
+PWM_Driver right_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, false);
 Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, false);
@@ -216,8 +216,8 @@ void loop() {
             act_right.stop();
             ledy_pin.write(0);
         } else if (lr_err >= act_max_err) {
-            // fault("Actuator relative error too large: " + String(aL_pos) + " " + String(aR_pos));
-            Serial.print("wtf");
+            fault("Actuator relative error too large: " + String(aL_pos) + " " + String(aR_pos));
+            // Serial.print("wtf");
         }
 
         if (!emergency_stop) {
