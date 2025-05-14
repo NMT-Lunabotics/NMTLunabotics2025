@@ -1,4 +1,3 @@
-#include <Wire.h>
 #include "helpers.hpp"
 // #include <Servo.h>
 
@@ -142,7 +141,7 @@ void fault();
 void setup(){
     Serial.begin(115200);
     Serial.flush();
-    Wire.begin();
+    // Wire.begin();
     // servo.attach(SERVO_PIN); //THIS LINE BREAKS THE MOTORS
     // servo.write(0);
     ledr_pin.write(1);
