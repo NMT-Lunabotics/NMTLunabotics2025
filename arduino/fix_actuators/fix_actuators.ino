@@ -23,8 +23,8 @@ bool debug_mode = false;
 
 // Actuator potentiometer read pins
 // TODO verify
-#define POTL_PIN A1
 #define POTR_PIN A0
+#define POTL_PIN A1
 #define POTB_PIN A2
 
 // Actuator info
@@ -116,10 +116,10 @@ float vel_gain = 2.5;
 // Set up actuators
 int change_l_dir = 1; // Separate from invert: -1 for invert speed
 int change_r_dir = 1;
-PWM_Driver left_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, false);
+PWM_Driver left_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, false);
 Actuator act_left(left_driver, pidL, POTL_PIN, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, false);
+PWM_Driver right_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, false);
 Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, false);
