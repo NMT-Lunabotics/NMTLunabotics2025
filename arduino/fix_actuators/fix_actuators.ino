@@ -178,7 +178,7 @@ void loop() {
         aB_pos = act_bucket.update_pos();
         Serial.println("Left: " + String(aL_pos) + " Right: " + String(aR_pos) + " Bucket: " + String(aB_pos));
 
-        act_bucket.tgt_ctrl(aB_tgt);
+        act_bucket.tgt_ctrl(40);
 
         lr_err = aL_pos - aR_pos;
 
