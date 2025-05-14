@@ -205,7 +205,8 @@ void loop() {
             }
         } else {
             Serial.println("Actuators within error threshold. Stopping");
-            stop_all();
+            act_left.stop();
+            act_right.stop();
         }
 
         if (abs(lr_err) > abs(prev_err) && abs(lr_err) > act_max_err) {
