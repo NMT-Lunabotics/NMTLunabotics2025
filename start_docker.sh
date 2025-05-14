@@ -23,7 +23,7 @@ RUN_RVIZ=false
 usage() {
     echo "Usage: $0 [--start (-s) | --motor_ctrl (-m) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |"
     echo "           --command (-c) <command> | --build (-b) | --stop (-x) |"
-    echo "           --restart (-r)] [--display (-d)] [--quiet (-q)] [--help (-h)]"
+    echo "           --restart (-r)] [--display (-d)] [--quiet (-q)] [--ros-domain-id (-i) <id>] [--help (-h)]"
     echo "This script is used to start and manage a Docker container for ROS2"
     echo "If no action is specified, the script will open an interactive bash terminal in the container."
     echo "Actions (pick ONE):"
@@ -31,7 +31,7 @@ usage() {
     echo "  --motor_ctrl (-m)           Run motor control"
     echo "  --teleop (-t)               Run joystick control using teleop.launch"
     echo "  --usb-cam (-u)              Run usb camera node using usb_cam.launch"
-    echo "  --video-stream (-v)          View the video stream using view_camera.launch"
+    echo "  --video-stream (-v)         View the video stream using view_camera.launch"
     echo "  --command (-c) <command>    Pass a command to be run in the container"
     echo "Options:"
     echo "  --display (-d)              Enable display support (forward X11 display)"
@@ -39,6 +39,7 @@ usage() {
     echo "  --stop (-x)                 Stop the running Docker container"
     echo "  --restart (-r)              Restart the Docker container if it is running"
     echo "  --quiet (-q)                Suppress output"
+    echo "  --ros-domain-id (-i) <id>   Set the ROS_DOMAIN_ID (default: 42)"
     echo "  --help (-h)                 Show this help message"
     exit 1
 }
@@ -57,6 +58,7 @@ while [[ "$#" -gt 0 ]]; do
         --stop|-x) STOP_CONTAINER=true; shift ;;
         --restart|-r) RESTART_CONTAINER=true; shift ;;
         --quiet|-q) QUIET_MODE=true; shift ;;
+        --ros-domain-id|-i) ROS_DOMAIN_ID="$2"; shift 2 ;;
         --help|-h) usage; shift ;;
         *) usage; shift ;;
     esac
