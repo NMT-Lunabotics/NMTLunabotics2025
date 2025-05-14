@@ -184,9 +184,10 @@ void loop() {
         aB_pos = act_bucket.update_pos();
 
         float lr_err = abs(aL_pos - aR_pos);
-        float prev_err = lr_err;
+        
         if (lr_err >= act_fix_err && lr_err < act_max_err) {
             stop_all();
+            float prev_err = lr_err;
             while (lr_err >= 0.5 * act_fix_err) {
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
@@ -209,7 +210,8 @@ void loop() {
             act_right.stop();
             ledy_pin.write(0);
         } else if (lr_err >= act_max_err) {
-            fault("Actuator relative error too large: " + String(aL_pos) + " " + String(aR_pos));
+            // fault("Actuator relative error too large: " + String(aL_pos) + " " + String(aR_pos));
+            Serial.print("wtf");
         }
 
         if (!emergency_stop) {
