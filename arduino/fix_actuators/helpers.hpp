@@ -1,6 +1,7 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+#include <Arduino.h>
 #include "arduino_lib.hpp"
 
 #define MEDIAN_SIZE 8 // Median filter window size for potentionmeter smoothing
@@ -19,7 +20,6 @@ public:
     error = 0;
     prev_error = 0;
     derivative = 0;
-    integral = 0;
   }
 
   float update(float error, float rel_error=0) {
@@ -78,10 +78,11 @@ class PWM_Driver {
   OutPin pwm_pin;
   OutPin dir1_pin;
   OutPin dir2_pin;
-  bool invert = false
+  bool invert = false;
+
 public:
   PWM_Driver(OutPin pwm_pin, OutPin dir1_pin, OutPin dir2_pin, bool invert=false) 
-    :  invert(invert), pwm_pin(pwm_pin), dir1_pin(dir1_pin), dir2_pin(dir2_pin) {}
+    : pwm_pin(pwm_pin), dir1_pin(dir1_pin), dir2_pin(dir2_pin), invert(invert) {}
 
   void set_speed(int speed) {
     speed = constrain(speed, -255, 255);
@@ -106,7 +107,7 @@ public:
     dir2_pin.write(0);
     pwm_pin.write_pwm_raw(0);
   }
-}
+};
 
 //////// Actuator Class ////////
 class Actuator {
@@ -171,7 +172,7 @@ public:
   void resetPIDIntegral() {
     pid.resetIntegral();
   }
-}
+};
 
 ///////// Motor Class ////////
 class Motor {

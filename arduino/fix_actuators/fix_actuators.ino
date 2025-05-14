@@ -116,13 +116,13 @@ float vel_gain = 2.5;
 // Set up actuators
 int change_l_dir = 1; // Separate from invert: -1 for invert speed
 int change_r_dir = 1;
-PWM_Driver left_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, invert=false);
+PWM_Driver left_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, false);
 Actuator act_left(left_driver, pidL, POTL_PIN, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, invert=false);
+PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, false);
 Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, invert=false);
+PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, false);
 Actuator act_bucket(bucket_driver, pidB, POTB_PIN, AB_POT_MIN, AB_POT_MAX, AB_STROKE, act_max_vel, 30, 110);
 
 // Set up motors
@@ -159,7 +159,7 @@ void setup(){
     stop_all();
     Serial.println("Giving you some time to connect and read debug messages");
     delay(2000);
-    Serial.println("I'm done waiting. Let's go.")
+    Serial.println("I'm done waiting. Let's go.");
 }
 
 void loop() {
@@ -167,9 +167,9 @@ void loop() {
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
 
-        aL_pos = act_left.get_position();
-        aR_pos = act_right.get_position();
-        aB_pos = act_bucket.get_position();
+        aL_pos = act_left.update_pos();
+        aR_pos = act_right.update_pos();
+        aB_pos = act_bucket.update_pos();
         Serial.println("Left: " + String(aL_pos) + " Right: " + String(aR_pos) + " Bucket: " + String(aB_pos));
 
         lr_err = aL_pos - aR_pos;
@@ -184,7 +184,7 @@ void loop() {
             float detected_vel_right = (aR_pos - last_ar_pos);
             Serial.println("Left - detected vel: " + String(detected_vel_left)
                 + " actual vel: " + String(l_speed)
-                + " Right - detected vel: " + String(detected_vel_right))
+                + " Right - detected vel: " + String(detected_vel_right)
                 + " actual vel: " + String(r_speed));
 
             bool detected_dir_left = (detected_vel_left > 0);
