@@ -160,6 +160,12 @@ void setup(){
     Serial.println("Giving you some time to connect and read debug messages");
     delay(2000);
     Serial.println("I'm done waiting. Let's go.");
+    
+    for (int i = 0; i < 10; i++) {
+        aL_pos = act_left.update_pos();
+        aR_pos = act_right.update_pos();
+        aB_pos = act_bucket.update_pos();
+    }
 }
 
 void loop() {
