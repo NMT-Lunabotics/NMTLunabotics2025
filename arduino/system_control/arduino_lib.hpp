@@ -21,12 +21,12 @@
 // (* = PWM)
 
 // Labels for pins.
-#define D4 4
-#define D5 5
-#define D6 6
-#define D8 8
-#define D9 9
-#define D13 13
+// #define D4 4
+// #define D5 5
+// #define D6 6
+// #define D8 8
+// #define D9 9
+// #define D13 13
 
 // Lock up the board, send an error message over serial, and flash the
 // LED forever.
@@ -40,24 +40,22 @@ class OutPin {
   int num;
   bool allow_pwm;
 
+  const static int num_pwm_pins = 12;
+  int pwm_pins[num_pwm_pins] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}; // Mega
+  // int pwm_pins[6] = {3, 5, 6, 9, 10, 11}; // Uno
+
 public:
   OutPin(int num) : num(num) {
     pinMode(num, OUTPUT);
 
     // Only some pins are allowed to do PWM output. This only runs
     // once at init, so isn't much of a speed concern.
-    switch (num) {
-    case 3:
-    case 5:
-    case 6:
-    case 9:
-    case 10:
-    case 11:
-      allow_pwm = true;
-      break;
-
-    default:
-      allow_pwm = false;
+    allow_pwm = false;
+    for (int i = 0; i < num_pwm_pins; i++) {
+      if (num == pwm_pins[i]) {
+        allow_pwm = true;
+        break;
+      }
     }
   }
 
