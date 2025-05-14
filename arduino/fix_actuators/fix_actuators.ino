@@ -183,9 +183,9 @@ void loop() {
             float detected_vel_left = (aL_pos - last_al_pos);
             float detected_vel_right = (aR_pos - last_ar_pos);
             Serial.println("Left - detected vel: " + String(detected_vel_left)
-                + " actual vel: " + String(l_speed)
+                + " tgt vel: " + String(l_speed)
                 + " Right - detected vel: " + String(detected_vel_right)
-                + " actual vel: " + String(r_speed));
+                + " tgt vel: " + String(r_speed));
 
             bool detected_dir_left = (detected_vel_left > 0);
             bool detected_dir_right = (detected_vel_right > 0);
@@ -202,6 +202,7 @@ void loop() {
                 change_r_dir *= -1;
             }
         } else {
+            Serial.println("Actuators within error threshold. Stopping");
             stop_all();
         }
 
