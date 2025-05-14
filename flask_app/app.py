@@ -1,26 +1,29 @@
-#!/usr/bin/env python3
 from flask import Flask, Response, render_template
 import cv2
 
 app = Flask(__name__)
 
-# --- Camera configuration: define per camera ID ---
 CAMERA_CONFIG = {
     0: {
         'resolution': (288, 160),
-        'fps': 10
+        'fps': 10,
+        'flip': False,
+        'rotate': 180  # 0, 90, 180, or 270
     },
     4: {
         'resolution': (320, 240),
-        'fps': 5
+        'fps': 5,
+        'flip': False,
+        'rotate': 0
     }
 }
 
-# --- Camera stream generator ---
 def gen_frames(camera_index):
-    config = CAMERA_CONFIG.get(camera_index, {'resolution': (640, 480), 'fps': 10})
+    config = CAMERA_CONFIG.get(camera_index, {'resolution': (640, 480), 'fps': 10, 'flip': False, 'rotate': 0})
     width, height = config['resolution']
     fps = config['fps']
+    flip = config.get('flip', False)
+    rotate = config.get('rotate', 0)
 
     cap = cv2.VideoCapture(camera_index)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
@@ -32,22 +35,30 @@ def gen_frames(camera_index):
         success, frame = cap.read()
         if not success:
             break
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+
+        if flip:
+            frame = cv2.flip(frame, 1)  # Horizontal flip
+
+        if rotate == 90:
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        elif rotate == 180:
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
+        elif rotate == 270:
+            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 10])
         if not ret:
             continue
-        frame = buffer.tobytes()
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
-# --- Route to render index.html ---
 @app.route('/')
 def index():
     camera_ids = list(CAMERA_CONFIG.keys())
     cameras = [{'id': cam_id} for cam_id in camera_ids]
     return render_template('index.html', cameras=cameras)
 
-# --- Route to serve video feed ---
 @app.route('/video/<int:camera_id>')
 def video_feed(camera_id):
     return Response(gen_frames(camera_id),
