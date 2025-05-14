@@ -25,7 +25,7 @@ bool debug_mode = false;
 // TODO verify
 #define POTL_PIN A1
 #define POTR_PIN A0
-#define POTB_PIN A2
+#define POTB_PIN A3
 
 // Actuator info
 // Actuator stroke in mm
@@ -113,7 +113,7 @@ Actuator act_left(left_driver, pidL, POTL_PIN, AL_POT_MIN, AL_POT_MAX, ALR_STROK
 PWM_Driver right_driver(DRV12_PWM_PIN, DRV12_DIR1_PIN, DRV12_DIR2_PIN, true);
 Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver bucket_driver(DRV22_PWM_PIN, DRV22_DIR1_PIN, DRV22_DIR2_PIN, true);
+PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, true);
 Actuator act_bucket(bucket_driver, pidB, POTB_PIN, AB_POT_MIN, AB_POT_MAX, AB_STROKE, act_max_vel, 30, 110);
 
 // Set up motors
