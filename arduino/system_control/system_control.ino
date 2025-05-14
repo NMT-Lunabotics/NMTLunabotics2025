@@ -148,6 +148,12 @@ void setup(){
     ledy_pin.write(1);
     ledg_pin.write(0);
     ledb_pin.write(0);
+
+    for (int i = 0; i < 10; i++) {
+        aL_pos = act_left.update_pos();
+        aR_pos = act_right.update_pos();
+        aB_pos = act_bucket.update_pos();
+    }
 }
 
 void loop() {
