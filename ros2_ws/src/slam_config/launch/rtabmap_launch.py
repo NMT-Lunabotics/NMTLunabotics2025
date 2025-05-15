@@ -10,7 +10,7 @@ def generate_launch_description():
     # Path to the RealSense camera and RTAB-Map launch files
     realsense_launch_file = os.path.join(
         get_package_share_directory(
-            'realsense2_camera'), 'launch', 'rs_launch.py'
+            'slam_config'), 'launch', 'realsense_launch.py'
     )
 
     rplidar_launch_file = os.path.join(
@@ -36,23 +36,8 @@ def generate_launch_description():
     )
 
     realsense_launch = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(realsense_launch_file),
-            launch_arguments={
-                'depth_module.depth_profile': '640x480x30',
-                'rgb_camera.color_profile': '640x480x30',
-                'enable_depth': 'true',
-                'enable_pointcloud': 'true',
-                'enable_color': 'true',
-                'enable_rgbd': 'false',
-                'enable_gyro': 'true',
-                'enable_accel': 'true',
-                'enable_sync': 'true',
-                'align_depth.enable': 'true',
-                'unite_imu_method': '2',
-                'serial_no': '_306322300659',
-                'camera_name': 'camera_1',
-            }.items()
-        )
+        PythonLaunchDescriptionSource(realsense_launch_file),
+    )
     
     rplidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rplidar_launch_file),
@@ -73,6 +58,8 @@ def generate_launch_description():
             'camera_info_topic': '/camera/camera_1/color/camera_info',
             'imu_topic': '/imu/data',
             'scan_topic': '/scan',
+            'Grid/FromDepth': 'true',
+            'Grid/RangeMax': '5.0',
             'wait_imu_to_init': 'true',
             'frame_id': 'base_link',
             'subscribe_depth': 'true',
