@@ -6,58 +6,14 @@ lifecycle_manager:
       # - map_server
       - controller_server
       - planner_server
-      - smoother_server
       - bt_navigator
       - waypoint_follower
-      - amcl
       - behavior_server
-      - velocity_smoother
       - collision_monitor
-
-amcl:
-  ros__parameters:
-    alpha1: 0.2
-    alpha2: 0.2
-    alpha3: 0.2
-    alpha4: 0.2
-    alpha5: 0.2
-    base_frame_id: "base_footprint"
-    beam_skip_distance: 0.5
-    beam_skip_error_threshold: 0.9
-    beam_skip_threshold: 0.3
-    do_beamskip: false
-    global_frame_id: "map"
-    lambda_short: 0.1
-    laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
-    laser_min_range: -1.0
-    laser_model_type: "likelihood_field"
-    max_beams: 60
-    max_particles: 2000
-    min_particles: 500
-    odom_frame_id: "odom"
-    pf_err: 0.05
-    pf_z: 0.99
-    recovery_alpha_fast: 0.0
-    recovery_alpha_slow: 0.0
-    resample_interval: 1
-    robot_model_type: "nav2_amcl::DifferentialMotionModel"
-    save_pose_rate: 0.5
-    sigma_hit: 0.2
-    tf_broadcast: true
-    transform_tolerance: 1.0
-    service_introspection_mode: "disabled"
-    update_min_a: 0.2
-    update_min_d: 0.25
-    z_hit: 0.5
-    z_max: 0.05
-    z_rand: 0.5
-    z_short: 0.05
-    scan_topic: scan
 
 bt_navigator:
   ros__parameters:
-    global_frame: "rtabmap/map"
+    global_frame: "map"
     robot_base_frame: base_link
     odom_topic: odom
     bt_loop_duration: 10
@@ -227,115 +183,55 @@ controller_server:
       #   twirling_cost_weight: 10.0
 
 local_costmap:
-  local_costmap:
-    ros__parameters:
-      update_frequency: 5.0
-      publish_frequency: 2.0
-      global_frame: odom
-      robot_base_frame: base_link
-      rolling_window: true
-      width: 10
-      height: 10
-      resolution: 0.05
-      footprint: "[[0.15, 0.15], [-0.15, 0.15], [-0.15, -0.15], [0.15, -0.15]]"
-      plugins: ["voxel_layer", "inflation_layer"]
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.70
-      voxel_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
-        enabled: True
-        publish_voxel_map: True
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
+  ros__parameters:
+    global_frame: "odom"
+    robot_base_frame: "base_link"
+    update_frequency: 5.0
+    publish_frequency: 2.0
+    resolution: 0.05
+    footprint: "[[0.15,0.15],[0.15,-0.15],[-0.15,-0.15],[-0.15,0.15]]"
+    plugins: ["obstacle_layer", "inflation_layer"]
+
+    obstacle_layer:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: scan pointcloud1 pointcloud2
+
+      scan:
+        topic: /scan
+        sensor_frame: laser_frame
+        data_type: LaserScan
+        min_obstacle_height: 0.0
         max_obstacle_height: 2.0
-        mark_threshold: 0
-        observation_sources: scan
-        scan:
-          # A relative topic will be appended to the parent of the local_costmap namespace.
-          # For example:
-          #   * User chosen namespace is `tb4`.
-          #   * User chosen topic is `scan`.
-          #   * Topic will be remapped to `/tb4/scan` without `local_costmap`.
-          #   * Use global topic `/scan` if you do not wish the node namespace to apply
-          topic: scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
-      always_send_full_costmap: True
-      service_introspection_mode: "disabled"
+        obstacle_range: 8.0
+        raytrace_range: 10.0
+        marking: true
+        clearing: true
+
+      pointcloud1:
+        topic: /camera/camera1/depth/color/points
+        sensor_frame: camera1_depth_optical_frame
+        data_type: PointCloud2
+        min_obstacle_height: 0.0
+        max_obstacle_height: 2.0
+        obstacle_range: 2.5
+        raytrace_range: 3.0
+        marking: true
+        clearing: true
+
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.5
+      cost_scaling_factor: 10.0
 
 global_costmap:
-  global_costmap:
-    ros__parameters:
-      # origin_z: 0
-      # origin_y: 5
-      # origin_x: 5
-      # width: 10
-      # height: 10
-      update_frequency: 1.0
-      publish_frequency: 1.0
-      global_frame: "rtabmap/map"
-      robot_base_frame: base_link
-      footprint: "[[0.15, 0.15], [-0.15, 0.15], [-0.15, -0.15], [0.15, -0.15]]"
-      resolution: 0.05
-      track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: True
-        observation_sources: scan
-        scan:
-          # A relative topic will be appended to the parent of the global_costmap namespace.
-          # For example:
-          #   * User chosen namespace is `tb4`.
-          #   * User chosen topic is `scan`.
-          #   * Topic will be remapped to `/tb4/scan` without `global_costmap`.
-          #   * Use global topic `/scan` if you do not wish the node namespace to apply
-          topic: scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.7
-      always_send_full_costmap: True
-      service_introspection_mode: "disabled"
-
-# The yaml_filename does not need to be specified since it going to be set by defaults in launch.
-# If you'd rather set it in the yaml, remove the default "map" value in the tb3_simulation_launch.py
-# file & provide full path to map below. If CLI map configuration or launch default is provided, that will be used.
-# map_server:
-#   ros__parameters:
-#     # yaml_filename: ""
-#     service_introspection_mode: "disabled"
-
-# map_saver:
-#   ros__parameters:
-#     save_map_timeout: 5.0
-#     free_thresh_default: 0.25
-#     occupied_thresh_default: 0.65
-#     map_subscribe_transient_local: True
-#     service_introspection_mode: "disabled"
+  ros__parameters:
+    global_frame: "map"
+    robot_base_frame: "base_link"
+    update_frequency: 1.0
+    publish_frequency: 1.0
+    resolution: 0.05
+    footprint: "[[0.15,0.15],[0.15,-0.15],[-0.15,-0.15],[-0.15,0.15]]"
+    plugins: ["static_layer", "inflation_layer"]
 
 planner_server:
   ros__parameters:
@@ -348,15 +244,6 @@ planner_server:
       tolerance: 0.5
       use_astar: true
       allow_unknown: true
-
-smoother_server:
-  ros__parameters:
-    smoother_plugins: ["simple_smoother"]
-    simple_smoother:
-      plugin: "nav2_smoother::SimpleSmoother"
-      tolerance: 1.0e-10
-      max_its: 1000
-      do_refinement: True
 
 behavior_server:  # Humble and newer
   ros__parameters:
@@ -394,19 +281,6 @@ waypoint_follower:
       enabled: True
       waypoint_pause_duration: 200
 
-velocity_smoother:
-  ros__parameters:
-    smoothing_frequency: 20.0
-    scale_velocities: False
-    feedback: "OPEN_LOOP"
-    max_velocity: [0.5, 0.0, 2.0]
-    min_velocity: [-0.5, 0.0, -2.0]
-    max_accel: [2.5, 0.0, 3.2]
-    max_decel: [-2.5, 0.0, -3.2]
-    odom_topic: "odom"
-    odom_duration: 0.1
-    deadband_velocity: [0.0, 0.0, 0.0]
-    velocity_timeout: 1.0
 
 collision_monitor:
   ros__parameters:
