@@ -27,6 +27,18 @@ import os
 
 def launch_setup(context, *args, **kwargs):
 
+    # Configurations
+    autostart = LaunchConfiguration('autostart')
+    lifecycle_nodes = ['bt_navigator',
+                       'controller_server',
+                       'planner_server',
+                       'smoother_server',
+                       'behavior_server',
+                       'robot_state_publisher',
+                       'waypoint_follower',
+                       'velocity_smoother',
+    ]
+
     # Directories
     pkg_nav2_bringup = get_package_share_directory(
         'nav2_bringup')
@@ -49,15 +61,6 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
-    lifecycle_nodes = ['bt_navigator',
-                       'controller_server',
-                       'planner_server',
-                       'smoother_server',
-                       'behavior_server',
-                       'robot_state_publisher',
-                       'waypoint_follower',
-                       'velocity_smoother',
-    ]
 
     return [
         # Nodes to launch
@@ -70,7 +73,6 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'autostart', default_value='true',
             description='Automatically startup the nav2 stack'),
-        
         
         
         Node(
