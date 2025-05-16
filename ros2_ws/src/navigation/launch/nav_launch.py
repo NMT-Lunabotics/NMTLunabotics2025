@@ -53,10 +53,10 @@ def generate_launch_description() -> LaunchDescription:
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
-    remappings = [('/rtabmap/map', '/map')]
+    # remappings = [('/rtabmap/map', '/map')]
 
     # Create our own temporary YAML files that include substitutions
-    param_substitutions = {'autostart': autostart}
+    param_substitutions = {'autostart': autostart, 'map_topic': '/rtabmap/map'}
 
     configured_params = ParameterFile(
         RewrittenYaml(
