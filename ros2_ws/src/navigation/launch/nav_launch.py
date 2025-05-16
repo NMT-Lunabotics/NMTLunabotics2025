@@ -16,7 +16,6 @@ def generate_launch_description():
         'planner_server',
         'smoother_server',
         'behavior_server',
-        'robot_state_publisher',
         'waypoint_follower',
         'velocity_smoother',
     ]
