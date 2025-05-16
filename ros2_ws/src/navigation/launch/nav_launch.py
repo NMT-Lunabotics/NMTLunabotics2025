@@ -37,6 +37,8 @@ def generate_launch_description() -> LaunchDescription:
     use_composition = LaunchConfiguration('use_composition')
     log_level = LaunchConfiguration('log_level')
 
+    nav_dir = os.path.join(get_package_share_directory('navigation'))
+
     lifecycle_nodes = [
         'controller_server',
         # 'smoother_server',
@@ -82,7 +84,7 @@ def generate_launch_description() -> LaunchDescription:
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(os.path.join(get_package_share_directory('navigation')), 'params', 'nav2_params.yaml'),
+        default_value=os.path.join(nav_dir, 'params', 'nav2_params.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
