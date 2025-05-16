@@ -64,7 +64,9 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         # Nodes to launch
-        nav2
+        nav2,
+        autostart,
+        lifecycle_nodes,        
     ]
 
 def generate_launch_description():
@@ -82,6 +84,4 @@ def generate_launch_description():
             output='screen',
             parameters=[{'autostart': autostart},
                         {'node_names': lifecycle_nodes}]),
-                        
-        OpaqueFunction(function=launch_setup)
     ])
