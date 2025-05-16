@@ -1,4 +1,4 @@
-# rtabmap_demos: We add segmented ground and obstacles to voxel_layer of the local costmap.
+# Modified to use icp_odom frame
 bt_navigator:
   ros__parameters:
     use_sim_time: False
@@ -145,7 +145,7 @@ local_costmap:
     ros__parameters:
       update_frequency: 5.0
       publish_frequency: 2.0
-      global_frame: odom
+      global_frame: icp_odom
       robot_base_frame: base_link
       use_sim_time: False
       rolling_window: true
@@ -167,33 +167,13 @@ local_costmap:
         z_voxels: 16
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: scan ground obstacles
+        observation_sources: scan
         scan:
           topic: /scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
           data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
-        ground:
-          topic: /camera/ground
-          max_obstacle_height: 0.4
-          clearing: True
-          marking: False
-          data_type: "PointCloud2"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
-        obstacles:
-          topic: /camera/obstacles
-          max_obstacle_height: 0.4
-          clearing: True
-          marking: True
-          data_type: "PointCloud2"
           raytrace_max_range: 3.0
           raytrace_min_range: 0.0
           obstacle_max_range: 2.5
@@ -205,7 +185,7 @@ local_costmap:
 
 global_costmap:
   global_costmap:
-    ros__parameters:    
+    ros__parameters:
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
@@ -214,7 +194,21 @@ global_costmap:
       robot_radius: 0.22
       resolution: 0.05
       track_unknown_space: true
-      plugins: ["static_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
@@ -261,7 +255,7 @@ behavior_server:
       plugin: "nav2_behaviors/Wait"
     assisted_teleop:
       plugin: "nav2_behaviors/AssistedTeleop"
-    global_frame: odom
+    global_frame: icp_odom
     robot_base_frame: base_link
     transform_tolerance: 0.1
     use_sim_time: False
