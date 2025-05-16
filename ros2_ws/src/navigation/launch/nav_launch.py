@@ -20,6 +20,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 import os
@@ -48,6 +49,16 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
+    lifecycle_nodes = ['bt_navigator',
+                       'controller_server',
+                       'planner_server',
+                       'smoother_server',
+                       'behavior_server',
+                       'robot_state_publisher',
+                       'waypoint_follower',
+                       'velocity_smoother',
+    ]
+
     return [
         # Nodes to launch
         nav2
@@ -56,5 +67,19 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
     return LaunchDescription([
         
+        DeclareLaunchArgument(
+            'autostart', default_value='true',
+            description='Automatically startup the nav2 stack'),
+        
+        
+        
+        Node(
+            package='nav2_lifecycle_manager',
+            executable='lifecycle_manager',
+            name='lifecycle_manager_navigation',
+            output='screen',
+            parameters=[{'autostart': autostart},
+                        {'node_names': lifecycle_nodes}]),
+                        
         OpaqueFunction(function=launch_setup)
     ])
