@@ -17,163 +17,42 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
-from nav2_common.launch import RewrittenYaml
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.substitutions import FindPackageShare
 
+import os
 
-def generate_launch_description():
-    # Get the launch directory
+def launch_setup(context, *args, **kwargs):
 
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    # Get the navigation package directory
-    nav_dir = os.path.join(get_package_share_directory('navigation'))
+    # Directories
+    pkg_nav2_bringup = get_package_share_directory(
+        'nav2_bringup')
 
-    use_sim_time = LaunchConfiguration('use_sim_time')
-    autostart = LaunchConfiguration('autostart')
-    params_file = LaunchConfiguration('params_file')
-    default_bt_xml_filename = LaunchConfiguration('default_bt_xml_filename')
-    map_subscribe_transient_local = LaunchConfiguration('map_subscribe_transient_local')
+    
+    nav2_params_file = os.path.join('navigation', 'config', 'nav2_params.yaml')
 
-    lifecycle_nodes = ['controller_server',
-                       'planner_server',
-                    #    'smoother_server',
-                       'bt_navigator',
-                    #    'waypoint_follower',
-                    #    'amcl',
-                       'behavior_server',
-                    #    'velocity_smoother',
-                    #    'collision_monitor',
+    # Paths
+    nav2_launch = PathJoinSubstitution(
+        [pkg_nav2_bringup, 'launch', 'navigation_launch.py'])
+
+    # Includes
+    nav2 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([nav2_launch]),
+        launch_arguments=[
+            ('use_sim_time', 'false'),
+            ('params_file', nav2_params_file)
+        ]
+    )
+
+    return [
+        # Nodes to launch
+        nav2
     ]
 
-    remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static'),
-                  ('/rtabmap/odom', 'odom'),]
-
-    # Create our own temporary YAML files that include substitutions
-    param_substitutions = {
-        'use_sim_time': use_sim_time,
-        'default_bt_xml_filename': default_bt_xml_filename,
-        'autostart': autostart,
-        'map_subscribe_transient_local': map_subscribe_transient_local}
-
-    # For a single robot, we can directly use the params file with substitutions
-    configured_params = RewrittenYaml(
-        source_file=params_file,
-        param_rewrites=param_substitutions,
-        convert_types=True)
-
+def generate_launch_description():
     return LaunchDescription([
-        # Set env var to print messages to stdout immediately
-        SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
-
-        DeclareLaunchArgument(
-            'namespace', default_value='',
-            description='Top-level namespace'),
-
-        DeclareLaunchArgument(
-            'use_sim_time', default_value='false',
-            description='Use simulation (Gazebo) clock if true'),
-
-        DeclareLaunchArgument(
-            'autostart', default_value='true',
-            description='Automatically startup the nav2 stack'),
-
-        DeclareLaunchArgument(
-            'params_file',
-            default_value=os.path.join(nav_dir, 'config', 'nav2_params.yaml'),
-            description='Full path to the ROS2 parameters file to use'),
-
-        DeclareLaunchArgument(
-            'default_bt_xml_filename',
-            default_value=os.path.join(
-                get_package_share_directory('nav2_bt_navigator'),
-                'behavior_trees', 'navigate_w_replanning_and_recovery.xml'),
-            description='Full path to the behavior tree xml file to use'),
-
-        DeclareLaunchArgument(
-            'map_subscribe_transient_local', default_value='false',
-            description='Whether to set the map subscriber QoS to transient local'),
-
-        Node(
-            package='nav2_controller',
-            executable='controller_server',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
         
-        # Node(
-        #     package='nav2_smoother',
-        #     executable='smoother_server',
-        #     name='smoother_server',
-        #     output='screen',
-        #     parameters=[configured_params],
-        #     remappings=remappings),
-
-        Node(
-            package='nav2_planner',
-            executable='planner_server',
-            name='planner_server',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
-
-        Node(
-            package='nav2_bt_navigator',
-            executable='bt_navigator',
-            name='bt_navigator',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
-
-        # Node(
-            # package='nav2_amcl',
-            # executable='amcl',
-            # name='amcl',
-            # output='screen',
-            # parameters=[configured_params],
-            # remappings=remappings),
-
-        # Node(
-            # package='nav2_waypoint_follower',
-            # executable='waypoint_follower',
-            # name='waypoint_follower',
-            # output='screen',
-            # parameters=[configured_params],
-            # remappings=remappings),
-
-        Node(
-            package='nav2_behaviors',
-            executable='behavior_server',
-            name='behavior_server',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
-
-        # Node(
-            # package='nav2_velocity_smoother',
-            # executable='velocity_smoother',
-            # name='velocity_smoother',
-            # output='screen',
-            # parameters=[configured_params],
-            # remappings=remappings),
-        
-        # Node(
-        #     package='nav2_collision_monitor',
-        #     executable='collision_monitor',
-        #     name='collision_monitor',
-        #     output='screen',
-        #     parameters=[configured_params],
-        #     remappings=remappings),
-
-        Node(
-            package='nav2_lifecycle_manager',
-            executable='lifecycle_manager',
-            name='lifecycle_manager_navigation',
-            output='screen',
-            parameters=[{'use_sim_time': use_sim_time},
-                        {'autostart': autostart},
-                        {'node_names': lifecycle_nodes}]),
-
+        OpaqueFunction(function=launch_setup)
     ])
