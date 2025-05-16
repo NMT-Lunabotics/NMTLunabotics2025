@@ -32,6 +32,7 @@ def generate_launch_description() -> LaunchDescription:
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     graph_filepath = LaunchConfiguration('graph')
+    container_name = LaunchConfiguration('container_name')
     params_file = LaunchConfiguration('params_file')
     use_composition = LaunchConfiguration('use_composition')
     log_level = LaunchConfiguration('log_level')
@@ -101,6 +102,12 @@ def generate_launch_description() -> LaunchDescription:
         'use_composition',
         default_value='False',
         description='Use composed bringup if True',
+    )
+
+    declare_container_name_cmd = DeclareLaunchArgument(
+        'container_name',
+        default_value='nav2_container',
+        description='the name of container that nodes will load in if use composition',
     )
 
     declare_log_level_cmd = DeclareLaunchArgument(
@@ -216,6 +223,7 @@ def generate_launch_description() -> LaunchDescription:
         actions=[
             SetParameter('use_sim_time', use_sim_time),
             LoadComposableNodes(
+                target_container=container_name,
                 composable_node_descriptions=[
                     ComposableNode(
                         package='nav2_controller',
@@ -306,6 +314,7 @@ def generate_launch_description() -> LaunchDescription:
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_graph_file_cmd)
     ld.add_action(declare_use_composition_cmd)
+    ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_log_level_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
