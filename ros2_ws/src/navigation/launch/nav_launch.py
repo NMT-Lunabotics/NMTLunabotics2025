@@ -38,17 +38,18 @@ def generate_launch_description():
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',
-                       'smoother_server',
+                    #    'smoother_server',
                        'bt_navigator',
-                       'waypoint_follower',
-                       'amcl',
+                    #    'waypoint_follower',
+                    #    'amcl',
                        'behavior_server',
-                       'velocity_smoother',
-                       'collision_monitor',
+                    #    'velocity_smoother',
+                    #    'collision_monitor',
     ]
 
     remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+                  ('/tf_static', 'tf_static'),
+                  ('/rtabmap/odom', 'odom'),]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {
@@ -102,13 +103,13 @@ def generate_launch_description():
             parameters=[configured_params],
             remappings=remappings),
         
-        Node(
-            package='nav2_smoother',
-            executable='smoother_server',
-            name='smoother_server',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
+        # Node(
+        #     package='nav2_smoother',
+        #     executable='smoother_server',
+        #     name='smoother_server',
+        #     output='screen',
+        #     parameters=[configured_params],
+        #     remappings=remappings),
 
         Node(
             package='nav2_planner',
@@ -126,21 +127,21 @@ def generate_launch_description():
             parameters=[configured_params],
             remappings=remappings),
 
-        Node(
-            package='nav2_amcl',
-            executable='amcl',
-            name='amcl',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
+        # Node(
+            # package='nav2_amcl',
+            # executable='amcl',
+            # name='amcl',
+            # output='screen',
+            # parameters=[configured_params],
+            # remappings=remappings),
 
-        Node(
-            package='nav2_waypoint_follower',
-            executable='waypoint_follower',
-            name='waypoint_follower',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
+        # Node(
+            # package='nav2_waypoint_follower',
+            # executable='waypoint_follower',
+            # name='waypoint_follower',
+            # output='screen',
+            # parameters=[configured_params],
+            # remappings=remappings),
 
         Node(
             package='nav2_behaviors',
@@ -150,21 +151,21 @@ def generate_launch_description():
             parameters=[configured_params],
             remappings=remappings),
 
-        Node(
-            package='nav2_velocity_smoother',
-            executable='velocity_smoother',
-            name='velocity_smoother',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
+        # Node(
+            # package='nav2_velocity_smoother',
+            # executable='velocity_smoother',
+            # name='velocity_smoother',
+            # output='screen',
+            # parameters=[configured_params],
+            # remappings=remappings),
         
-        Node(
-            package='nav2_collision_monitor',
-            executable='collision_monitor',
-            name='collision_monitor',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
+        # Node(
+        #     package='nav2_collision_monitor',
+        #     executable='collision_monitor',
+        #     name='collision_monitor',
+        #     output='screen',
+        #     parameters=[configured_params],
+        #     remappings=remappings),
 
         Node(
             package='nav2_lifecycle_manager',
