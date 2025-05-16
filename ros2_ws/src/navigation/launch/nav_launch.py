@@ -31,7 +31,9 @@ def launch_setup(context, *args, **kwargs):
         'nav2_bringup')
 
     
-    nav2_params_file = os.path.join('navigation', 'config', 'nav2_params.yaml')
+    nav_dir = os.path.join(get_package_share_directory('navigation'))
+    
+    nav2_params_file = os.path.join(nav_dir, 'config', 'nav2_params.yaml')
 
     # Paths
     nav2_launch = PathJoinSubstitution(
