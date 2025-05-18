@@ -268,7 +268,7 @@ elif [ "$RUN_NAV" = true ]; then
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch navigation nav_launch.py
 elif [ "$SAVE_MAP" = true ]; then
     echo "Saving map to ~/my_map..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 run nav2_map_server map_saver_cli -f ~/my_map
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 run nav2_map_server map_saver_cli -f ~/my_map map:=/rtabmap/map
 elif [ "$COPY_MAP" = true ]; then
     echo "Copying map files from Docker to ./maps directory..."
     mkdir -p ./maps
