@@ -40,6 +40,11 @@ bool debug_mode = false;
 #define AB_POT_MIN 30
 #define AB_POT_MAX 782
 
+float bucket_min = 20; // mm
+float bucket_max = 110; // mm
+float bucket_absolute_max = 115; // mm
+float act_end_tolerance = 1; // mm
+
 float act_max_vel = 25; //mm/s
 float act_fix_err = 3.0; // mm
 float act_max_err = 5.0; // mm
@@ -114,7 +119,7 @@ PWM_Driver right_driver(DRV11_PWM_PIN, DRV11_DIR1_PIN, DRV11_DIR2_PIN, false);
 Actuator act_right(right_driver, pidR, POTR_PIN, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(DRV21_PWM_PIN, DRV21_DIR1_PIN, DRV21_DIR2_PIN, true);
-Actuator act_bucket(bucket_driver, pidB, POTB_PIN, AB_POT_MIN, AB_POT_MAX, AB_STROKE, act_max_vel, 30, 110);
+Actuator act_bucket(bucket_driver, pidB, POTB_PIN, AB_POT_MIN, AB_POT_MAX, AB_STROKE, act_max_vel, bucket_min, bucket_max);
 
 // Set up motors
 OutPin motor_left_dac1(DACL1_PIN);
@@ -189,8 +194,28 @@ void loop() {
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
 
+        // Ensure bucket is in bounds
+        if (ab_pos > bucket_absolute_max) {
+            fault("Bucket position out of bounds: " + String(aB_pos));
+        }
+        if (aB_pos < bucket_min || aB_pos > bucket_max) {
+            while (ab_pos < bucket_min) {
+                act_bucket.vel_ctrl(5);
+                aB_pos = act_bucket.update_pos();
+                delay(5);
+                Serial.println("Bucket past minimum. Fixing");
+            }
+            while (aB_pos > bucket_max) {
+                act_bucket.vel_ctrl(-5);
+                aB_pos = act_bucket.update_pos();
+                delay(5);
+                Serial.println("Bucket past maximum. Fixing");
+            }
+            act_bucket.stop();
+        }
+
+        // Correct dual actuator misalignment
         float lr_err = abs(aL_pos - aR_pos);
-        
         if (lr_err >= act_fix_err && lr_err < act_max_err) {
             stop_all();
             float prev_err = lr_err;
@@ -199,7 +224,7 @@ void loop() {
 
                 act_left.vel_ctrl(aL_speed - factor);
                 act_right.vel_ctrl(aR_speed + factor);
-                delay(10);
+                delay(5);
 
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
