@@ -1,3 +1,5 @@
+// Updated to use the same serial protocol as system_control.ino
+
 const int motor1_pwm_pin = 3;  // Motor 1 speed (PWM)
 const int motor1_dir_pin1 = 4;  // Motor 1 direction pin 1
 const int motor1_dir_pin2 = 5;  // Motor 1 direction pin 2
@@ -8,8 +10,13 @@ const int motor2_dir_pin2 = 8;  // Motor 2 direction pin 2
 
 const float rpm_to_pwm_constant = 5;
 
+int mL_speed = 0;
+int mR_speed = 0;
+
+void processMessage(byte* data, int length);
+
 void setup() {
-  Serial.begin(2000000);  // Set baud rate to match Python script
+  Serial.begin(115200);  // Set baud rate to match Python script
 
   // Set motor control pins as output
   pinMode(motor1_pwm_pin, OUTPUT);
@@ -22,52 +29,57 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
-    String inputString = Serial.readStringUntil('>');  // Read until '>'
-    
-    if (inputString.startsWith("<")) {  // Ensure message starts with '<'
-      inputString = inputString.substring(1);  // Remove the starting '<'
-      // Serial.println(inputString);
-      if (inputString.startsWith("M")) {
-        inputString = inputString.substring(2);  // Remove the starting 'M'
-        int commaIndex = inputString.indexOf(',');
-        if (commaIndex > 0) {
-          // Parse the RPM values for motor 1 and motor 2
-          int rpm_motor1 = inputString.substring(0, commaIndex).toInt();
-          int rpm_motor2 = inputString.substring(commaIndex + 1).toInt();
-
-          // Convert RPM to PWM using the constant
-          int pwm_motor1 = constrain(abs(rpm_motor1) * rpm_to_pwm_constant, 0, 255);
-          int pwm_motor2 = constrain(abs(rpm_motor2) * rpm_to_pwm_constant, 0, 255);
-
-          // Set motor 1 direction
-          if (rpm_motor1 >= 0) {
-            digitalWrite(motor1_dir_pin1, HIGH);
-            digitalWrite(motor1_dir_pin2, LOW);
-          } else {
-            digitalWrite(motor1_dir_pin1, LOW);
-            digitalWrite(motor1_dir_pin2, HIGH);
-          }
-
-          // Set motor 1 speed
-          analogWrite(motor1_pwm_pin, pwm_motor1);
-
-          // Set motor 2 direction
-          if (rpm_motor2 >= 0) {
-            digitalWrite(motor2_dir_pin1, HIGH);
-            digitalWrite(motor2_dir_pin2, LOW);
-          } else {
-            digitalWrite(motor2_dir_pin1, LOW);
-            digitalWrite(motor2_dir_pin2, HIGH);
-          }
-
-          // Set motor 2 speed
-          analogWrite(motor2_pwm_pin, pwm_motor2);
-
-          // Send success message to the ROS node
-          // Serial.println("1");
-        }
+  // Protocol: 0x02 <length> <data...> 0x03
+  if (Serial.available() > 0) {
+    if (Serial.read() == 0x02) { // Start byte
+      while (Serial.available() < 1) {} // Wait for length byte
+      int length = Serial.read();
+      while (Serial.available() < length + 1) {} // Wait for the entire message
+      byte data[length];
+      Serial.readBytes(data, length);
+      while (Serial.available() < 1) {} // Wait for end byte
+      if (Serial.read() == 0x03) { // End byte
+        processMessage(data, length);
+      } else {
+        Serial.println("End byte not found");
       }
     }
+  }
+}
+
+void processMessage(byte* data, int length) {
+  char type = data[0];
+  switch (type) {
+    case 'M': { // Motor control
+      mL_speed = (int8_t)data[1];
+      mR_speed = (int8_t)data[2];
+
+      // Motor 1 (left)
+      int pwm_motor1 = constrain(abs(mL_speed) * rpm_to_pwm_constant, 0, 255);
+      if (mL_speed >= 0) {
+        digitalWrite(motor1_dir_pin1, HIGH);
+        digitalWrite(motor1_dir_pin2, LOW);
+      } else {
+        digitalWrite(motor1_dir_pin1, LOW);
+        digitalWrite(motor1_dir_pin2, HIGH);
+      }
+      analogWrite(motor1_pwm_pin, pwm_motor1);
+
+      // Motor 2 (right)
+      int pwm_motor2 = constrain(abs(mR_speed) * rpm_to_pwm_constant, 0, 255);
+      if (mR_speed >= 0) {
+        digitalWrite(motor2_dir_pin1, HIGH);
+        digitalWrite(motor2_dir_pin2, LOW);
+      } else {
+        digitalWrite(motor2_dir_pin1, LOW);
+        digitalWrite(motor2_dir_pin2, HIGH);
+      }
+      analogWrite(motor2_pwm_pin, pwm_motor2);
+
+      break;
+    }
+    default:
+      Serial.println("Unknown message type");
+      break;
   }
 }
