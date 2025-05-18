@@ -6,7 +6,7 @@ const int motor2_pwm_pin = 6;  // Motor 2 speed (PWM)
 const int motor2_dir_pin1 = 7;  // Motor 2 direction pin 1
 const int motor2_dir_pin2 = 8;  // Motor 2 direction pin 2
 
-const float rpm_to_pwm_constant = 2.5;
+const float rpm_to_pwm_constant = 5;
 
 void setup() {
   Serial.begin(2000000);  // Set baud rate to match Python script
