@@ -1,7 +1,30 @@
 rtabmap:
+  
+  # RVIZ
+  rtabmapviz: true
+
+  # Topic names
   depth_topic: /camera/camera/depth/image_rect_raw
   rgb_topic: /camera/camera/color/image_raw
   camera_info_topic: /camera/camera/color/camera_info
-  rtabmapviz: true
+  
+  # RTAB Map Functionality
   localization: true
   approx_sync: true
+  visual_odometry: true
+
+  # RTAB Map Frames and TFs
+  publish_tf: true
+  map_frame_id: map
+  odom_frame_id: odom
+  frame_id: base_link
+
+  # Occupancy Grid
+  Grid/FromDepth: true
+  Grid/3D: false
+  Grid/CellSize: 0.05
+  # Grid/DepthDecimation: 5 # Change as needed
+  Grid/RangeMin: 0.3
+  Grid/RangeMax: 10.0
+  grid_map_publisher_rate: 1.0
+  grid_frame_id: map

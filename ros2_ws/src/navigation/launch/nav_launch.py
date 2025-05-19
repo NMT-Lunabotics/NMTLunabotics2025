@@ -27,8 +27,6 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description() -> LaunchDescription:
     # Get the launch directory
     # bringup_dir = get_package_share_directory('nav2_bringup')
-
-    namespace = LaunchConfiguration('namespace')
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     graph_filepath = LaunchConfiguration('graph')
@@ -56,25 +54,8 @@ def generate_launch_description() -> LaunchDescription:
     # remappings = [('/rtabmap/map', '/map')]
     remappings = []
 
-    # Create our own temporary YAML files that include substitutions
-    param_substitutions = {'autostart': autostart, 'map_topic': '/rtabmap/map'}
-
-    configured_params = ParameterFile(
-        RewrittenYaml(
-            source_file=params_file,
-            root_key=namespace,
-            param_rewrites=param_substitutions,
-            convert_types=True,
-        ),
-        allow_substs=True,
-    )
-
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_LOGGING_BUFFERED_STREAM', '1'
-    )
-
-    declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace', default_value='', description='Top-level namespace'
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
@@ -116,6 +97,18 @@ def generate_launch_description() -> LaunchDescription:
         'log_level', default_value='info', description='log level'
     )
 
+    # Create our own temporary YAML files that include substitutions
+    param_substitutions = {'autostart': autostart}
+
+    configured_params = ParameterFile(
+        RewrittenYaml(
+            source_file=params_file,
+            param_rewrites=param_substitutions,
+            convert_types=True,
+        ),
+        allow_substs=True,
+    )
+
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
@@ -127,7 +120,8 @@ def generate_launch_description() -> LaunchDescription:
  
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                # remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                remappings=remappings,
             ),
             # Node(
             #     package='nav2_smoother',
@@ -166,7 +160,8 @@ def generate_launch_description() -> LaunchDescription:
  
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                # remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                remappings=remappings,
             ),
             Node(
                 package='nav2_bt_navigator',
@@ -310,7 +305,6 @@ def generate_launch_description() -> LaunchDescription:
     ld.add_action(stdout_linebuf_envvar)
 
     # Declare the launch options
-    ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
