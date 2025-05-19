@@ -272,7 +272,8 @@ elif [ "$SAVE_MAP" = true ]; then
 elif [ "$COPY_MAP" = true ]; then
     echo "Copying map files from Docker to ./maps directory..."
     mkdir -p ./maps
-    docker cp $CONTAINER_ID:/home/luna/my_map.* ./maps/ 2>/dev/null || true
+    docker cp $CONTAINER_ID:/home/luna/my_map.pgm ./maps/my_map.pgm
+    docker cp $CONTAINER_ID:/home/luna/my_map.yaml ./maps/my_map.yaml
     echo "Map files copied to ./maps/"
 elif [ -n "$COMMAND_TO_RUN" ]; then
     echo "Running custom command: $COMMAND_TO_RUN"
