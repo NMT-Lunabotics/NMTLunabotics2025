@@ -93,7 +93,7 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 200; //hz
+int update_rate = 500; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
@@ -196,7 +196,7 @@ void loop() {
 
         // Ensure bucket is in bounds
         if (aB_pos > bucket_absolute_max) {
-            fault("Bucket position out of bounds: " + String(aB_pos));
+            //fault("Bucket position out of bounds: " + String(aB_pos));
         }
         if (aB_pos < bucket_min || aB_pos > bucket_max) {
             while (aB_pos < bucket_min) {
