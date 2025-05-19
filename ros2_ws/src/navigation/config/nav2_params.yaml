@@ -3,7 +3,7 @@ lifecycle_manager:
     use_sim_time: false
     autostart: true
     lifecycle_nodes:
-      # - map_server
+      - map_server
       - controller_server
       - planner_server
       # - smoother_server
