@@ -268,8 +268,7 @@ elif [ "$RUN_NAV" = true ]; then
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch navigation nav_launch.py
 elif [ "$SAVE_MAP" = true ]; then
     echo "Saving map to ~/my_map..."
-    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 run nav2_map_server map_saver_cli -f ~/my_map map:=/rtabmap/map
-elif [ "$COPY_MAP" = true ]; then
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 run nav2_map_server map_saver_cli -f ~/my_map --ros-args --remap map:=/rtabmap/map
     echo "Copying map files from Docker to ./maps directory..."
     mkdir -p ./maps
     docker cp $CONTAINER_ID:/home/luna/my_map.pgm ./maps/my_map.pgm
