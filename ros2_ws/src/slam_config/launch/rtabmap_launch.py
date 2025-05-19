@@ -21,7 +21,7 @@ def generate_launch_description():
 
     rtabmap_launch_file = os.path.join(
         get_package_share_directory(
-            'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
+        'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
     )
 
     urdf_file = os.path.join(
