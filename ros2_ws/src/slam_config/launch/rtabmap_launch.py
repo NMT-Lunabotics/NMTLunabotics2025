@@ -7,7 +7,15 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    # Path to the RealSense camera and RTAB-Map launch files
+    # Declare a launch argument for localization mode
+    localization_arg = DeclareLaunchArgument(
+        'localization',
+        default_value='false',
+        description='Launch in localization mode (true/false)'
+    )
+
+    localization = LaunchConfiguration('localization')
+
     realsense_launch_file = os.path.join(
         get_package_share_directory(
             'slam_config'), 'launch', 'realsense_launch.py'
@@ -70,12 +78,13 @@ def generate_launch_description():
             'approx_sync': 'true',
             'queue_size': '10',
             'rtabmap_viz': 'false',
-            'database_path': ''
+            'database_path': '',
+            'localization': localization
         }.items()
     )
 
-    # Launch arguments
     return LaunchDescription([
+        localization_arg,
         robot_state_publisher_node,
         rplidar_launch,
         realsense_launch,

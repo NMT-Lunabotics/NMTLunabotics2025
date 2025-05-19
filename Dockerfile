@@ -79,6 +79,8 @@ RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon bui
 RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
 RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
 
+COPY --chown=$USER:$USER maps /home/$USER/maps
+
 # Copy in the entrypoint script
 USER root
 WORKDIR /home/$USER
