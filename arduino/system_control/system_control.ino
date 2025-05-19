@@ -195,11 +195,11 @@ void loop() {
         aB_pos = act_bucket.update_pos();
 
         // Ensure bucket is in bounds
-        if (ab_pos > bucket_absolute_max) {
+        if (aB_pos > bucket_absolute_max) {
             fault("Bucket position out of bounds: " + String(aB_pos));
         }
         if (aB_pos < bucket_min || aB_pos > bucket_max) {
-            while (ab_pos < bucket_min) {
+            while (aB_pos < bucket_min) {
                 act_bucket.vel_ctrl(5);
                 aB_pos = act_bucket.update_pos();
                 delay(5);
