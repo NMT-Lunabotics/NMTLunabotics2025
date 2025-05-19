@@ -6,15 +6,15 @@ app = Flask(__name__)
 
 CAMERA_CONFIG = {
     0: {
-        'resolution': (288, 160),
+        'resolution': (640, 320),
         'fps': 10,
         'flip': False,
         'rotate': 180,  # 0, 90, 180, or 270
         'lines': [0.2] # Percent of height for reference line
     },
     4: {
-        'resolution': (320, 240),
-        'fps': 5,
+        'resolution': (640, 320),
+        'fps': 10,
         'flip': False,
         'rotate': 0,
         'lines': [] # Percent of height for reference line
@@ -55,9 +55,9 @@ def gen_frames(camera_index):
             cv2.line(frame, (0, y), (frame.shape[1], y), (255, 0, 0), 2)
 
         # Convert to grayscale
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
-        ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 10])
+        ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 50])
         if not ret:
             continue
         yield (b'--frame\r\n'
