@@ -51,7 +51,7 @@ def gen_frames(camera_index):
 
         # Draw reference lines
         for line in config['lines']:
-            y = int(frame.shape[0] * line)
+            y = int(frame.shape[0] * (1 - line))
             cv2.line(frame, (0, y), (frame.shape[1], y), (255, 0, 0), 2)
 
         # Convert to grayscale
