@@ -10,7 +10,7 @@ CAMERA_CONFIG = {
         'fps': 10,
         'flip': False,
         'rotate': 180,  # 0, 90, 180, or 270
-        'lines': [0.2] # Percent of height for reference line
+        'lines': [0.25] # Percent of height for reference line
     },
     4: {
         'resolution': (640, 320),
