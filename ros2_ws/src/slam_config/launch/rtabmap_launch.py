@@ -29,7 +29,7 @@ def generate_launch_description():
 
     rtabmap_launch_file = os.path.join(
         get_package_share_directory(
-            'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
+        'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
     )
 
     urdf_file = os.path.join(
@@ -59,28 +59,7 @@ def generate_launch_description():
         remappings=[('imu/data_raw', '/camera/camera_1/imu')])
 
     rtabmap_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(rtabmap_launch_file),
-        launch_arguments={
-            'depth_topic': '/camera/camera_1/aligned_depth_to_color/image_raw',
-            'rgb_topic': '/camera/camera_1/color/image_raw',
-            'camera_info_topic': '/camera/camera_1/color/camera_info',
-            'imu_topic': '/imu/data',
-            'scan_topic': '/scan',
-            'Grid/FromDepth': 'true',
-            'Grid/RangeMax': '5.0',
-            'wait_imu_to_init': 'true',
-            'frame_id': 'base_link',
-            'subscribe_depth': 'true',
-            'subscribe_rgb': 'true',
-            'subscribe_stereo': 'false',
-            'subscribe_scan': 'true',
-            'visual_odometry': 'true',
-            'approx_sync': 'true',
-            'queue_size': '10',
-            'rtabmap_viz': 'false',
-            'database_path': '',
-            'localization': localization
-        }.items()
+        PythonLaunchDescriptionSource(rtabmap_launch_file)
     )
 
     return LaunchDescription([
