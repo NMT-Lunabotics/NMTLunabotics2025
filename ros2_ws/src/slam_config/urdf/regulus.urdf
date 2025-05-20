@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="goliath">
+<robot name="regulus">
 
     <!-- Base Link -->
     <link name="base_link"/>
@@ -7,6 +7,9 @@
     <!-- Camera Link 1 -->
     <link name="camera_1_link"/>
 
+    <!-- Camera Link 2-->
+    <link name="camera_2_link"/>
+    
     <!-- Laser Link -->
     <link name="laser"/>
 
@@ -14,14 +17,20 @@
     <joint name="base_to_camera_1" type="fixed">
         <parent link="base_link"/>
         <child link="camera_1_link"/>
-        <origin xyz="0.15 0 0.095" rpy="0 0 0"/>
+        <origin xyz="0.2661 -0.2965 0.4909" rpy="-0.523599 -0.523599 0"/>
     </joint>
+
+    <!-- Joint between base_link and camera_link_2 -->
+    <joint name="base_to_camera_2" type="fixed">
+        <parent link="base_link"/>
+        <child link="camera_2_link"/>
+        <origin xyz="0.2661 0.2965 0.4909" rpy="0.523599 -0.523599 0"/>
 
     <!-- Joint between base_link and laser -->
     <joint name="base_to_laser" type="fixed">
         <parent link="base_link"/>
         <child link="laser"/>
-        <origin xyz="0 0 0.15" rpy="0 0 3.14"/>
+        <origin xyz="-0.3593 0 -0.0271" rpy="0 0 3.14"/>
     </joint>
 
 </robot>
