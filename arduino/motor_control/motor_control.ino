@@ -13,7 +13,7 @@ const float rpm_to_pwm_constant = 5;
 int mL_speed = 0;
 int mR_speed = 0;
 
-int update_rate = 200; // Hz
+int update_rate = 100; // Hz
 unsigned long last_update_time = 0;
 unsigned long current_time = 0;
 
@@ -85,7 +85,7 @@ void processMessage(byte* data, int length) {
       break;
     }
     default:
-      Serial.println("Unknown message type");
+      // Serial.println("Unknown message type");
       break;
   }
 }

@@ -11,7 +11,7 @@ class MotorControlNode(Node):
         # Declare parameters
         self.declare_parameter('cmd_vel_topic', 'cmd_vel')
         self.declare_parameter('wheel_base', 0.5)  # Default in meters
-        self.declare_parameter('wheel_diameter', 0.1)  # Default in meters
+        self.declare_parameter('wheel_diameter', 0.3)  # Default in meters
         # Maximum RPM value for motor control
         self.declare_parameter('max_rpm', 30)
         # Minimum RPM value for motor control
