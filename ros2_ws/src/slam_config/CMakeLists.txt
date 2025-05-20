@@ -26,4 +26,10 @@ install(DIRECTORY launch config urdf
   DESTINATION share/${PROJECT_NAME}/
 )
 
+# Install the Python scan_trim_node
+install(PROGRAMS
+  src/scan_trim_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

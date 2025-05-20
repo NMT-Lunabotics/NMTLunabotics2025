@@ -25,7 +25,7 @@ def generate_launch_description():
     )
 
     urdf_file = os.path.join(
-        get_package_share_directory('slam_config'), 'urdf', 'regulus.urdf'
+        get_package_share_directory('slam_config'), 'urdf', 'goliath.urdf'
     )
 
     robot_state_publisher_node = Node(
@@ -64,29 +64,6 @@ def generate_launch_description():
                         'publish_tf':False}],
         remappings=[('imu/data_raw', '/camera/camera_1/imu')])
 
-
-    sync_cam1 = Node(
-        package='rtabmap_sync', executable='rgbd_sync', name='rgbd_sync_cam1',
-        remappings=[
-            ('rgb/image',       '/camera_1/color/image_raw'),
-            ('depth/image',     '/camera_1/aligned_depth_to_color/image_raw'),
-            ('rgb/camera_info', '/camera_1/color/camera_info'),
-            ('rgbd_image',      '/camera_1/rgbd_image')
-        ],
-        parameters=[{'approx_sync': True, 'queue_size': 10}]
-    )
-    
-    sync_cam2 = Node(
-        package='rtabmap_sync', executable='rgbd_sync', name='rgbd_sync_cam2',
-        remappings=[
-            ('rgb/image',       '/camera_2/color/image_raw'),
-            ('depth/image',     '/camera_2/aligned_depth_to_color/image_raw'),
-            ('rgb/camera_info', '/camera_2/color/camera_info'),
-            ('rgbd_image',      '/camera_2/rgbd_image')
-        ],
-        parameters=[{'approx_sync': True, 'queue_size': 10}]
-    )
-
     rtabmap_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rtabmap_launch_file),
         launch_arguments={
@@ -102,9 +79,8 @@ def generate_launch_description():
             'subscribe_stereo': 'false',
             'subscribe_scan': 'true',
             'visual_odometry': 'true',
-            # 'approx_sync': 'true',
-            # 'queue_size': '10',
-            'rgbd_cameras': 2'
+            'approx_sync': 'true',
+            'queue_size': '10',
             'rtabmap_viz': 'false',
             'database_path': ''
         }.items()
@@ -116,7 +92,5 @@ def generate_launch_description():
         rplidar_launch,
         realsense_launch,
         imu_filter_node,
-        sync_cam1,
-        sync_cam2,
         rtabmap_launch,
     ])
