@@ -7,7 +7,20 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    # Path to the RealSense camera and RTAB-Map launch files
+    # Declare a launch argument for localization mode
+    localization_arg = DeclareLaunchArgument(
+        'localization',
+        default_value='false',
+        description='Launch in localization mode (true/false)'
+    )
+
+    localization = LaunchConfiguration('localization')
+
+    rtabmap_config_file = os.path.join(
+        get_package_share_directory('slam_config'),
+                                       'config', 'rtabmap_config.yaml')
+
+
     realsense_launch_file = os.path.join(
         get_package_share_directory(
             'slam_config'), 'launch', 'realsense_launch.py'
@@ -21,7 +34,7 @@ def generate_launch_description():
 
     rtabmap_launch_file = os.path.join(
         get_package_share_directory(
-            'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
+        'rtabmap_launch'), 'launch', 'rtabmap.launch.py'
     )
 
     urdf_file = os.path.join(
@@ -58,24 +71,46 @@ def generate_launch_description():
             'camera_info_topic': '/camera/camera_1/color/camera_info',
             'imu_topic': '/imu/data',
             'scan_topic': '/scan',
-            'Grid/FromDepth': 'true',
-            'Grid/RangeMax': '5.0',
-            'wait_imu_to_init': 'true',
+            
+            # RTAB Map Functionality
+            'localization': 'false',
+            'approx_sync': 'true',
+            # 'mapping': 'true',
+            'visual_odometry': 'true',
+
+            # RTAB Map Frames and TFs
+            'publish_tf': 'true',
             'frame_id': 'base_link',
+            'odom_frame_id': 'odom',
+            'map_frame_id': 'map',
+
+            # Occupancy Grid
+            # 'Grid/FromDepth': 'true',
+            # 'Grid/3D': 'false',
+            # 'Grid/CellSize': '0.05',
+            # # 'Grid/DepthDecimation': '5' # Change as needed
+            # 'Grid/RangeMin': '0.3',
+            # 'Grid/RangeMax': '5.0',
+            'grid_map_publisher_rate': '1.0',
+            # 'grid_frame_id': 'map',
+
+            # Publishing/Subscribing
+            'queue_size': '10',
+            'wait_imu_to_init': 'true',
             'subscribe_depth': 'true',
             'subscribe_rgb': 'true',
             'subscribe_stereo': 'false',
             'subscribe_scan': 'true',
-            'visual_odometry': 'true',
-            'approx_sync': 'true',
-            'queue_size': '10',
-            'rtabmap_viz': 'false',
-            'database_path': ''
-        }.items()
+            # 'Mem/IncrementalMemory': 'true',
+            'rtabmap_args':
+                '--ros-args --params-file '
+                '/home/luna/ros2_ws/src/slam_config/config/rtabmap_config.yaml'
+            
+    }.items()
     )
 
-    # Launch arguments
     return LaunchDescription([
+        localization_arg,
         robot_state_publisher_node,
         rplidar_launch,
         realsense_launch,

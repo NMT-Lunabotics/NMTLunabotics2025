@@ -20,8 +20,14 @@ ROS_DOMAIN_ID=42
 OPEN_BASH=false
 RUN_RVIZ=false
 
+RUN_MAPPING=false
+RUN_NAV=false
+SAVE_MAP=false
+COPY_MAP=false
+
 usage() {
     echo "Usage: $0 [--start (-s) | --motor_ctrl (-m) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |"
+    echo "           --mapping (-M) | --nav (-n) | --save-map (-S) | --copy-map (-C) |"
     echo "           --command (-c) <command> | --build (-b) | --stop (-x) |"
     echo "           --restart (-r)] [--display (-d)] [--quiet (-q)] [--ros-domain-id (-i) <id>] [--help (-h)]"
     echo "This script is used to start and manage a Docker container for ROS2"
@@ -32,6 +38,10 @@ usage() {
     echo "  --teleop (-t)               Run joystick control using teleop.launch"
     echo "  --usb-cam (-u)              Run usb camera node using usb_cam.launch"
     echo "  --video-stream (-v)         View the video stream using view_camera.launch"
+    echo "  --mapping (-M)              Run rtabmap_launch.py from slam_config"
+    echo "  --nav (-n)                  Run nav_launch.py from navigation"
+    echo "  --save-map (-S)             Save map using nav2_map_server map_saver_cli"
+    echo "  --copy-map (-C)             Copy map files from Docker to ./maps directory"
     echo "  --command (-c) <command>    Pass a command to be run in the container"
     echo "Options:"
     echo "  --display (-d)              Enable display support (forward X11 display)"
@@ -52,6 +62,10 @@ while [[ "$#" -gt 0 ]]; do
         --teleop|-t) RUN_TELEOP_LAUNCH=true; shift ;;
         --usb-cam|-u) RUN_USB_CAM_NODE=true; shift ;;
         --video-stream|-v) RUN_VIEW_CAMERA_LAUNCH=true; DISPLAY_ENABLED=true; shift ;;
+        --mapping|-M) RUN_MAPPING=true; shift ;;
+        --nav|-n) RUN_NAV=true; shift ;;
+        --save-map|-S) SAVE_MAP=true; shift ;;
+        --copy-map|-C) COPY_MAP=true; shift ;;
         --command|-c) COMMAND_TO_RUN="$2"; shift 2 ;;
         --display|-d) DISPLAY_ENABLED=true; shift ;;
         --build|-b) BUILD_CONTAINER=true; shift ;;
@@ -71,6 +85,10 @@ if [ "$RUN_MOTOR_CTRL" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_TELEOP_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_USB_CAM_NODE" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_MAPPING" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$RUN_NAV" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$SAVE_MAP" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
+if [ "$COPY_MAP" = true ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 if [ -n "$COMMAND_TO_RUN" ]; then ACTION_COUNT=$((ACTION_COUNT + 1)); fi
 
 if [ "$ACTION_COUNT" -gt 1 ]; then
@@ -242,6 +260,20 @@ elif [ "$RUN_USB_CAM_NODE" = true ]; then
 elif [ "$RUN_VIEW_CAMERA_LAUNCH" = true ]; then
     echo "Viewing ROS Camera feed..."
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch camera view_cam_launch.py
+elif [ "$RUN_MAPPING" = true ]; then
+    echo "Running rtabmap mapping (slam_config/rtabmap_launch.py)..."
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch slam_config rtabmap_launch.py
+elif [ "$RUN_NAV" = true ]; then
+    echo "Running navigation (navigation/nav_launch.py)..."
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 launch navigation nav_launch.py
+elif [ "$SAVE_MAP" = true ]; then
+    echo "Saving map to ~/my_map..."
+    docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh ros2 run nav2_map_server map_saver_cli -f ~/my_map --ros-args --remap map:=/rtabmap/map
+    echo "Copying map files from Docker to ./maps directory..."
+    mkdir -p ./maps
+    docker cp $CONTAINER_ID:/home/luna/my_map.pgm ./maps/my_map.pgm
+    docker cp $CONTAINER_ID:/home/luna/my_map.yaml ./maps/my_map.yaml
+    echo "Map files copied to ./maps/"
 elif [ -n "$COMMAND_TO_RUN" ]; then
     echo "Running custom command: $COMMAND_TO_RUN"
     docker exec $DOCKER_EXEC_FLAGS --env-file $ENV_FILE $CONTAINER_ID /entrypoint.sh $COMMAND_TO_RUN
