@@ -73,7 +73,7 @@ COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 RUN groupadd -f video
 
 # Add user to video group
-RUN usermod -aG video myuser
+RUN usermod -aG video $USER
 
 # Compile the ros workspace
 USER $USER
