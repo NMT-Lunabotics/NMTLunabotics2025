@@ -243,6 +243,7 @@ void loop() {
             fault("Bucket position out of bounds: " + String(aB_pos));
         }
         if (aB_pos < bucket_min || aB_pos > bucket_max) {
+            stop_all();
             while (aB_pos < bucket_min) {
                 act_bucket.vel_ctrl(5);
                 aB_pos = act_bucket.update_pos();
@@ -264,14 +265,14 @@ void loop() {
             stop_all();
             float prev_err = lr_err;
             while (lr_err >= 0.5 * act_fix_err) {
+                act_bucket.stop();
+                aL_pos = act_left.update_pos();
+                aR_pos = act_right.update_pos();
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
                 act_left.vel_ctrl(aL_speed - factor);
                 act_right.vel_ctrl(aR_speed + factor);
                 delay(5);
-
-                aL_pos = act_left.update_pos();
-                aR_pos = act_right.update_pos();
 
                 prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
