@@ -98,6 +98,7 @@ int update_actuator_feedback = 1000; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
+unsigned long last_update_actuator_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
 unsigned long current_time = 0;
@@ -227,8 +228,8 @@ void loop() {
         emergency_stop = true;
     }
 
-    if (current_time - last_update_time >= 1000 / update_actuator_feedback) {
-        last_update_time = current_time;
+    if (current_time - last_update_actuator_time >= 1000 / update_actuator_feedback) {
+        last_update_actuator_time = current_time;
 
         aL_pos = act_left.update_pos();
         aR_pos = act_right.update_pos();
@@ -237,7 +238,8 @@ void loop() {
 
     if (current_time - last_update_time >= 1000 / update_rate) {
         last_update_time = current_time;
-
+        print("here");
+        
         // Ensure bucket is in bounds
         if (aB_pos > bucket_absolute_max) {
             fault("Bucket position out of bounds: " + String(aB_pos));
