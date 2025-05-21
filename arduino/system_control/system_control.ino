@@ -241,25 +241,25 @@ void loop() {
         print("here");
         
         // Ensure bucket is in bounds
-        if (aB_pos > bucket_absolute_max) {
-            fault("Bucket position out of bounds: " + String(aB_pos));
-        }
-        if (aB_pos < bucket_min || aB_pos > bucket_max) {
-            stop_all();
-            while (aB_pos < bucket_min) {
-                act_bucket.vel_ctrl(5);
-                aB_pos = act_bucket.update_pos();
-                delay(5);
-                Serial.println("Bucket past minimum. Fixing");
-            }
-            while (aB_pos > bucket_max) {
-                act_bucket.vel_ctrl(-5);
-                aB_pos = act_bucket.update_pos();
-                delay(5);
-                Serial.println("Bucket past maximum. Fixing");
-            }
-            act_bucket.stop();
-        }
+        // if (aB_pos > bucket_absolute_max) {
+        //     fault("Bucket position out of bounds: " + String(aB_pos));
+        // }
+        // if (aB_pos < bucket_min || aB_pos > bucket_max) {
+        //     stop_all();
+        //     while (aB_pos < bucket_min) {
+        //         act_bucket.vel_ctrl(5);
+        //         aB_pos = act_bucket.update_pos();
+        //         delay(5);
+        //         Serial.println("Bucket past minimum. Fixing");
+        //     }
+        //     while (aB_pos > bucket_max) {
+        //         act_bucket.vel_ctrl(-5);
+        //         aB_pos = act_bucket.update_pos();
+        //         delay(5);
+        //         Serial.println("Bucket past maximum. Fixing");
+        //     }
+        //     act_bucket.stop();
+        // }
 
         // Correct dual actuator misalignment
         float lr_err = abs(aL_pos - aR_pos);
@@ -307,9 +307,14 @@ void loop() {
 
             if (aB_tgt >= 0) {
                 act_bucket.tgt_ctrl(aB_tgt);
-            } else {
+            } else if((aB_speed >0 && aB_pos < bucket_max) || (aB_speed <0 && aB_pos > bucket_min)){
                 act_bucket.vel_ctrl(aB_speed);
+            }else{
+                act_bucket.stop();
             }
+            
+        
+            
 
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);
