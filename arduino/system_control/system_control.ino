@@ -106,6 +106,17 @@ unsigned long last_message_time = 0;
 bool emergency_stop = false;
 bool doomsday = false;
 
+// Serial and state
+bool receiving_message = false;
+bool at_bucket_min = false;
+bool at_bucket_max = false;
+bool dual_actuator_correct = false;
+int serial_index = 0;
+int expected_length = -1;
+const int SERIAL_BUFFER_SIZE = 128;
+byte serial_buffer[SERIAL_BUFFER_SIZE];
+
+
 // Set up PID controllers
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
@@ -163,32 +174,60 @@ void setup(){
 }
 
 void loop() {
-    if (Serial.available() > 0) {
-        if (Serial.read() == 0x02) { // Start byte
-            while (Serial.available() < 1) {} // Wait for type and length bytes
-            int length = Serial.read();
-            while (Serial.available() < length + 1) {} // Wait for the entire message
-            byte data[length];
-            Serial.readBytes(data, length);
-            while (Serial.available() < 1) {} // Wait for end byte
-            if (Serial.read() == 0x03) { // End byte
-                emergency_stop = false;
-                last_message_time = millis();
-                processMessage(data, length);
-            } else {
-                Serial.println("End byte not found");
-                emergency_stop = true;
+    current_time = millis();
+    // if (Serial.available() > 0) {
+    //     if (Serial.read() == 0x02) { // Start byte
+    //         while (Serial.available() < 1) {} // Wait for type and length bytes
+    //         int length = Serial.read();
+    //         while (Serial.available() < length + 1) {} // Wait for the entire message
+    //         byte data[length];
+    //         Serial.readBytes(data, length);
+    //         while (Serial.available() < 1) {} // Wait for end byte
+    //         if (Serial.read() == 0x03) { // End byte
+    //             emergency_stop = false;
+    //             last_message_time = millis();
+    //             processMessage(data, length);
+    //         } else {
+    //             Serial.println("End byte not found");
+    //             emergency_stop = true;
+    //         }
+    //     }
+    // }
+
+        // --- Non-blocking serial receive ---
+    while (Serial.available() > 0) {
+        byte b = Serial.read();
+        if (!receiving_message) {
+            if (b == 0x02) {
+                receiving_message = true;
+                serial_index = 0;
+                expected_length = -1;
+            }
+        } else {
+            if (expected_length == -1) {
+                expected_length = b;
+            } else if (serial_index < SERIAL_BUFFER_SIZE) {
+                serial_buffer[serial_index++] = b;
+                if (serial_index == expected_length + 1) { // +1 for end byte
+                    if (serial_buffer[serial_index - 1] == 0x03) {
+                        emergency_stop = false;
+                        last_message_time = millis();
+                        processMessage(serial_buffer, expected_length);
+                    } else {
+                        Serial.println("End byte not found");
+                        emergency_stop = true;
+                    }
+                    receiving_message = false;
+                }
             }
         }
     }
-
-    current_time = millis();
 
     if (current_time - last_message_time > estop_timeout) {
         emergency_stop = true;
     }
 
-    if (current_time - last_update_time >= 1000 / update_bucket_feedback) {
+    if (current_time - last_update_time >= 1000 / update_actuator_feedback) {
         last_update_time = current_time;
 
         aL_pos = act_left.update_pos();
