@@ -41,8 +41,8 @@ bool debug_mode = false;
 #define AB_POT_MAX 782
 
 float bucket_min = 20; // mm
-float bucket_max = 110; // mm
-float bucket_absolute_max = 115; // mm
+float bucket_max = 105; // mm
+float bucket_absolute_max = 110; // mm
 float act_end_tolerance = 1; // mm
 
 float act_max_vel = 25; //mm/s
@@ -93,7 +93,8 @@ bool led_g = false;
 bool led_b = false;
 
 // Timing
-int update_rate = 500; //hz
+int update_rate = 200; //hz
+int update_actuator_feedback = 1000; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
@@ -187,16 +188,20 @@ void loop() {
         emergency_stop = true;
     }
 
-    if (current_time - last_update_time >= 1000 / update_rate) {
+    if (current_time - last_update_time >= 1000 / update_bucket_feedback) {
         last_update_time = current_time;
 
         aL_pos = act_left.update_pos();
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
+    }
+
+    if (current_time - last_update_time >= 1000 / update_rate) {
+        last_update_time = current_time;
 
         // Ensure bucket is in bounds
         if (aB_pos > bucket_absolute_max) {
-            //fault("Bucket position out of bounds: " + String(aB_pos));
+            fault("Bucket position out of bounds: " + String(aB_pos));
         }
         if (aB_pos < bucket_min || aB_pos > bucket_max) {
             while (aB_pos < bucket_min) {
