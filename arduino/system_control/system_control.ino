@@ -41,8 +41,8 @@ bool debug_mode = false;
 #define AB_POT_MAX 782
 
 float bucket_min = 20; // mm
-float bucket_max = 110; // mm
-float bucket_absolute_max = 115; // mm
+float bucket_max = 105; // mm
+float bucket_absolute_max = 110; // mm
 float act_end_tolerance = 1; // mm
 
 float act_max_vel = 25; //mm/s
