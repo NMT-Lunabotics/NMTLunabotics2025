@@ -26,30 +26,38 @@ cd NMTLunabotics2025
 
 `start_docker.sh`: Start docker container and enter a bash terminal  
 ```
-Usage: ./start_docker.sh [--start (-s) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |  
-           --command (-c) <command> | --roscore (-r) | --build (-b) | --stop (-x) |  
-           --restart (-R)] [--port (-p) <port>] [--ip (-i) <host_ip>] [--master-ip (-m) <master_ip>]  
-           [--master-hostname (-n) <master_hostname>] [--display (-d)] [--quiet (-q)] [--help (-h)]  
-This script is used to start and manage a Docker container for WALL-E the wildlife monitoring robot.  
-If no IP addresses are specified, the script will attempt to determine them from the hostname. If this fails, try setting the hostname or IP.  
-If no action is specified, the script will open an interactive bash terminal in the container.  
+Usage: ./start_docker.sh [--start (-s) | --motor_ctrl (-m) | --teleop (-t) | --usb-cam (-u) | --video-stream (-v) |
+           --mapping (-M) | --nav (-n) | --save-map (-S) | --copy-map (-C) |
+           --command (-c) <command> | --build (-b) | --stop (-x) |
+           --restart (-r)] [--display (-d)] [--quiet (-q)] [--ros-domain-id (-i) <id>] [--help (-h)]
+This script is used to start and manage a Docker container for ROS2
+If no action is specified, the script will open an interactive bash terminal in the container.
 Actions (pick ONE):
   --start (-s)                Start all processes on the robot
+  --motor_ctrl (-m)           Run motor control
   --teleop (-t)               Run joystick control using teleop.launch
   --usb-cam (-u)              Run usb camera node using usb_cam.launch
-  --video-stream (-v)          View the video stream using view_camera.launch
+  --video-stream (-v)         View the video stream using view_camera.launch
+  --mapping (-M)              Run rtabmap_launch.py from slam_config
+  --nav (-n)                  Run nav_launch.py from navigation
+  --save-map (-S)             Save map using nav2_map_server map_saver_cli
+  --copy-map (-C)             Copy map files from Docker to ./maps directory
   --command (-c) <command>    Pass a command to be run in the container
 Options:
-  --port (-p) <port>          Specify custom ROS master port (default is 11311)
-  --ip (-i) <host_ip>         Specify host IP
-  --master-ip (-m) <master_ip> Specify master IP
-  --master-hostname (-n) <master_hostname> Specify master hostname (default is nuc)
   --display (-d)              Enable display support (forward X11 display)
   --build (-b)                Build the Docker container (will stop the running container if any)
   --stop (-x)                 Stop the running Docker container
-  --restart (-R)              Restart the Docker container if it is running
+  --restart (-r)              Restart the Docker container if it is running
   --quiet (-q)                Suppress output
+  --ros-domain-id (-i) <id>   Set the ROS_DOMAIN_ID (default: 42)
   --help (-h)                 Show this help message
+```
+
+# Ethernet
+To ssh into the jetson via ethernet, set static ip adresses for the ethernet port on both computers. Replace eth0 with the name of your ethernet device.
+```
+sudo ip addr flush dev eth0
+sudo ip addr add dev eth0 192.168.50.xxx/24
 ```
 
 # Helpful Docs

@@ -41,8 +41,8 @@ bool debug_mode = false;
 #define AB_POT_MAX 782
 
 float bucket_min = 20; // mm
-float bucket_max = 110; // mm
-float bucket_absolute_max = 115; // mm
+float bucket_max = 105; // mm
+float bucket_absolute_max = 110; // mm
 float act_end_tolerance = 1; // mm
 
 float act_max_vel = 25; //mm/s
@@ -94,9 +94,11 @@ bool led_b = false;
 
 // Timing
 int update_rate = 200; //hz
+int update_actuator_feedback = 1000; //hz
 int feedback_rate = 10; //hz
 int reset_int_rate = 10; //hz
 unsigned long last_update_time = 0;
+unsigned long last_update_actuator_time = 0;
 unsigned long last_feedback_time = 0;
 unsigned long last_reset_int_time = 0;
 unsigned long current_time = 0;
@@ -104,6 +106,17 @@ const unsigned long estop_timeout = 1000; // 1 second timeout
 unsigned long last_message_time = 0;
 bool emergency_stop = false;
 bool doomsday = false;
+
+// Serial and state
+bool receiving_message = false;
+bool at_bucket_min = false;
+bool at_bucket_max = false;
+bool dual_actuator_correct = false;
+int serial_index = 0;
+int expected_length = -1;
+const int SERIAL_BUFFER_SIZE = 128;
+byte serial_buffer[SERIAL_BUFFER_SIZE];
+
 
 // Set up PID controllers
 PID pidL(2.2, 0.0022, 0.34, 2.0);
@@ -162,57 +175,91 @@ void setup(){
 }
 
 void loop() {
-    if (Serial.available() > 0) {
-        if (Serial.read() == 0x02) { // Start byte
-            while (Serial.available() < 1) {} // Wait for type and length bytes
-            int length = Serial.read();
-            while (Serial.available() < length + 1) {} // Wait for the entire message
-            byte data[length];
-            Serial.readBytes(data, length);
-            while (Serial.available() < 1) {} // Wait for end byte
-            if (Serial.read() == 0x03) { // End byte
-                emergency_stop = false;
-                last_message_time = millis();
-                processMessage(data, length);
-            } else {
-                Serial.println("End byte not found");
-                emergency_stop = true;
+    current_time = millis();
+    // if (Serial.available() > 0) {
+    //     if (Serial.read() == 0x02) { // Start byte
+    //         while (Serial.available() < 1) {} // Wait for type and length bytes
+    //         int length = Serial.read();
+    //         while (Serial.available() < length + 1) {} // Wait for the entire message
+    //         byte data[length];
+    //         Serial.readBytes(data, length);
+    //         while (Serial.available() < 1) {} // Wait for end byte
+    //         if (Serial.read() == 0x03) { // End byte
+    //             emergency_stop = false;
+    //             last_message_time = millis();
+    //             processMessage(data, length);
+    //         } else {
+    //             Serial.println("End byte not found");
+    //             emergency_stop = true;
+    //         }
+    //     }
+    // }
+
+        // --- Non-blocking serial receive ---
+    while (Serial.available() > 0) {
+        byte b = Serial.read();
+        if (!receiving_message) {
+            if (b == 0x02) {
+                receiving_message = true;
+                serial_index = 0;
+                expected_length = -1;
+            }
+        } else {
+            if (expected_length == -1) {
+                expected_length = b;
+            } else if (serial_index < SERIAL_BUFFER_SIZE) {
+                serial_buffer[serial_index++] = b;
+                if (serial_index == expected_length + 1) { // +1 for end byte
+                    if (serial_buffer[serial_index - 1] == 0x03) {
+                        emergency_stop = false;
+                        last_message_time = millis();
+                        processMessage(serial_buffer, expected_length);
+                    } else {
+                        Serial.println("End byte not found");
+                        emergency_stop = true;
+                    }
+                    receiving_message = false;
+                }
             }
         }
     }
-
-    current_time = millis();
 
     if (current_time - last_message_time > estop_timeout) {
         emergency_stop = true;
     }
 
-    if (current_time - last_update_time >= 1000 / update_rate) {
-        last_update_time = current_time;
+    if (current_time - last_update_actuator_time >= 1000 / update_actuator_feedback) {
+        last_update_actuator_time = current_time;
 
         aL_pos = act_left.update_pos();
         aR_pos = act_right.update_pos();
         aB_pos = act_bucket.update_pos();
+    }
 
+    if (current_time - last_update_time >= 1000 / update_rate) {
+        last_update_time = current_time;
+        print("here");
+        
         // Ensure bucket is in bounds
-        if (ab_pos > bucket_absolute_max) {
-            fault("Bucket position out of bounds: " + String(aB_pos));
-        }
-        if (aB_pos < bucket_min || aB_pos > bucket_max) {
-            while (ab_pos < bucket_min) {
-                act_bucket.vel_ctrl(5);
-                aB_pos = act_bucket.update_pos();
-                delay(5);
-                Serial.println("Bucket past minimum. Fixing");
-            }
-            while (aB_pos > bucket_max) {
-                act_bucket.vel_ctrl(-5);
-                aB_pos = act_bucket.update_pos();
-                delay(5);
-                Serial.println("Bucket past maximum. Fixing");
-            }
-            act_bucket.stop();
-        }
+        // if (aB_pos > bucket_absolute_max) {
+        //     fault("Bucket position out of bounds: " + String(aB_pos));
+        // }
+        // if (aB_pos < bucket_min || aB_pos > bucket_max) {
+        //     stop_all();
+        //     while (aB_pos < bucket_min) {
+        //         act_bucket.vel_ctrl(5);
+        //         aB_pos = act_bucket.update_pos();
+        //         delay(5);
+        //         Serial.println("Bucket past minimum. Fixing");
+        //     }
+        //     while (aB_pos > bucket_max) {
+        //         act_bucket.vel_ctrl(-5);
+        //         aB_pos = act_bucket.update_pos();
+        //         delay(5);
+        //         Serial.println("Bucket past maximum. Fixing");
+        //     }
+        //     act_bucket.stop();
+        // }
 
         // Correct dual actuator misalignment
         float lr_err = abs(aL_pos - aR_pos);
@@ -220,14 +267,14 @@ void loop() {
             stop_all();
             float prev_err = lr_err;
             while (lr_err >= 0.5 * act_fix_err) {
+                act_bucket.stop();
+                aL_pos = act_left.update_pos();
+                aR_pos = act_right.update_pos();
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
                 act_left.vel_ctrl(aL_speed - factor);
                 act_right.vel_ctrl(aR_speed + factor);
                 delay(5);
-
-                aL_pos = act_left.update_pos();
-                aR_pos = act_right.update_pos();
 
                 prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
@@ -260,9 +307,14 @@ void loop() {
 
             if (aB_tgt >= 0) {
                 act_bucket.tgt_ctrl(aB_tgt);
-            } else {
+            } else if((aB_speed >0 && aB_pos < bucket_max) || (aB_speed <0 && aB_pos > bucket_min)){
                 act_bucket.vel_ctrl(aB_speed);
+            }else{
+                act_bucket.stop();
             }
+            
+        
+            
 
             motor_left.motor_ctrl(mL_speed);
             motor_right.motor_ctrl(mR_speed);

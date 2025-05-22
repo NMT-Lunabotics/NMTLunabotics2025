@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-
-#!/usr/bin/env python3
 
 class ScanTrimNode(Node):
     def __init__(self):
@@ -17,13 +17,10 @@ class ScanTrimNode(Node):
             '/scan_trimmed',
             10)
         self.declare_parameter('trim_angle_deg', 120.0)
-        self.declare_parameter('offset_angle_deg', 0.0)  # New parameter
 
     def scan_callback(self, msg: LaserScan):
         trim_angle_deg = self.get_parameter('trim_angle_deg').value
-        offset_angle_deg = self.get_parameter('offset_angle_deg').value  # Get offset
         trim_angle_rad = trim_angle_deg * 3.141592653589793 / 180.0
-        offset_angle_rad = offset_angle_deg * 3.141592653589793 / 180.0
 
         total_angle = msg.angle_max - msg.angle_min
         if trim_angle_rad > total_angle:
@@ -31,8 +28,8 @@ class ScanTrimNode(Node):
             self.publisher.publish(msg)
             return
 
-        # Center the trimmed scan with offset
-        center_angle = (msg.angle_max + msg.angle_min) / 2.0 + offset_angle_rad
+        # Center the trimmed scan
+        center_angle = (msg.angle_max + msg.angle_min) / 2.0
         new_angle_min = center_angle - trim_angle_rad / 2.0
         new_angle_max = center_angle + trim_angle_rad / 2.0
 
