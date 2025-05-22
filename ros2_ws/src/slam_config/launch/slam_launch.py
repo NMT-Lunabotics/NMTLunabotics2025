@@ -33,6 +33,10 @@ def generate_launch_description():
     # Include rplidar Launch File
     rplidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rplidar_launch_file),
+        launch_arguments={
+            'angle_max': '0.5236',
+            'angle_min': '-0.5236',
+        }.items()
     )
 
     # Laser scan matching
