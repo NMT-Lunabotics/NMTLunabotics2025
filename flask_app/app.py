@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
 from flask import Flask, Response, render_template
 import cv2
+import sys
 
+
+num_arg = len(sys.argv)
+
+rotate_array = [[180],[0],[180]]  # Initialize array with 3 0 values
+lines_draw = [[0.25],[0],[0]]  # Initialize array with 3 0 values
+
+if num_arg > 1:
+    # First argument is an array of camera indices
+    rotate_array = [int(x) for x in sys.argv[1].strip('[]').split(',')]
+    
+    if num_arg > 2:
+        lines_draw = [[float(x)] for x in sys.argv[2].strip('[]').split(',')]
+        
+               
 app = Flask(__name__)
 
 CAMERA_CONFIG = {
@@ -9,15 +24,23 @@ CAMERA_CONFIG = {
         'resolution': (640, 320),
         'fps': 10,
         'flip': False,
-        'rotate': 180,  # 0, 90, 180, or 270
-        'lines': [0.25] # Percent of height for reference line
+        'rotate': rotate_array[0],  # 0, 90, 180, or 270
+        'lines': lines_draw[0] # Percent of height for reference line
     },
     4: {
         'resolution': (640, 320),
         'fps': 10,
         'flip': False,
-        'rotate': 0,
-        'lines': [] # Percent of height for reference line
+        'rotate': rotate_array[1],  # 0, 90, 180, or 270
+        'lines': lines_draw[1] # Percent of height for reference line
+    },
+    
+    8: {
+        'resolution': (640, 320),
+        'fps': 10,
+        'flip': False,
+        'rotate': rotate_array[2],  # 0, 90, 180, or 270
+        'lines': lines_draw[2] # Percent of height for reference line
     }
 }
 

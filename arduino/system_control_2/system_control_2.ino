@@ -33,11 +33,11 @@ bool debug_mode = false;
 #define AB_STROKE 140
 
 // Actuator Calibration
-#define AL_POT_MIN 48
+#define AL_POT_MIN 47
 #define AL_POT_MAX 893
-#define AR_POT_MIN -2
+#define AR_POT_MIN 0
 #define AR_POT_MAX 840
-#define AB_POT_MIN 28
+#define AB_POT_MIN 30
 #define AB_POT_MAX 782
 
 float bucket_min = 20; // mm
