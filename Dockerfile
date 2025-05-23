@@ -51,8 +51,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-message-filters && \
     pip3 install --no-cache-dir pyserial
 
-RUN apt-get remove -y 'librealsense2*'
-
+# RUN apt-get remove -y 'librealsense2*'
 
 ###############################################################################
 # 3. Build librealsense (RSUSB backend - no kernel patch required)
@@ -81,8 +80,8 @@ RUN git clone https://github.com/IntelRealSense/realsense-ros.git
 # 5. Copy your own packages & RViz config
 ###############################################################################
 WORKDIR /home/${USER}
-COPY --chown=${USER}:${USER} ros2_ws  /home/${USER}/ros2_ws
-COPY --chown=${USER}:${USER} rviz2    /home/${USER}/.rviz2
+COPY --chown=$USER:$USER ros2_ws /home/$USER/ros2_ws
+COPY --chown=$USER:$USER rviz2 /home/$USER/.rviz2
 
 ###############################################################################
 # 6. Prepare log/ folder so colcon (non-root) can write there
@@ -95,19 +94,20 @@ RUN mkdir -p /home/${USER}/ros2_ws/log && \
 ###############################################################################
 USER ${USER}
 WORKDIR /home/${USER}/ros2_ws
-RUN . /opt/ros/humble/setup.sh && \
-    colcon build --merge-install               
+RUN /bin/bash -c '. /opt/ros/humble/setup.sh; cd /home/$USER/ros2_ws; colcon build'             
 
 ###############################################################################
 # 8. Convenience sourcing for interactive shells
 ###############################################################################
-RUN echo 'source /opt/ros/humble/setup.bash'         >> /home/${USER}/.bashrc && \
-    echo 'source ~/ros2_ws/install/setup.bash' >> /home/${USER}/.bashrc
+RUN echo ". /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
+RUN echo ". /home/$USER/ros2_ws/install/setup.bash" >> /home/$USER/.bashrc
 
 ###############################################################################
 # 9. Entrypoint
 ###############################################################################
 USER root
+WORKDIR /home/$USER
+RUN chmod -R 666 /dev
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

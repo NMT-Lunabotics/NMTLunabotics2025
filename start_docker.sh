@@ -218,6 +218,10 @@ if [[ "$BUILD_CONTAINER" = true ]]; then
     docker build -t $IMAGE_NAME --build-arg TARGET_ARCH=$TARGET_ARCH .
 fi
 
+# Docker run flags: privileged, host network, mount devices
+DOCKER_RUN_FLAGS+=("--volume=/dev/bus/usb:/dev/bus/usb:rw")
+DOCKER_RUN_FLAGS+=("--device-cgroup-rule=c 189:* rmw")
+
 # Start the container if it is not already running
 if [[ "$RUNNING" = false ]]; then
     echo "Starting the Docker container..."
