@@ -32,12 +32,12 @@ RUN apt-get update && apt-get install -y python3 python3-pip
 RUN pip3 install pyserial
 
 # Add error handling for packages that might not be available on ARM
+# Install common tools as root
+USER root
+WORKDIR /home/$USER
 RUN apt-get update && apt-get install -y \
-    python3-pydantic \
-    v4l-utils \
-    # ros-humble-librealsense2* \
-    # ros-humble-realsense2-* \
-    # ros-humble-realsense2-description \
+    python3 python3-pip \
+    python3-pydantic v4l-utils \
     ros-humble-teleop-twist-joy \
     ros-humble-joy \
     ros-humble-rmw-cyclonedds-cpp \
@@ -54,8 +54,10 @@ RUN apt-get update && apt-get install -y \
     ros-humble-tf2-ros \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup \
-    ros-humble-message-filters 
-
+    ros-humble-message-filters \
+    git cmake build-essential libusb-1.0-0-dev pkg-config \
+    python3-colcon-common-extensions libssl-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev && \
+    pip3 install pyserial
 # RUN apt-get -y install \
 #     ros-humble-robot-state-publisher \
 #     ros-humble-rviz2 \
@@ -65,32 +67,25 @@ RUN apt-get update && apt-get install -y \
 #     ros-humble-tf2-ros \
 #     ros-humble-message-filters
 
-# Add the realsense cameras
-USER root
-RUN apt-get update && apt-get install -y \
-    git cmake build-essential \
-    libusb-1.0-0-dev pkg-config \
-    python3-colcon-common-extensions \
-    libssl-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
-
+# Build librealsense from source with RSUSB backend
 WORKDIR /opt
 RUN git clone https://github.com/IntelRealSense/librealsense.git -b v2.55.1 && \
     mkdir -p librealsense/build && cd librealsense/build && \
     cmake .. \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DFORCE_RSUSB_BACKEND=ON \
-        -DBUILD_EXAMPLES=OFF \
-        -DBUILD_GRAPHICAL_EXAMPLES=OFF && \
-    make -j"$(nproc)" && \
-    make install && ldconfig
+      -DCMAKE_BUILD_TYPE=Release \
+      -DFORCE_RSUSB_BACKEND=ON \
+      -DBUILD_EXAMPLES=OFF \
+      -DBUILD_GRAPHICAL_EXAMPLES=OFF && \
+    make -j"$(nproc)" && make install && ldconfig && \
+    # install udev rules
+    cd ../scripts && sudo ./setup_udev_rules.sh
 
-WORKDIR /opt/librealsense
-RUN ./scripts/setup_udev_rules.sh
+# Ensure RSUSB-built libs are discoverable
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-WORKDIR /home/$USER
-RUN git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-development realsense-ros2 && \
-    . /opt/ros/humble/setup.sh && \
-    colcon build --base-paths realsense-ros2 --merge-install
+# Clone and build realsense-ros2 inside the main workspace
+WORKDIR /home/$USER/ros2_ws/src
+RUN git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-development realsense-ros2
 
 # Make sure the container looks at the built realsense stuff instead of apt
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
