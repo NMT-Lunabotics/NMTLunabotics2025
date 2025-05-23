@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from std_srvs.srv import Empty
+from moon_services.srv import DigDump
 from moon_messages.msg import Motors, Actuators  # Updated import for custom messages
 import time
 import signal
@@ -13,7 +13,7 @@ class DigDumpService(Node):
         super().__init__('dig_dump_service')
         
         # Create the service
-        self.srv = self.create_service(Empty, 'dig_dump_cycle', self.dig_dump_callback)
+        self.srv = self.create_service(DigDump, 'dig_dump_cycle', self.dig_dump_callback)
         
         # Publishers for motor control and arm/bucket positions
         self.motor_pub = self.create_publisher(Motors, 'motor_control', 10)
