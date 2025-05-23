@@ -386,6 +386,7 @@ void processMessage(byte* data, int length) {
         case 'A': { // Actuator control
             aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
             aB_tgt = (int16_t)((data[3] << 8) | data[4]);
+            aB_tgt = constrain(aB_tgt, bucket_min, bucket_max);
             aL_speed = -(int8_t)data[5];
             aR_speed = aL_speed;
             aB_speed = -(int8_t)data[6];
@@ -414,7 +415,7 @@ void processMessage(byte* data, int length) {
         }
         case 'H': { // Servo control
             heartbeat = data[1];  // Adjusted index to skip the type byte
-            ledb_pin.write(true);
+            led_b = true;
             if (debug_mode) {
                 Serial.print("Heartbeat: ");
                 Serial.println(heartbeat);
