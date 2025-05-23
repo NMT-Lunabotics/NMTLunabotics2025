@@ -47,7 +47,7 @@ float act_end_tolerance = 1; // mm
 
 float act_max_vel = 25; //mm/s
 float act_fix_err = 3.0; // mm
-float act_max_err = 5.0; // mm
+float act_max_err = 6.0; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -241,11 +241,12 @@ void loop() {
     }
 
     // TEST
-    aLR_tgt = 100;
+    // aB_tgt = 40
+    //aLR_tgt = 10;
 
-    // if (current_time - last_message_time > estop_timeout) {
-    //     emergency_stop = true;
-    // }
+    if (current_time - last_message_time > estop_timeout) {
+       emergency_stop = true;
+    }
 
     if (current_time - last_update_actuator_time >= 1000 / update_actuator_feedback) {
         last_update_actuator_time = current_time;
@@ -290,14 +291,14 @@ void loop() {
                 aR_pos = act_right.update_pos();
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                act_left.vel_ctrl(aL_speed + factor);
+                act_right.vel_ctrl(aR_speed - factor);
                 delay(5);
 
                 prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
                 if (lr_err > prev_err) {
-                    fault("Actuator positions are diverging.");
+                    // fault("Actuator positions are diverging.");
                 }
                 Serial.println("Fixing actuators: ");
                 ledy_pin.write(1);
@@ -319,8 +320,8 @@ void loop() {
                 act_right.tgt_ctrl(aLR_tgt);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                act_left.vel_ctrl(aL_speed + factor);
+                act_right.vel_ctrl(aR_speed - factor);
             }
 
             if (aB_tgt >= 0) {

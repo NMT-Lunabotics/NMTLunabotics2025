@@ -434,6 +434,7 @@ void stop_all() {
     motor_right.stop();
 }
 
+<<<<<<< HEAD
 void fault(String msg) {
     while (true) {
         stop_all();
@@ -444,3 +445,15 @@ void fault(String msg) {
         Serial.println("Critical Error: " + msg + " - Reset arduino to continue.");
     }
 }
+=======
+// void fault(String msg) {
+//     while (true) {
+//         stop_all();
+//         ledr_pin.write(1);
+//         delay(500);
+//         ledr_pin.write(0);
+//         delay(500);
+//         Serial.println("Critical Error: " + msg + " - Reset arduino to continue.");
+//     }
+// }
+>>>>>>> fdc020997fcbd5ecbc8a070be759759669de8756
