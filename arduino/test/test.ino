@@ -302,7 +302,7 @@ void loop() {
                 if (lr_err > prev_err && prev_err > prev_prev_err) {
                     fault("Actuator positions are diverging.");
                 }
-                Serial.println("Fixing actuators: ");
+                Serial.println("Fixing actuators: " + String(aL_pos) + " " + String(aR_pos) + " " + String(lr_err));
                 ledy_pin.write(1);
             }
             act_left.stop();
