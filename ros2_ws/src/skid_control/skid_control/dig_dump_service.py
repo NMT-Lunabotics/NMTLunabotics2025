@@ -52,18 +52,27 @@ class DigDumpService(Node):
         self.actuator_pub.publish(msg)
         self.get_logger().info('Actuators stopped')
         
-    def set_actuators(self, arm_position, bucket_position):
-        """Set arm and bucket positions"""
+    def set_actuators(self, arm_position, bucket_position, wait_time=3.0):
+        """Set arm and bucket positions and wait for them to reach the position"""
         if self.interrupted:
             return
         msg = Actuators()
-        msg.arm_pos = arm_position  # Changed from msg.arm to msg.arm_pos
-        msg.bucket_pos = bucket_position  # Changed from msg.bucket to msg.bucket_pos
-        msg.arm_vel = 0  # Need to set these as well since they're required fields
+        msg.arm_pos = arm_position
+        msg.bucket_pos = bucket_position
+        msg.arm_vel = 0
         msg.bucket_vel = 0
         self.actuator_pub.publish(msg)
         self.get_logger().info(f'Arm position set to {arm_position}, Bucket position set to {bucket_position}')
         
+        # Wait for actuators to reach position
+        self.get_logger().info(f'Waiting {wait_time} seconds for actuators to reach position...')
+        start_time = time.time()
+        while time.time() - start_time < wait_time:
+            if self.interrupted:
+                return
+            time.sleep(0.1)
+        self.get_logger().info('Wait complete')
+
     def run_motors(self, speed, duration):
         """Run motors at given speed for duration (seconds)"""
         if self.interrupted:
@@ -91,32 +100,35 @@ class DigDumpService(Node):
         self.get_logger().info('Starting dig-dump cycle')
         
         try:
-            # Run motors backwards for 5 seconds
-            self.run_motors(-5, 3.5)  # Changed from -1.0 to -1
+            # Run motors backwards for 3.5 seconds
+            self.run_motors(-5, 3.5)
             if self.interrupted: return response
             
-            # Set arm position to 10, bucket position to 50
-            self.set_actuators(10, 50)
-            
-            # Run motors forward for 2 seconds
-            self.run_motors(5, 1)  # Changed from 1.0 to 1
+            # Set arm position to 10, bucket position to 50 and wait 3 seconds
+            self.set_actuators(10, 50, 3.0)
             if self.interrupted: return response
             
-            # Set bucket position to 20, arm position to 150
-            self.set_actuators(150, 20)
-            
-            # Run motors forward for 4 seconds
-            self.run_motors(5, 3.33)  # Changed from 1.0 to 1
+            # Run motors forward for 1 second
+            self.run_motors(5, 1)
             if self.interrupted: return response
             
-            # Set bucket position to 110, arm position to 100
-            self.set_actuators(100, 110)
+            # Set bucket position to 20, arm position to 150 and wait 3 seconds
+            self.set_actuators(150, 20, 3.0)
+            if self.interrupted: return response
+            
+            # Run motors forward for 3.33 seconds
+            self.run_motors(5, 3.33)
+            if self.interrupted: return response
+            
+            # Set bucket position to 110, arm position to 100 and wait 3 seconds
+            self.set_actuators(100, 110, 3.0)
+            if self.interrupted: return response
             
             # Stop motors
             self.stop_motors()
             
             self.get_logger().info('Dig-dump cycle completed')
-    
+
         except Exception as e:
             self.get_logger().error(f'Error in dig-dump cycle: {str(e)}')
             self.stop_motors()
