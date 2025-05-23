@@ -4,6 +4,7 @@ project(moon_services)
 find_package(ament_cmake REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)  # <-- Add this line
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/DigDump.srv"
