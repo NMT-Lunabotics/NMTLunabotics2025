@@ -47,7 +47,7 @@ float act_end_tolerance = 1; // mm
 
 float act_max_vel = 25; //mm/s
 float act_fix_err = 3.0; // mm
-float act_max_err = 5.0; // mm
+float act_max_err = 6.0; // mm
 
 // Actuator targets
 int aL_speed = 0;
@@ -141,10 +141,10 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.5;
 
 // Set up actuators
-PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, true);
+PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, false);
 Actuator act_left(left_driver, pidL, potl, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, true);
+PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, false);
 Actuator act_right(right_driver, pidR, potr, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(drv21_pwm, drv21_dir1, drv21_dir2, true);
@@ -241,7 +241,8 @@ void loop() {
     }
 
     // TEST
-    aLR_tgt = 100;
+    aB_tgt = 40;
+    aLR_tgt = 10;
 
     // if (current_time - last_message_time > estop_timeout) {
     //     emergency_stop = true;
@@ -297,7 +298,7 @@ void loop() {
                 prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
                 if (lr_err > prev_err) {
-                    fault("Actuator positions are diverging.");
+                    // fault("Actuator positions are diverging.");
                 }
                 Serial.println("Fixing actuators: ");
                 ledy_pin.write(1);
