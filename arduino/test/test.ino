@@ -286,7 +286,7 @@ void loop() {
             stop_all();
             float prev_err = lr_err;
             float prev_prev_err = lr_err;
-            while (lr_err >= 0.3 * act_fix_err) {
+            while (lr_err >= 0.5 * act_fix_err) {
                 act_bucket.stop();
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
