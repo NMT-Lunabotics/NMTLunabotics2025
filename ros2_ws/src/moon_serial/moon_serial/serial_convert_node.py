@@ -12,7 +12,7 @@ class SerialConvertNode(Node):
         
         self.create_subscription(Actuators, '/actuator_control', self.actuator_control_subscriber, 10)
         self.create_subscription(Motors, '/motor_control', self.motor_control_subscriber, 10)
-        self.create_subscription(Bool, '/servo_control', self.servo_control_subscriber, 10)
+        self.create_subscription(Bool, '/heartbeat_control', self.servo_control_subscriber, 10)
         self.create_subscription(Leds, '/led_control', self.led_control_subscriber, 10)
     
     def actuator_control_subscriber(self, msg):

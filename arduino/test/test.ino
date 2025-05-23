@@ -78,7 +78,7 @@ int mR_speed = 0;
 // #define SERVO_PIN 22
 
 // Servo
-bool servo_state = false;
+bool heartbeat = false;
 
 // LED's
 // TODO implement
@@ -351,6 +351,7 @@ void loop() {
 
         if (emergency_stop) {
             Serial.println("Estopped");
+            ledb_pin.write(false);
         }
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
             + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
@@ -411,11 +412,12 @@ void processMessage(byte* data, int length) {
             }
             break;
         }
-        case 'S': { // Servo control
-            servo_state = data[1];  // Adjusted index to skip the type byte
+        case 'H': { // Servo control
+            heartbeat = data[1];  // Adjusted index to skip the type byte
+            ledb_pin.write(true);
             if (debug_mode) {
-                Serial.print("Servo State: ");
-                Serial.println(servo_state);
+                Serial.print("Heartbeat: ");
+                Serial.println(heartbeat);
             }
             break;
         }
