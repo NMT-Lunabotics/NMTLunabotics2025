@@ -161,7 +161,7 @@ public:
   void vel_ctrl(int speed) {
     speed = constrain(speed, -act_max_vel, act_max_vel);
     speed = speed / act_max_vel * 255;
-    if(abs(speed) < 20) {
+    if(abs(speed) < 10) {
       speed = 0;
     }
     pwm_driver.set_speed(speed);
