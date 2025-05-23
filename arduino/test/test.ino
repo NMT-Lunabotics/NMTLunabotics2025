@@ -241,7 +241,7 @@ void loop() {
     }
 
     // TEST
-    aB_tgt = 50;
+    aLR_tgt = 100;
 
     // if (current_time - last_message_time > estop_timeout) {
     //     emergency_stop = true;
