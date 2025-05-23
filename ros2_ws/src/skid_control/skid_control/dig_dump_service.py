@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from moon_services.srv import DigDump
-from moon_messages.msg import Motors, Actuators  # Updated import for custom messages
+from moon_messages.msg import Motors, Actuators
 import time
 import signal
 import sys
@@ -37,8 +37,8 @@ class DigDumpService(Node):
     def stop_motors(self):
         """Stop the motors"""
         msg = Motors()
-        msg.left = 0  # Changed from 0.0 to 0
-        msg.right = 0  # Changed from 0.0 to 0
+        msg.left = 0
+        msg.right = 0
         self.motor_pub.publish(msg)
         self.get_logger().info('Motors stopped')
 
@@ -55,7 +55,8 @@ class DigDumpService(Node):
     def set_actuators(self, arm_position, bucket_position, wait_time=3.0):
         """Set arm and bucket positions and wait for them to reach the position"""
         if self.interrupted:
-            return
+            return False
+            
         msg = Actuators()
         msg.arm_pos = arm_position
         msg.bucket_pos = bucket_position
@@ -69,17 +70,18 @@ class DigDumpService(Node):
         start_time = time.time()
         while time.time() - start_time < wait_time:
             if self.interrupted:
-                return
+                return False
             time.sleep(0.1)
         self.get_logger().info('Wait complete')
+        return True
 
     def run_motors(self, speed, duration):
         """Run motors at given speed for duration (seconds)"""
         if self.interrupted:
-            return
+            return False
         
         # Convert float to int for the Motors message
-        speed_int = int(speed)  # Convert to integer
+        speed_int = int(speed)
         
         msg = Motors()
         msg.left = speed_int
@@ -92,43 +94,64 @@ class DigDumpService(Node):
         start_time = time.time()
         while time.time() - start_time < duration:
             if self.interrupted:
-                return
+                return False
             time.sleep(0.1)
         
+        return True
+        
+    def execute_action(self, action_type, *args):
+        """Execute a specific action and return success status"""
+        if action_type == "motors":
+            speed, duration = args
+            success = self.run_motors(speed, duration)
+            # Stop motors after each movement action
+            self.stop_motors()
+            return success
+        elif action_type == "actuators":
+            arm_pos, bucket_pos, wait_time = args
+            sucess = self.set_actuators(arm_pos, bucket_pos, wait_time)
+            # Stop actuators after each setting action
+            # self.stop_actuators()
+            return success
+        else:
+            self.get_logger().error(f"Unknown action type: {action_type}")
+            return False
+        
     def dig_dump_callback(self, request, response):
-        """Execute the dig-dump cycle"""
+        """Execute the dig-dump cycle using a list of actions"""
         self.get_logger().info('Starting dig-dump cycle')
         
+        # Define the sequence of actions
+        # Each action is a tuple: (action_type, *parameters)
+        actions = [
+            ("motors", -5, 3.5),                    # Reverse for 3.5s
+            ("actuators", 10, 50, 3.0),             # Set arm=10, bucket=50, wait 3s
+            ("motors", 5, 1.0),                     # Forward for 1s
+            ("actuators", 150, 20, 3.0),            # Set arm=150, bucket=20, wait 3s
+            ("motors", 5, 3.33),                    # Forward for 3.33s
+            ("actuators", 100, 110, 3.0),           # Set arm=100, bucket=110, wait 3s
+        ]
+        
         try:
-            # Run motors backwards for 3.5 seconds
-            self.run_motors(-5, 3.5)
-            if self.interrupted: return response
+            # Execute each action in sequence
+            for action in actions:
+                action_type = action[0]
+                action_params = action[1:]
+                
+                self.get_logger().info(f"Executing action: {action_type} with params: {action_params}")
+                success = self.execute_action(action_type, *action_params)
+                
+                if not success or self.interrupted:
+                    self.get_logger().warn("Action interrupted or failed")
+                    self.stop_motors()
+                    break
             
-            # Set arm position to 10, bucket position to 50 and wait 3 seconds
-            self.set_actuators(10, 50, 3.0)
-            if self.interrupted: return response
-            
-            # Run motors forward for 1 second
-            self.run_motors(5, 1)
-            if self.interrupted: return response
-            
-            # Set bucket position to 20, arm position to 150 and wait 3 seconds
-            self.set_actuators(150, 20, 3.0)
-            if self.interrupted: return response
-            
-            # Run motors forward for 3.33 seconds
-            self.run_motors(5, 3.33)
-            if self.interrupted: return response
-            
-            # Set bucket position to 110, arm position to 100 and wait 3 seconds
-            self.set_actuators(100, 110, 3.0)
-            if self.interrupted: return response
-            
-            # Stop motors
+            # Ensure motors are stopped at the end
             self.stop_motors()
             
-            self.get_logger().info('Dig-dump cycle completed')
-
+            if not self.interrupted:
+                self.get_logger().info('Dig-dump cycle completed successfully')
+            
         except Exception as e:
             self.get_logger().error(f'Error in dig-dump cycle: {str(e)}')
             self.stop_motors()
