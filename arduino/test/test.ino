@@ -141,10 +141,10 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.5;
 
 // Set up actuators
-PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, false);
+PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, true);
 Actuator act_left(left_driver, pidL, potl, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, false);
+PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, true);
 Actuator act_right(right_driver, pidR, potr, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(drv21_pwm, drv21_dir1, drv21_dir2, true);
