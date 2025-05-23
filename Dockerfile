@@ -77,11 +77,14 @@ RUN git clone https://github.com/IntelRealSense/librealsense.git -b v2.55.1 && \
       -DBUILD_EXAMPLES=OFF \
       -DBUILD_GRAPHICAL_EXAMPLES=OFF && \
     make -j"$(nproc)" && make install && ldconfig && \
-    # install udev rules
-    cd ../scripts && sudo ./setup_udev_rules.sh
+    
+# install udev rules    
+# switch into the repo root so the udev script can see config/99-realsense-libusb.rules
+WORKDIR /opt/librealsense
+RUN ./scripts/setup_udev_rules.sh
 
 # Ensure RSUSB-built libs are discoverable
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 # Clone and build realsense-ros2 inside the main workspace
 WORKDIR /home/$USER/ros2_ws/src
