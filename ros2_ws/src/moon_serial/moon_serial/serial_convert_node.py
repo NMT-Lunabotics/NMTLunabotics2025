@@ -12,7 +12,7 @@ class SerialConvertNode(Node):
         
         self.create_subscription(Actuators, '/actuator_control', self.actuator_control_subscriber, 10)
         self.create_subscription(Motors, '/motor_control', self.motor_control_subscriber, 10)
-        self.create_subscription(Bool, '/heartbeat', self.heartbeat_subscriber, 1)
+        self.create_subscription(Bool, '/heartbeat', self.heartbeat_subscriber, 10)
         self.create_subscription(Leds, '/led_control', self.led_control_subscriber, 10)
     
     def actuator_control_subscriber(self, msg):
@@ -24,7 +24,7 @@ class SerialConvertNode(Node):
         self.send_serial_data(data)
     
     def heartbeat_subscriber(self, msg):
-        data = struct.pack('>BB', ord('H'), 1 if msg.data else 0)
+        data = struct.pack('>BB', ord('H'), 1)
         self.send_serial_data(data)
     
     def led_control_subscriber(self, msg):
