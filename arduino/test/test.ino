@@ -325,6 +325,7 @@ void loop() {
             }
 
             if (aB_tgt >= 0) {
+                aB_tgt = constrain(aB_tgt, bucket_min, bucket_max);
                 act_bucket.tgt_ctrl(aB_tgt);
             } else if((aB_speed >0 && aB_pos < bucket_max) || (aB_speed <0 && aB_pos > bucket_min)){
                 act_bucket.vel_ctrl(aB_speed);
@@ -387,7 +388,6 @@ void processMessage(byte* data, int length) {
         case 'A': { // Actuator control
             aLR_tgt = (int16_t)((data[1] << 8) | data[2]);  // Adjusted index to skip the type byte
             aB_tgt = (int16_t)((data[3] << 8) | data[4]);
-            aB_tgt = constrain(aB_tgt, bucket_min, bucket_max);
             aL_speed = -(int8_t)data[5];
             aR_speed = aL_speed;
             aB_speed = -(int8_t)data[6];
