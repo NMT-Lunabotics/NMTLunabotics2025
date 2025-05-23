@@ -92,21 +92,21 @@ class DigDumpService(Node):
         
         try:
             # Run motors backwards for 5 seconds
-            self.run_motors(-1, 5.0)  # Changed from -1.0 to -1
+            self.run_motors(-5, 3.5)  # Changed from -1.0 to -1
             if self.interrupted: return response
             
             # Set arm position to 10, bucket position to 50
             self.set_actuators(10, 50)
             
             # Run motors forward for 2 seconds
-            self.run_motors(1, 2.0)  # Changed from 1.0 to 1
+            self.run_motors(5, 1)  # Changed from 1.0 to 1
             if self.interrupted: return response
             
             # Set bucket position to 20, arm position to 150
             self.set_actuators(150, 20)
             
             # Run motors forward for 4 seconds
-            self.run_motors(1, 4.0)  # Changed from 1.0 to 1
+            self.run_motors(5, 3.33)  # Changed from 1.0 to 1
             if self.interrupted: return response
             
             # Set bucket position to 110, arm position to 100
