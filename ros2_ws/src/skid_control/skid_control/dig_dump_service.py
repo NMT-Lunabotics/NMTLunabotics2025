@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Empty
-from skid_control.msg import Motors, Actuators  # Updated import for custom messages
+from moon_messages.msg import Motors, Actuators  # Updated import for custom messages
 import time
 import signal
 import sys
