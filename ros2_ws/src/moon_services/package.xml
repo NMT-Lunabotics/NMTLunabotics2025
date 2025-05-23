@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>moon_services</name>
+  <version>0.0.1</version>
+  <description>Service-only Python package</description>
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
