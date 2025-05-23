@@ -153,7 +153,7 @@ public:
 
   void tgt_ctrl(int tgt, float other_pos) {
     float tgt_error = tgt - pos_mm;
-    float rel_error = other_pos - pos_mm;
+    float rel_error = pos_mm - other_pos;
     float speed = pid.update(tgt_error, rel_error);
     vel_ctrl(speed);
   }

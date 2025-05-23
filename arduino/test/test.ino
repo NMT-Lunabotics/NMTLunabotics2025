@@ -141,10 +141,10 @@ PID pidB(3.0, 0.001, 0.4);
 float vel_gain = 2.5;
 
 // Set up actuators
-PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, false);
+PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, true);
 Actuator act_left(left_driver, pidL, potl, AL_POT_MIN, AL_POT_MAX, ALR_STROKE, act_max_vel);
 
-PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, false);
+PWM_Driver right_driver(drv11_pwm, drv11_dir1, drv11_dir2, true);
 Actuator act_right(right_driver, pidR, potr, AR_POT_MIN, AR_POT_MAX, ALR_STROKE, act_max_vel);
 
 PWM_Driver bucket_driver(drv21_pwm, drv21_dir1, drv21_dir2, true);
@@ -241,12 +241,12 @@ void loop() {
     }
 
     // TEST
-    aB_tgt = 40;
-    aLR_tgt = 10;
+    // aB_tgt = 40
+    //aLR_tgt = 10;
 
-    // if (current_time - last_message_time > estop_timeout) {
-    //     emergency_stop = true;
-    // }
+    if (current_time - last_message_time > estop_timeout) {
+       emergency_stop = true;
+    }
 
     if (current_time - last_update_actuator_time >= 1000 / update_actuator_feedback) {
         last_update_actuator_time = current_time;
@@ -291,8 +291,8 @@ void loop() {
                 aR_pos = act_right.update_pos();
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                act_left.vel_ctrl(aL_speed + factor);
+                act_right.vel_ctrl(aR_speed - factor);
                 delay(5);
 
                 prev_err = lr_err;
@@ -320,8 +320,8 @@ void loop() {
                 act_right.tgt_ctrl(aLR_tgt);
             } else {
                 float factor = (aL_pos - aR_pos) * vel_gain;
-                act_left.vel_ctrl(aL_speed - factor);
-                act_right.vel_ctrl(aR_speed + factor);
+                act_left.vel_ctrl(aL_speed + factor);
+                act_right.vel_ctrl(aR_speed - factor);
             }
 
             if (aB_tgt >= 0) {
