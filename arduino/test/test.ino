@@ -354,7 +354,8 @@ void loop() {
             ledb_pin.write(false);
         }
         Serial.println("<F," + String(aL_pos) + "," + String(aR_pos) + "," + String(aB_pos)
-            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aLR_tgt)
+            + "," + String(aL_speed) + "," + String(aR_speed) + ',' + String(aB_speed)
+            + "," + String(aLR_tgt) + "," + String(aB_tgt)
             + "," + String(mL_speed) + "," + String(mR_speed) + ">");
     }
 
