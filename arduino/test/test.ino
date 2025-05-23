@@ -285,7 +285,7 @@ void loop() {
         if (lr_err >= act_fix_err && lr_err < act_max_err) {
             stop_all();
             float prev_err = lr_err;
-            while (lr_err >= 0.5 * act_fix_err) {
+            while (lr_err >= 0.3 * act_fix_err) {
                 act_bucket.stop();
                 aL_pos = act_left.update_pos();
                 aR_pos = act_right.update_pos();
@@ -298,7 +298,7 @@ void loop() {
                 prev_err = lr_err;
                 lr_err = abs(aL_pos - aR_pos);
                 if (lr_err > prev_err) {
-                    // fault("Actuator positions are diverging.");
+                    fault("Actuator positions are diverging.");
                 }
                 Serial.println("Fixing actuators: ");
                 ledy_pin.write(1);
