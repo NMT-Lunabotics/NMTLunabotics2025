@@ -37,6 +37,12 @@ def generate_launch_description():
             executable='serial_convert_node',
             name='serial_convert_node'
         ),
+        Node(  # Add the heartbeat_publisher node
+            package='moon_serial',
+            executable='heartbeat_publisher',
+            name='heartbeat_publisher',
+            output='screen'
+        ),
         TimerAction(
             period=2.0,  # Wait 2 seconds after nodes start
             actions=[led_on_command],
