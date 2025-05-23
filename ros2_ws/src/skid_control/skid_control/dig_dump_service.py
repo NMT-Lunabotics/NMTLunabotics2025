@@ -109,7 +109,7 @@ class DigDumpService(Node):
             return success
         elif action_type == "actuators":
             arm_pos, bucket_pos, wait_time = args
-            sucess = self.set_actuators(arm_pos, bucket_pos, wait_time)
+            success = self.set_actuators(arm_pos, bucket_pos, wait_time)
             # Stop actuators after each setting action
             # self.stop_actuators()
             return success
