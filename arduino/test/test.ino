@@ -292,8 +292,8 @@ void loop() {
                 aR_pos = act_right.update_pos();
                 float factor = (aL_pos - aR_pos) * vel_gain;
 
-                act_left.vel_ctrl(aL_speed + factor);
-                act_right.vel_ctrl(aR_speed - factor);
+                act_left.vel_ctrl(factor);
+                act_right.vel_ctrl(-factor);
                 delay(5);
 
                 prev_prev_err = prev_err;
@@ -302,7 +302,7 @@ void loop() {
                 if (lr_err > prev_err && prev_err > prev_prev_err) {
                     fault("Actuator positions are diverging.");
                 }
-                Serial.println("Fixing actuators: " + String(aL_pos) + " " + String(aR_pos) + " " + String(lr_err));
+                Serial.println("Fixing actuators: " + String(aL_pos) + " " + String(aR_pos) + " " + String(aL_pos - aR_pos));
                 ledy_pin.write(1);
             }
             act_left.stop();
