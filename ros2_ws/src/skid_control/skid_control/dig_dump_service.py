@@ -37,8 +37,8 @@ class DigDumpService(Node):
     def stop_motors(self):
         """Stop the motors"""
         msg = Motors()
-        msg.left = 0.0
-        msg.right = 0.0
+        msg.left = 0  # Changed from 0.0 to 0
+        msg.right = 0  # Changed from 0.0 to 0
         self.motor_pub.publish(msg)
         self.get_logger().info('Motors stopped')
 
@@ -57,8 +57,10 @@ class DigDumpService(Node):
         if self.interrupted:
             return
         msg = Actuators()
-        msg.arm = arm_position
-        msg.bucket = bucket_position
+        msg.arm_pos = arm_position  # Changed from msg.arm to msg.arm_pos
+        msg.bucket_pos = bucket_position  # Changed from msg.bucket to msg.bucket_pos
+        msg.arm_vel = 0  # Need to set these as well since they're required fields
+        msg.bucket_vel = 0
         self.actuator_pub.publish(msg)
         self.get_logger().info(f'Arm position set to {arm_position}, Bucket position set to {bucket_position}')
         
@@ -67,12 +69,15 @@ class DigDumpService(Node):
         if self.interrupted:
             return
         
+        # Convert float to int for the Motors message
+        speed_int = int(speed)  # Convert to integer
+        
         msg = Motors()
-        msg.left = speed
-        msg.right = speed
+        msg.left = speed_int
+        msg.right = speed_int
         self.motor_pub.publish(msg)
         
-        self.get_logger().info(f'Running motors at speed {speed} for {duration} seconds')
+        self.get_logger().info(f'Running motors at speed {speed_int} for {duration} seconds')
         
         # Wait for specified duration while checking for interrupts
         start_time = time.time()
@@ -87,21 +92,21 @@ class DigDumpService(Node):
         
         try:
             # Run motors backwards for 5 seconds
-            self.run_motors(-1.0, 5.0)
+            self.run_motors(-1, 5.0)  # Changed from -1.0 to -1
             if self.interrupted: return response
             
             # Set arm position to 10, bucket position to 50
             self.set_actuators(10, 50)
             
             # Run motors forward for 2 seconds
-            self.run_motors(1.0, 2.0)
+            self.run_motors(1, 2.0)  # Changed from 1.0 to 1
             if self.interrupted: return response
             
             # Set bucket position to 20, arm position to 150
             self.set_actuators(150, 20)
             
             # Run motors forward for 4 seconds
-            self.run_motors(1.0, 4.0)
+            self.run_motors(1, 4.0)  # Changed from 1.0 to 1
             if self.interrupted: return response
             
             # Set bucket position to 110, arm position to 100
@@ -111,7 +116,7 @@ class DigDumpService(Node):
             self.stop_motors()
             
             self.get_logger().info('Dig-dump cycle completed')
-        
+    
         except Exception as e:
             self.get_logger().error(f'Error in dig-dump cycle: {str(e)}')
             self.stop_motors()
