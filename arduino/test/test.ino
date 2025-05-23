@@ -138,7 +138,7 @@ InPin potb(POTB_PIN);
 PID pidL(2.2, 0.0022, 0.34, 2.0);
 PID pidR(1.85, 0.0018, 0.31, 1.7);
 PID pidB(3.0, 0.001, 0.4);
-float vel_gain = 2.5;
+float vel_gain = 3.0; // Gain for dual actuator correction
 
 // Set up actuators
 PWM_Driver left_driver(drv12_pwm, drv12_dir1, drv12_dir2, true);
